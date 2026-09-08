@@ -185,7 +185,7 @@
     border-right: 1px solid var(--line);
   }
   .plan-wrap svg { width: 100%; height: 100%; display: block; cursor: grab;
-    -webkit-user-select: none; user-select: none; }
+    -webkit-user-select: none; user-select: none; touch-action: none; }
   .plan-wrap svg.placing, .plan-wrap svg.placing * { cursor: crosshair; }
   /* last, so a pan in progress wins over the placement crosshair */
   .plan-wrap svg.panning, .plan-wrap svg.panning * { cursor: grabbing; }
@@ -195,13 +195,40 @@
     pointer-events: none;
   }
   .placing-banner {
-    position: absolute; top: .8rem; left: 50%; transform: translateX(-50%);
+    position: absolute; top: .8rem; left: 0; right: 0; margin: 0 auto; width: max-content;
     background: var(--terra); color: #F6F0E2;
     font-size: .7rem; padding: .35rem .9rem; border-radius: 2px;
     box-shadow: var(--shadow);
     display: none; max-width: 80%; text-align: center;
   }
   .placing-banner.active { display: block; }
+  /* touch: the spot is chosen by a tap and confirmed by a button */
+  .placing-confirm {
+    position: absolute; bottom: .7rem; left: 0; right: 0; margin: 0 auto; width: max-content;
+    display: none; gap: .5rem; z-index: 5;
+  }
+  .placing-confirm button { white-space: nowrap; }
+  .plan-wrap.confirming .plan-caption { display: none; }
+  .placing-confirm.active { display: flex; }
+  .placing-confirm button {
+    font-family: Optima, Candara, "Gill Sans", sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; font-size: .7rem; padding: .5rem .9rem; border-radius: 2px;
+    border: 1px solid var(--bronze); background: var(--panel); color: var(--ink);
+    box-shadow: var(--shadow); cursor: pointer; min-height: 2.2rem;
+  }
+  .placing-confirm button.go { background: var(--terra); border-color: var(--terra); color: #F6F0E2; }
+  .placing-confirm button.go:disabled { opacity: .45; cursor: default; }
+  /* zoom buttons for screens without a scroll wheel */
+  .plan-zoom {
+    position: absolute; right: .6rem; bottom: .7rem; z-index: 5;
+    display: none; flex-direction: column; gap: .3rem;
+  }
+  .plan-zoom button {
+    width: 2.2rem; height: 2.2rem; padding: 0; border-radius: 2px;
+    border: 1px solid var(--bronze); background: var(--panel); color: var(--ink);
+    font-size: 1.15rem; line-height: 1; box-shadow: var(--shadow); cursor: pointer;
+  }
+  @media (pointer: coarse) { .plan-zoom { display: flex; } }
   .placing-banner.bad { background: var(--danger); }
   .herald-back {
     position: absolute; inset: 0; z-index: 20;
@@ -355,6 +382,7 @@
   .sitefile .gk { font-style: italic; color: var(--terra); font-size: .85rem; }
   .sitefile .lvl { font-size: .66rem; color: var(--ink-soft); letter-spacing: .12em; }
   .sitefile p { margin: .45rem 0 0; font-size: .82rem; color: var(--ink-soft); }
+  .sitefile .place-btn { display: none; margin-top: .6rem; }
   .sitefile .cite {
     margin-top: .55rem; padding-top: .5rem; border-top: 1px dashed var(--line);
     font-size: .75rem; color: var(--ink-soft);
@@ -436,6 +464,9 @@
   #ghost polygon.fpd { fill: var(--verdigris); fill-opacity: .18; stroke: var(--verdigris); stroke-dasharray: 4 3; stroke-width: 1.4; }
   #ghost.bad polygon.fpd { fill: var(--danger); fill-opacity: .15; stroke: var(--danger); }
   #ghost .ghost-sprite { opacity: .6; }
+  /* a spot chosen by tap and waiting for the word: a solid outline */
+  #ghost.proposed polygon.fpd { stroke: var(--terra); stroke-dasharray: none; stroke-width: 2.2; fill: var(--terra); fill-opacity: .14; }
+  #ghost.proposed.bad polygon.fpd { stroke: var(--danger); stroke-dasharray: 4 3; fill: var(--danger); }
   #ghost polygon.hint-zone { fill: var(--verdigris); fill-opacity: .12; stroke: none; }
   #ghost polygon.hint-target { fill: var(--verdigris); fill-opacity: .1; stroke: var(--verdigris); stroke-width: 1.2; stroke-dasharray: 5 4; }
   #ghost polyline.hint-edge { fill: none; stroke: var(--verdigris); stroke-width: 1.2; stroke-dasharray: 5 4; }
@@ -450,6 +481,8 @@
     padding: .45rem .65rem .5rem; box-shadow: var(--shadow);
     font-size: .74rem; line-height: 1.45; color: var(--ink-soft);
   }
+  .plan-tip.pinned { pointer-events: auto; }
+  .plan-tip .t-link { display: block; margin-top: .4rem; color: var(--terra); text-decoration: underline; cursor: pointer; font-size: .76rem; }
   .plan-tip .t-name { font-weight: 600; color: var(--ink); font-size: .8rem; }
   .plan-tip .t-name .t-gk { font-weight: 400; }
   .plan-tip .t-gk { font-style: italic; color: var(--terra); }
@@ -749,7 +782,16 @@
   @media (max-width: 860px) {
     /* one column: the map on top, the panel below as an ordinary page. The
        action bar stays at the top of the screen while the panel scrolls. */
-    .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+    /* the page is the scroller: let the body grow with the panel, and keep the
+       grid from being squeezed to the viewport (which left the footer floating
+       in the middle of the panel) */
+    html, body { height: auto; min-height: 100%; }
+    .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; flex: none; }
+    .sitefile .place-btn { display: block; }
+    .plan-zoom { display: flex; }
+    .plan-caption { right: 3.4rem; }
+    .placing-banner { top: .5rem; font-size: .62rem; padding: .3rem .6rem; max-width: 90%; }
+    #ghost polygon.hint-target, #ghost polyline.hint-edge { stroke-width: 2; }
     .plan-wrap { height: 46vh; min-height: 260px; border-right: none; border-bottom: 1px solid var(--line); }
     .rail { overflow: visible; min-width: 0; }
     .railbar { top: 0; padding: .5rem .8rem; flex-wrap: wrap; }
@@ -836,6 +878,15 @@
     <div class="plan-tip" id="planTip"></div>
 
     <div class="placing-banner lapidary" id="placingBanner"></div>
+    <div class="placing-confirm" id="placingConfirm">
+      <button type="button" id="placeCancelBtn">Cancel</button>
+      <button type="button" class="go" id="placeGoBtn" disabled>Build here</button>
+    </div>
+    <div class="plan-zoom" id="planZoom">
+      <button type="button" id="zoomInBtn" aria-label="Zoom in" title="Zoom in">+</button>
+      <button type="button" id="zoomOutBtn" aria-label="Zoom out" title="Zoom out">&minus;</button>
+      <button type="button" id="zoomFitBtn" aria-label="Show the whole sanctuary" title="Show the whole sanctuary">&#8962;</button>
+    </div>
     <div class="herald-back" id="heraldBack">
       <div class="herald" role="dialog" aria-modal="false" aria-labelledby="heraldTitle">
         <svg id="heraldVig" viewBox="0 0 240 92" aria-hidden="true"></svg>
@@ -909,7 +960,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. kinetos</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. haptikos</span>
 </footer>
 
 <div class="found-back open" id="foundBack">
@@ -3796,15 +3847,42 @@
   /* ---------- hover tooltip ---------- */
 
   const tipEl = document.getElementById("planTip");
+  // the last pointer to touch the page: a finger has no hover, so on a touch
+  // screen the explanations open on tap and stay until the next tap
+  let coarse = !!(window.matchMedia && (matchMedia("(pointer: coarse)").matches || matchMedia("(hover: none)").matches));
+  document.addEventListener("pointerdown", e => { if (e.pointerType) coarse = e.pointerType === "touch"; }, true);
+  let tipPinned = false;
 
   function tipShow(html, evt) {
-    if (S.placingId) return; // the placement ghost owns the pointer
+    if (S.placingId || coarse) return; // the placement ghost owns the pointer; a finger uses tipPin
     tipEl.innerHTML = html;
     tipEl.style.display = "block";
     tipMove(evt);
   }
+  // a tap opens the explanation above the finger and leaves it there; the next
+  // tap anywhere else closes it
+  function tipPin(html, evt, siteFile) {
+    if (S.placingId) return;
+    tipEl.innerHTML = html + (siteFile ? '<span class="t-link" id="tipFileLink">Open the site file &darr;</span>' : "");
+    tipEl.classList.add("pinned");
+    tipEl.style.display = "block";
+    tipPinned = true;
+    const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+    let x = evt.clientX - w / 2, y = evt.clientY - h - 18;
+    if (y < 8) y = evt.clientY + 18;
+    x = Math.min(window.innerWidth - w - 8, Math.max(8, x));
+    y = Math.min(window.innerHeight - h - 8, Math.max(8, y));
+    tipEl.style.left = x + "px";
+    tipEl.style.top = y + "px";
+    const link = document.getElementById("tipFileLink");
+    if (link) link.addEventListener("click", e => { e.stopPropagation(); tipHide(); focusSiteFile(true); });
+    evt._tipPinned = true;
+  }
+  document.addEventListener("pointerdown", e => {
+    if (tipPinned && !tipEl.contains(e.target)) tipHide();
+  }, true);
   function tipMove(evt) {
-    if (tipEl.style.display !== "block") return;
+    if (tipEl.style.display !== "block" || tipPinned) return;
     let x = evt.clientX + 14;
     let y = evt.clientY + 14;
     if (x + tipEl.offsetWidth > window.innerWidth - 8) x = evt.clientX - tipEl.offsetWidth - 12;
@@ -3812,12 +3890,14 @@
     tipEl.style.left = Math.max(8, x) + "px";
     tipEl.style.top = Math.max(8, y) + "px";
   }
-  function tipHide() { tipEl.style.display = "none"; }
+  function tipHide() { tipEl.style.display = "none"; tipEl.classList.remove("pinned"); tipPinned = false; }
 
   function hoverTip(target, htmlFn) {
     target.addEventListener("mouseenter", e => tipShow(htmlFn(), e));
     target.addEventListener("mousemove", tipMove);
     target.addEventListener("mouseleave", tipHide);
+    if (target instanceof SVGElement) // the map's features; the standing strip has its own modal
+      target.addEventListener("click", e => { if (coarse && !e._tipPinned) tipPin(htmlFn(), e, false); });
   }
 
   function featTip(name, gk, desc) {
@@ -3833,7 +3913,7 @@
       (gkOf(bld) ? '<div class="t-gk">' + gkOf(bld) + "</div>" : "") +
       "<div>" + (bld.tip || "") + "</div>" +
       '<div class="t-stats num">+' + drawOf(bld.id, l) + " pilgrims per year · +" + l.renown + " monuments · upkeep " + l.upkeep + " dr. per year</div>" +
-      '<div class="t-hint">Click to inspect' + (bld.levels[b.lvl + 1] ? " & upgrade" : "") + "</div>";
+      (coarse ? "" : '<div class="t-hint">Click to inspect' + (bld.levels[b.lvl + 1] ? " & upgrade" : "") + "</div>");
   }
 
   let planTerrainG = null;
@@ -4054,7 +4134,7 @@
         const lbl = el("text", { x: b.x, y: b.y + fp[1]/2 + 11, class: "bld-label gk-label" }, g);
         lbl.textContent = bld.gk + (bld.levels.length > 1 ? " " + "·".repeat(0) + roman(b.lvl + 1) : "");
       }
-      const onClick = (e) => { e.stopPropagation(); tipHide(); inspect(i); };
+      const onClick = (e) => { e.stopPropagation(); tipHide(); inspect(i); if (coarse) tipPin(builtTip(i), e, true); };
       g.addEventListener("click", onClick);
       g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inspect(i); } });
       hoverTip(g, () => builtTip(i));
@@ -4128,23 +4208,46 @@
     }
   }
 
+  // where the ghost stands, in plan coordinates. With a mouse it follows the
+  // pointer; on a touch screen a tap sets it and a button confirms
+  let ghostPos = null;
+
   function updateGhost(evt) {
-    svg.classList.toggle("placing", !!S.placingId);
     if (!S.placingId) { clearGhost(); return; }
     tipHide();
-    const p = isoPlanPoint(evt);
+    drawGhost(isoPlanPoint(evt));
+  }
+
+  function drawGhost(p) {
+    svg.classList.toggle("placing", !!S.placingId);
+    if (!S.placingId) { clearGhost(); return; }
+    ghostPos = p;
     const bld = BID[S.placingId];
+    const banner = document.getElementById("placingBanner");
+    const goBtn = document.getElementById("placeGoBtn");
+    if (!ghostLayer) ghostLayer = el("g", { id: "ghost" }, svg);
+    svg.appendChild(ghostLayer); // stay above the scene
+    ghostLayer.innerHTML = "";
+    drawSitingHints(ghostLayer, bld);
+    banner.classList.add("active");
+    document.getElementById("placingConfirm").classList.toggle("active", coarse);
+    document.querySelector(".plan-wrap").classList.toggle("confirming", coarse);
+    if (!p) { // placement just chosen: the allowed ground alone, and what to do
+      ghostLayer.setAttribute("class", "");
+      banner.classList.remove("bad");
+      banner.textContent = coarse
+        ? "Tap the map where the " + bld.name.toLowerCase() + " should stand"
+        : "Move over the map to site the " + bld.name.toLowerCase() + " — Esc to cancel";
+      goBtn.disabled = true;
+      return;
+    }
     const fp = bld.levels[0].fp;
     const v = validate(S.placingId, 0, p.x, p.y);
     const fullDr = costOf(S.placingId, bld.levels[0]);
     const major = fullDr >= MAJOR_COST;
     const needDr = Math.round(fullDr * (major ? 0.09 : 0.3)); // sponsored share's down payment
     const short = v.ok && !major && S.treasury < needDr;
-    if (!ghostLayer) ghostLayer = el("g", { id: "ghost" }, svg);
-    svg.appendChild(ghostLayer); // stay above the scene
-    ghostLayer.innerHTML = "";
-    ghostLayer.setAttribute("class", v.ok && !short ? "" : "bad");
-    drawSitingHints(ghostLayer, bld);
+    ghostLayer.setAttribute("class", (coarse ? "proposed" : "") + (v.ok && !short ? "" : " bad"));
     const hx = fp[0] / 2, hy = fp[1] / 2;
     el("polygon", { class: "fpd", points: isoPts(
       [isoT(p.x - hx, p.y - hy, 0), isoT(p.x + hx, p.y - hy, 0),
@@ -4155,27 +4258,40 @@
       const [gx, gy] = isoT(p.x, p.y, 0);
       fns[0](sg, gx, gy, isoKEff(S.placingId, 0, fns[0], fp), false);
     }
-    const banner = document.getElementById("placingBanner");
     banner.classList.toggle("bad", !v.ok || short);
+    goBtn.disabled = !v.ok || short;
     banner.textContent = !v.ok
       ? (v.reason || "Cannot build here")
       : short
         ? "The chest holds " + fmt(S.treasury) + " dr. — the down payment needs " + fmt(needDr)
-        : major
-          ? "A capital work — click to see how it can be paid for (Esc to cancel)"
-          : "Begin the work: " + bld.name.toLowerCase() + " — click to start building (Esc to cancel)";
+        : coarse
+          ? (major ? "A capital work — Build here shows how it can be paid for"
+                   : "Build here, or tap another spot to move it")
+          : major
+            ? "A capital work — click to see how it can be paid for (Esc to cancel)"
+            : "Begin the work: " + bld.name.toLowerCase() + " — click to start building (Esc to cancel)";
   }
 
   function clearGhost() {
     svg.classList.remove("placing");
+    ghostPos = null;
     if (ghostLayer) { ghostLayer.remove(); ghostLayer = null; }
+    document.getElementById("placingConfirm").classList.remove("active");
+    document.querySelector(".plan-wrap").classList.remove("confirming");
   }
 
-  svg.addEventListener("mousemove", updateGhost);
+  svg.addEventListener("mousemove", evt => { if (!coarse) updateGhost(evt); });
   svg.addEventListener("click", (evt) => {
     if (!S.placingId) return;
     const p = isoPlanPoint(evt);
+    if (coarse) { tipHide(); drawGhost(p); return; } // a tap sites the ghost; "Build here" confirms
     attemptPlace(S.placingId, p.x, p.y);
+  });
+  document.getElementById("placeGoBtn").addEventListener("click", () => {
+    if (S.placingId && ghostPos) attemptPlace(S.placingId, ghostPos.x, ghostPos.y);
+  });
+  document.getElementById("placeCancelBtn").addEventListener("click", () => {
+    S.placingId = null; clearGhost(); renderAll();
   });
 
   /* ================================================================== */
@@ -5438,18 +5554,28 @@
     return pt.matrixTransform(svg.getScreenCTM().inverse());
   }
 
-  svg.addEventListener("wheel", evt => {
-    evt.preventDefault();
-    const step = evt.deltaY * (evt.deltaMode === 1 ? 16 : evt.deltaMode === 2 ? 320 : 1);
-    const z = Math.min(CAM_ZMAX, Math.max(CAM_ZMIN, cam.z * Math.exp(-step * 0.0016)));
-    if (Math.abs(z - cam.z) < 1e-4) return;
-    const before = camPoint(evt);
+  // zoom to z, holding the ground under a client point still
+  function camZoomTo(z, anchor) {
+    z = Math.min(CAM_ZMAX, Math.max(CAM_ZMIN, z));
+    if (Math.abs(z - cam.z) < 1e-4) return false;
+    const before = camPoint(anchor);
     cam.z = z;
     camApply();
-    const after = camPoint(evt); // hold the ground under the pointer still
+    const after = camPoint(anchor);
     cam.cx += before.x - after.x;
     cam.cy += before.y - after.y;
     camApply();
+    return true;
+  }
+  function svgCentre() {
+    const r = svg.getBoundingClientRect();
+    return { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+  }
+
+  svg.addEventListener("wheel", evt => {
+    evt.preventDefault();
+    const step = evt.deltaY * (evt.deltaMode === 1 ? 16 : evt.deltaMode === 2 ? 320 : 1);
+    if (!camZoomTo(cam.z * Math.exp(-step * 0.0016), evt)) return;
     // a drag in flight measures from where it started: re-baseline it, or the
     // next pointermove would undo the zoom and then pan at the old scale
     if (camDrag) {
@@ -5457,21 +5583,52 @@
       camDrag.cx = cam.cx; camDrag.cy = cam.cy;
       camDrag.sc = (svg.getScreenCTM() || { a: 1 }).a || 1;
     }
-    if (S.placingId) updateGhost(evt);
+    if (S.placingId && !coarse) updateGhost(evt);
   }, { passive: false });
+  document.getElementById("zoomInBtn").addEventListener("click", () => camZoomTo(cam.z * 1.35, svgCentre()));
+  document.getElementById("zoomOutBtn").addEventListener("click", () => camZoomTo(cam.z / 1.35, svgCentre()));
+  document.getElementById("zoomFitBtn").addEventListener("click", () => camRest());
 
   // the drag listens on the window rather than taking pointer capture: capture
   // would retarget mouseup to the <svg>, and the browser then fires the click
   // on the <svg> instead of on the sprite that was pressed, which would swallow
   // every click that opens a building's site file
   let camDrag = null, camMoved = false;
+  const fingers = new Map(); // touches on the map, by pointer id
+  let pinch = null;
+  function dragFrom(x, y) {
+    camDrag = { x, y, cx: cam.cx, cy: cam.cy, sc: (svg.getScreenCTM() || { a: 1 }).a || 1 };
+  }
   svg.addEventListener("pointerdown", evt => {
-    if (evt.button !== 0 || evt.pointerType === "touch") return;
-    camDrag = { x: evt.clientX, y: evt.clientY, cx: cam.cx, cy: cam.cy,
-                sc: (svg.getScreenCTM() || { a: 1 }).a || 1 };
+    if (evt.pointerType === "touch") {
+      if (evt.isPrimary) { fingers.clear(); pinch = null; } // a new gesture: forget any finger whose release was lost
+      fingers.set(evt.pointerId, { x: evt.clientX, y: evt.clientY });
+      if (fingers.size === 2) { // a second finger: the drag becomes a pinch
+        const [a, b] = [...fingers.values()];
+        const mid = { clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 };
+        pinch = { d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), z: cam.z, ground: camPoint(mid) };
+        camDrag = null; camMoved = true; // neither finger's release is a tap
+        svg.classList.add("panning"); tipHide();
+        return;
+      }
+      if (fingers.size > 2) return;
+    } else if (evt.button !== 0) return;
+    dragFrom(evt.clientX, evt.clientY);
     camMoved = false;
   });
   window.addEventListener("pointermove", evt => {
+    if (pinch && fingers.has(evt.pointerId)) {
+      fingers.set(evt.pointerId, { x: evt.clientX, y: evt.clientY });
+      const [a, b] = [...fingers.values()];
+      const mid = { clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 };
+      cam.z = Math.min(CAM_ZMAX, Math.max(CAM_ZMIN, pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d));
+      camApply();
+      const cur = camPoint(mid); // the ground first held between the fingers follows them
+      cam.cx += pinch.ground.x - cur.x;
+      cam.cy += pinch.ground.y - cur.y;
+      camApply();
+      return;
+    }
     if (!camDrag) return;
     const dx = evt.clientX - camDrag.x, dy = evt.clientY - camDrag.y;
     if (!camMoved && Math.hypot(dx, dy) < 4) return;
@@ -5481,7 +5638,18 @@
     cam.cy = camDrag.cy - dy / camDrag.sc;
     camApply();
   });
-  function camEnd() {
+  function camEnd(evt) {
+    if (evt && evt.pointerType === "touch") {
+      fingers.delete(evt.pointerId);
+      if (fingers.size >= 2) return;
+      if (fingers.size === 1) { // one finger lifted: the other goes on panning
+        pinch = null;
+        const f = [...fingers.values()][0];
+        dragFrom(f.x, f.y);
+        return;
+      }
+      pinch = null;
+    }
     camDrag = null;
     svg.classList.remove("panning");
   }
@@ -5913,6 +6081,7 @@
         wg.addEventListener("click", ev => {
           if (S.placingId) return;
           ev.stopPropagation(); tipHide(); inspect(periIdx);
+          if (coarse) tipPin(builtTip(periIdx), ev, true);
         });
         hoverTip(wg, () => builtTip(periIdx));
       }
@@ -6067,6 +6236,7 @@
         wrap.addEventListener("click", ev => {
           if (S.placingId) return; // the placement click falls through to the svg
           ev.stopPropagation(); tipHide(); inspect(idx);
+          if (coarse) tipPin(builtTip(idx), ev, true);
         });
         hoverTip(wrap, () => builtTip(idx));
       }});
@@ -9494,10 +9664,20 @@
 
   // bring the site file to the top of the rail, rather than the rail's top —
   // the entry itself is what the player just asked to see
-  function focusSiteFile() {
+  function focusSiteFile(force) {
     const rail = document.querySelector(".rail"), sec = document.getElementById("infoSection");
     if (!rail || !sec) return;
+    if (getComputedStyle(rail).overflowY === "visible") { // one column: the page itself scrolls
+      if (!force) return; // a tap on the map keeps the map in view
+      const bar = document.getElementById("railBar");
+      window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - (bar ? bar.offsetHeight : 0) - 6, behavior: "smooth" });
+      return;
+    }
     rail.scrollTop += sec.getBoundingClientRect().top - rail.getBoundingClientRect().top - 8;
+  }
+  function focusMap() {
+    const wrap = document.querySelector(".plan-wrap");
+    window.scrollTo({ top: wrap.getBoundingClientRect().top + window.scrollY - 2, behavior: "smooth" });
   }
 
   // the first built instance of this type whose next stage is within reach
@@ -9552,7 +9732,7 @@
           if (!S.placingId) clearGhost();
           showCatalogFile(b);
           renderAll();
-          focusSiteFile();
+          focusSiteFile(true);
         };
         card.addEventListener("click", act);
         card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
@@ -9593,7 +9773,14 @@
             fmt(Math.round(costOf(b.id, l) * 0.1)) + " and " + fmt(Math.round(costOf(b.id, l) * 0.4)) + " dr., depending on the conditions accepted, and comes from the building fund, which holds " + fmt(S.fund) + " dr. Public money brings public officials with it.</div>"
           : "") +
         '<div class="cite">' + l.cite + "</div>" +
+        '<button type="button" class="act place-btn" id="placeBtn">Place it on the map &uarr;</button>' +
       "</div>";
+    // one-column layout only (see the phone block): scroll up to the map, and
+    // take up the placement again if it was cancelled meanwhile
+    document.getElementById("placeBtn").addEventListener("click", () => {
+      if (S.placingId !== b.id) { S.placingId = b.id; renderAll(); }
+      focusMap();
+    });
   }
 
   /* — demolition: anything the player raised can come down again; the altar
@@ -9941,6 +10128,8 @@
     renderConsult();
     renderPalette();
     renderIso();
+    if (S.placingId) drawGhost(ghostPos); // the allowed ground shows as soon as a work is chosen
+    else if (ghostLayer) clearGhost();
     // the checklist ticks itself off while it is on screen
     if (S.deity && document.querySelector("#infoBox .howto ol.checklist")) showHowTo();
     const eyBtn = document.getElementById("endYearBtn");
