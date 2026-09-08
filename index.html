@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TEMENOS — Sanctuary Simulator Prototype</title>
 <style>
   :root {
@@ -586,11 +587,6 @@
   .aspect-grid .aspect-found-row { display: none; margin-top: .6rem; }
   .aspect-grid .dcard.selected .aspect-found-row { display: block; }
 
-  @media (max-width: 860px) {
-    .app { grid-template-columns: 1fr; height: auto; }
-    .plan-wrap { height: 58vh; border-right: none; border-bottom: 1px solid var(--line); }
-    .meters { grid-template-columns: repeat(2, 1fr); }
-  }
   .event-card .evmed { float: right; width: 68px; height: 68px; border-radius: 50%;
     margin: 0 0 .4rem .6rem; background-size: cover; background-position: center;
     box-shadow: 0 0 0 1px var(--ground), 0 0 0 3px var(--terra); }
@@ -749,6 +745,44 @@
   .bird-track-a { animation: birdGlideA 26s linear infinite; }
   .bird-track-b { animation: birdGlideB 34s linear infinite; }
   @media (prefers-reduced-motion: reduce) { .birds { display: none; } }
+  /* — phones: last, so these win over every base rule above — */
+  @media (max-width: 860px) {
+    /* one column: the map on top, the panel below as an ordinary page. The
+       action bar stays at the top of the screen while the panel scrolls. */
+    .app { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+    .plan-wrap { height: 46vh; min-height: 260px; border-right: none; border-bottom: 1px solid var(--line); }
+    .rail { overflow: visible; min-width: 0; }
+    .railbar { top: 0; padding: .5rem .8rem; flex-wrap: wrap; }
+    .railbar button.act, .railbar button.endyear { flex: 1 1 100%; white-space: normal; padding: .55rem .7rem; }
+    .rail section { padding-left: .8rem; padding-right: .8rem; }
+    header { gap: .4rem .8rem; padding: .7rem .9rem .6rem; }
+    header h1 { font-size: 1.1rem; }
+    header .deity { flex: 1 1 60%; }
+    .tier-box { flex: 1 1 100%; margin-left: 0; align-items: flex-start; }
+    .standing-strip { white-space: normal; flex-wrap: wrap; }
+    .meters, .meters.five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .meter { padding: .45rem .55rem .45rem; }
+    .meter .value { font-size: 1.05rem; }
+    .meter .status { font-size: .64rem; }
+    .palette { grid-template-columns: 1fr; }
+    .drow .dl { flex-basis: 5rem; }
+    /* sheets instead of centred boxes */
+    .modal, .modal.wide { max-width: none; width: 100%; max-height: 100vh; height: 100%; border-radius: 0; }
+    .herald-back { position: fixed; }
+    .herald { max-width: none; width: calc(100% - 1.2rem); max-height: calc(100vh - 1.2rem); }
+    .herald svg#heraldVig { max-height: 120px; }
+    .plan-tip { max-width: 60vw; }
+    /* fingers, not pointers */
+    button { min-height: 2rem; }
+    .vcell .vstep button { min-width: 2.4rem; min-height: 2.4rem; font-size: 1.05rem; padding: .1rem .4rem; }
+    .vgrid { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+    .money { grid-template-columns: 1fr; gap: .2rem; }
+    .money .marrow { padding: 0; font-size: 0; }
+    .money .marrow::before { content: "\2193"; font-size: 1.1rem; }
+    .found-grid { grid-template-columns: 1fr; }
+    .dossier { padding: .9rem .8rem 1rem; }
+    .aspect-grid { grid-template-columns: 1fr; }
+  }
 </style>
 
 <header>
@@ -875,7 +909,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. eikones c</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. kinetos</span>
 </footer>
 
 <div class="found-back open" id="foundBack">
