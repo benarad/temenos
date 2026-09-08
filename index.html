@@ -526,6 +526,13 @@
     padding: .6rem 1.4rem; font-size: .68rem; color: var(--ink-faint);
     border-top: 1px solid var(--line);
   }
+  footer .sep, .found-foot .sep { margin: 0 .3rem; }
+  footer a, .found-foot a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-faint);
+    text-transform: none; letter-spacing: .04em; }
+  footer .name, .found-foot .name { text-transform: none; letter-spacing: .04em; }
+  footer a:hover, .found-foot a:hover { color: var(--terra); border-color: var(--terra); }
+  .found-foot { margin-top: 2.4rem; padding-top: .7rem; border-top: 1px solid var(--line);
+    font-size: .68rem; color: var(--ink-faint); }
 
   /* ---------- founding screen ---------- */
   .found-back {
@@ -772,6 +779,7 @@
   .vcell .vstep b { min-width: 1.2rem; text-align: center; }
   .vcell .vstep button { padding: .1rem .55rem; font-size: .8rem; }
   .vcell .vstep button[disabled] { opacity: .35; cursor: default; }
+  .vic-note { font-size: .68rem; color: var(--ink-faint); margin: -.2rem 0 .3rem 5.4rem; }
 
   @keyframes birdGlideA { from { transform: translate(-60px, 0); } to { transform: translate(820px, -26px); } }
   @keyframes birdGlideB { from { transform: translate(820px, 0); } to { transform: translate(-70px, 20px); } }
@@ -816,8 +824,18 @@
     .plan-tip { max-width: 60vw; }
     /* fingers, not pointers */
     button { min-height: 2rem; }
+    .law-opts { gap: .35rem .4rem; }
+    .law-opts .opt-label { flex-basis: 100%; min-width: 0; }
+    .law-opts .vgrid { flex-basis: 100%; grid-template-columns: 1fr; gap: 0; }
+    .vcell { display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+      padding: .3rem 0; border-bottom: 1px dotted var(--line); }
+    .vcell:last-child { border-bottom: none; }
+    .vcell .vname { font-size: .84rem; }
+    .vcell .vstep { margin-top: 0; gap: .3rem; }
+    .vcell .vstep b { min-width: 1.7rem; font-size: .95rem; }
+    .vcell .vstep .dchip { min-width: 1.8rem; text-align: right; }
     .vcell .vstep button { min-width: 2.4rem; min-height: 2.4rem; font-size: 1.05rem; padding: .1rem .4rem; }
-    .vgrid { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+    .vic-note { margin-left: 0; }
     .money { grid-template-columns: 1fr; gap: .2rem; }
     .money .marrow { padding: 0; font-size: 0; }
     .money .marrow::before { content: "\2193"; font-size: 1.1rem; }
@@ -960,7 +978,9 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. haptikos</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. sphragis</span>
+  <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
+  <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
 
 <div class="found-back open" id="foundBack">
@@ -969,6 +989,8 @@
     <h2>Found the sanctuary</h2>
     <div class="found-sub">You direct the board of hieropoioi, the officials that a community appoints to manage festivals and sanctuaries. Your first decision is which god you want to dedicate your new sanctuary to. Several of the gods have multiple variants to choose from as well. Large buildings are paid for by patrons, and patrons expect something in return.</div>
     <div class="found-grid" id="foundGrid"></div>
+    <div class="found-foot lapidary">Temenos <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
+      <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a></div>
   </div>
 </div>
 
@@ -10230,7 +10252,7 @@
         "</div></div>" +
         (S.tier >= 1 ? '<div class="law-opts"><button class="' + (cal.peak && cal.peakIdx === i ? "cur" : "ghost") + '" data-peak="' + i + '" title="Held on a grander scale every fourth year">every 4th year: greater</button></div>' : "") +
         '<div class="law-opts">' + lbl("Victims") + '<div class="vgrid">' + VIC_ORDER.map(vic).join("") + "</div></div>" +
-          (oxenCap() < 100 ? '<div style="font-size:.68rem; color:var(--ink-faint); margin:-.2rem 0 .3rem 5.4rem">the altar limits oxen to ' + oxenCap() + "</div>" : "") +
+          (oxenCap() < 100 ? '<div class="vic-note">the altar limits oxen to ' + oxenCap() + "</div>" : "") +
         line(lbl("Procession") + opt("pompe", ["none", "modest", "full"], h.pompe) +
           (hasBld("propylon") ? ' <span style="font-size:.66rem; color:var(--verdigris)">+ gateway bonus</span>' : "")) +
         line(lbl("Music") + opt("music", ["none", "piper", "chorus"], h.music)) +
