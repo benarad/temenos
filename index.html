@@ -120,6 +120,7 @@
     background: var(--line);
     border-bottom: 1px solid var(--line);
   }
+  .meters.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   /* six cells of one shape: a label, a figure, one status line; the rules live on hover */
   .meter { background: var(--ground); padding: .55rem 1rem .6rem; display: grid; grid-template-rows: auto auto auto; row-gap: .12rem; align-content: start; min-width: 0; }
   .meter .label { font-size: .6rem; color: var(--ink-soft); cursor: help; width: max-content; max-width: 100%;
@@ -129,6 +130,9 @@
   .meter .status { font-size: .7rem; color: var(--ink-soft); }
   .meter .status.good { color: var(--verdigris); }
   .meter .status.warn { color: var(--danger); }
+  .meter .status.soft { color: var(--bronze); }
+  .meter .status button.linkish.soft { color: var(--bronze); }
+  .meter.treasury { cursor: pointer; }
   .meter .status button.linkish { background: none; border: none; padding: 0; cursor: pointer; color: var(--danger); font: inherit;
     text-decoration: underline; text-underline-offset: 2px; }
   .meter .status button.switch { display: inline-block; font-family: Optima, Candara, "Gill Sans", sans-serif; letter-spacing: .1em; text-transform: uppercase;
@@ -592,6 +596,7 @@
   .drow .dv .line { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; }
   .drow .dv .line + .line { margin-top: .12rem; }
   .drow .dv .lo { color: var(--ink-faint); }
+  .drow .dv .soft { color: var(--bronze); }
   .drow .dv .warn { color: var(--danger); font-size: .72rem; }
   .drow .dv .good { color: var(--verdigris); }
   .drow .dv .bad { color: var(--danger); }
@@ -645,6 +650,22 @@
   .law-opts button { font-size: .64rem; padding: .38rem .65rem; }
   .law-opts button.cur { background: var(--terra); color: #F6F0E2; }
   .law-opts button.cur:hover { background: var(--terra); }
+  .money { display: grid; grid-template-columns: 1fr 1rem 1fr 1rem 1fr; gap: .45rem; align-items: start; margin: .3rem 0 .5rem; }
+  .money .mh { font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .3rem; }
+  .money .mbox { border: 1px solid var(--line); background: var(--ground); padding: .3rem .45rem; margin-bottom: .3rem; font-size: .74rem; display: flex; justify-content: space-between; gap: .4rem; }
+  .money .mbox .num { white-space: nowrap; }
+  .money .mbox.beyond { border-style: dashed; }
+  .money .mbox.end { font-weight: 600; }
+  .money .chest .mbox { border-color: var(--bronze); }
+  .money .marrow { align-self: center; color: var(--ink-faint); font-size: 1.1rem; text-align: center; padding-top: 1.2rem; }
+  /* in the rail the three groups stack, so no box has to share its width */
+  .ledger .money { grid-template-columns: 1fr; gap: .2rem; }
+  .ledger .money .marrow { padding: 0; line-height: 1; }
+  .ledger .money .marrow::before { content: "\2193"; }
+  .ledger .money .marrow { font-size: 0; }
+  .ledger .money .marrow::before { font-size: 1.1rem; }
+  .money-note { font-size: .74rem; color: var(--ink-soft); margin: .2rem 0 .3rem; }
+  .pal-note { font-size: .72rem; color: var(--ink-soft); margin: -.25rem 0 .5rem; }
   .law-note { font-size: .74rem; color: var(--verdigris); }
   .law-cite { font-size: .72rem; color: var(--ink-soft); font-style: italic; margin-top: .3rem; }
 
@@ -793,17 +814,20 @@
       <p class="times" id="timesLine"></p>
       <div class="drows">
         <div class="projection" id="projection"></div>
+        <div id="treasurerRow"></div>
         <div id="calRow"></div>
         <div id="personnelRow"></div>
         <div id="consultRow"></div>
       </div>
       <div class="quiet-row">
         <button class="quiet" id="lawBtn">Sacred law</button>
+        <button class="quiet" id="moneyBtn">Where the money goes</button>
         <button class="quiet" id="laurelsBtn" style="display:none">Laurels</button>
         <div class="refmenu">
           <button class="quiet" id="refBtn" aria-haspopup="true" aria-expanded="false">Reference ▾</button>
           <div class="refpop" id="refPop" role="menu">
             <button class="quiet" id="howtoBtn">How to play</button>
+            <button class="quiet" id="treasurerBtn">The treasurer’s notes: on</button>
             <button class="quiet" id="glossaryBtn">Glossary</button>
             <button class="quiet" id="sourcesBtn">Sources</button>
             <button class="quiet" id="numbersBtn">The numbers</button>
@@ -828,7 +852,8 @@
     </section>
 
     <section>
-      <h2 class="lapidary">Build — every structure cites a real parallel</h2>
+      <h2 class="lapidary">Build</h2>
+      <p class="pal-note">A work is paid for as it goes up: three-tenths down, the rest by the year, and a tenth held until the work is approved. Upkeep is charged per year.</p>
       <div class="palette" id="palette"></div>
     </section>
 
@@ -840,7 +865,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. epikleseis</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. tamias c</span>
 </footer>
 
 <div class="found-back open" id="foundBack">
@@ -1307,10 +1332,10 @@
         blurb: "Athena Polias is the goddess of the city itself. Her temple also holds the city’s treasury, her priestess comes from one family and serves for life, a new robe is woven for her image, and on one day a year the image is washed and the sanctuary does no business.",
         fest: "Panathenaia" },
       { id: "nike", full: "Athena Nike", plain: "Athena of victory",
-        blurb: "Athena Nike is the Athena of victory in war. Her priestess is chosen from all Athenian women rather than from one family, and the city owes her fifty drachmas a year and the legs and skins of every public victim. That pay is owed in peace and in war, while the offerings rise and fall with the fighting.",
+        blurb: "Athena Nike is the Athena of victory in war. Her priestess is chosen from all Athenian women rather than from one family, and the city owes her fifty drachmas per year and the legs and skins of every public victim. That pay is owed in peace and in war, while the offerings rise and fall with the fighting.",
         fest: "Victory rites (no separate festival is attested; she takes her share at every public sacrifice)",
-        line: "The priestess’s pay is fixed by decree at fifty drachmas a year plus the skins of the public victims. The skins therefore never reach the chest.",
-        rule: { line: "The priestess’s pay is fixed by decree at fifty drachmas a year plus the back legs and skins of every public victim. The skins therefore never reach the chest.",
+        line: "The priestess’s pay is fixed by decree at fifty drachmas per year plus the skins of the public victims. The skins therefore never reach the chest.",
+        rule: { line: "The priestess’s pay is fixed by decree at fifty drachmas per year plus the back legs and skins of every public victim. The skins therefore never reach the chest.",
           cite: "“The priestess is to receive fifty drachmas and to receive the backlegs and skins of the public sacrifices” — a priestess “[allotted?] from all Athenian women” (IG I³ 35, AIO translation); IG I³ 36 orders the arrears actually paid.",
           noHideSale: true },
         econ: { kind: "cash", label: "Victory offerings, less the priestess’s pay", amt: () => Math.max(0, (windOf(S.year) === "war" ? 110 : 30) - 50),
@@ -2124,7 +2149,7 @@
     {
       id: "a-nike", deity: "athena", aspect: "nike", minTier: 1,
       title: "Pay the priestess",
-      body: "The priestess's salary is two years in arrears. The decree that created her office fixed it at fifty drachmas a year, and the decree stands on stone. She has asked for it publicly, at the festival.",
+      body: "The priestess's salary is two years in arrears. The decree that created her office fixed it at fifty drachmas per year, and the decree stands on stone. She has asked for it publicly, at the festival.",
       cite: "IG I³ 36 is exactly this document: a decree ordering that the priestess of Athena Nike be paid what the founding decree (IG I³ 35) had fixed — fifty drachmas and the backlegs and skins of the public victims (AIO translations).",
       choices: [
         { label: "Pay the arrears in full (100 dr.)", fx: { treasury: -100, piety: 5, deeds: 5 }, log: "The board pays, and cuts the payment order in stone beside the first decree, so the question cannot arise again." },
@@ -3378,18 +3403,21 @@
   function festivalRenown() { return Math.round(festivalRep() * 2.5); }
   function monumentRenown() { return Math.min(MONUMENT_MAX, Math.round(monuments() * 0.5)); }
   function festivalShortfall() {
+    if (!S.festRep.length) return 0; // the first decade is not judged: nothing is lost before a festival has been held
     const want = FEST_EXPECT[S.tier], have = festivalRep();
     // the decade of a promotion and the decade after forgive half the shortfall
     const grace = (S.tierAt != null && S.year - S.tierAt < 20) ? 0.5 : 1;
     return have >= want ? 0 : Math.round((want - have) * 1.5 * grace);
   }
+  // before the first festival: is the calendar, as it stands, below the standard for this rank?
+  function plannedBelow() { return !!(S.cal && !S.festRep.length && calSplendorNow() < FEST_EXPECT[S.tier]); }
   // Piety rises with observance but the last stretch is the hardest to win:
   // each year's gain is scaled by how far the sanctuary still is from the
   // ceiling, so a calendar settles at a level that reports its own quality
   // (thin ~20, solid ~30, rich ~35) instead of pinning at the cap. A penalty
   // therefore takes years of good practice to work off, not one turn.
   // the god's service grows with the sanctuary: the cap rises by rank, and on top
-  // of the point a year that every sanctuary loses unless it is tended, the higher
+  // of the point per year that every sanctuary loses unless it is tended, the higher
   // ranks lose a little more (a quarter point at polis, half a point at panhellenic)
   const PIETY_CAPS = [40, 50, 60];
   const PIETY_DRIFT = [0, 0.25, 0.5];
@@ -3540,10 +3568,10 @@
     },
     surplus: {
       name: "The disposal of surplus", gk: "ta perionta",
-      cite: "IG I\u00b3 78: the remainder is spent on dedications, 'no provision made for a surplus.' On Delos the god lent instead \u2014 the hieropoioi put Apollo's money out at 10% a year (Reger).",
+      cite: "IG I\u00b3 78: the remainder is spent on dedications, 'no provision made for a surplus.' On Delos the god lent instead \u2014 the hieropoioi put Apollo's money out at 10% per year (Reger).",
       options: {
         plate: { label: "Worked into plate", note: "surplus silver is weighed into phialai and entered in the inventories (IG I\u00b3 78). This adds renown and no income." },
-        loans: { label: "Lent at interest", note: "polis rank and above: surplus goes out at 10% a year, as Apollo's money did on Delos. This adds income and no renown.", minTier: 1 },
+        loans: { label: "Lent at interest", note: "polis rank and above: surplus goes out at 10% per year, as Apollo's money did on Delos. This adds income and no renown.", minTier: 1 },
         fund: { label: "Set aside for building", note: "polis rank and above: a tenth of each decade's income, or a third of the surplus if that is more, is kept in coin toward the next large building, up to half the working float a decade; the rest of the surplus is worked into plate. The fund earns no renown, and a city at war may borrow it.", minTier: 1 },
       },
     },
@@ -3555,7 +3583,7 @@
   }
   const LOAN_CAP = [0, 2000, 6000];
   // what the city may owe the god under the lendable condition, by rank; it
-  // borrows at the state's rate, the 1.2% a year of the Athenian war loans
+  // borrows at the state's rate, the 1.2% per year of the Athenian war loans
   // (IG I3 369), not at the 10% the god's own loans earn
   const CITY_CAP = [0, 4000, 12000];
   const CITY_RATE = 0.012;
@@ -3714,7 +3742,7 @@
         (staged ? ' <span class="t-gk">· stage ' + roman(b.lvl + 1) + "</span>" : "") + "</div>" +
       (gkOf(bld) ? '<div class="t-gk">' + gkOf(bld) + "</div>" : "") +
       "<div>" + (bld.tip || "") + "</div>" +
-      '<div class="t-stats num">+' + drawOf(bld.id, l) + " pilgrims/yr · +" + l.renown + " monuments · upkeep " + l.upkeep + " dr./yr</div>" +
+      '<div class="t-stats num">+' + drawOf(bld.id, l) + " pilgrims per year · +" + l.renown + " monuments · upkeep " + l.upkeep + " dr. per year</div>" +
       '<div class="t-hint">Click to inspect' + (bld.levels[b.lvl + 1] ? " & upgrade" : "") + "</div>";
   }
 
@@ -6522,7 +6550,7 @@
       text: "The accounts are cut on a stone stele each decade for anyone to read. The stele counts as a monument, and the magistrates, who read the accounts, support every later request. A decade whose accounts close in deficit is found by the audit and fined a tenth of the deficit." },
     lendable: { label: "The city may borrow", short: "the city may borrow from the surplus",
       play: "The city borrows from the surplus before anything is set aside, at 1.2%, and repays slowly. In war it takes the whole building fund.",
-      text: "Each decade the city takes what it needs from the surplus first, up to a ceiling, at the state\u2019s rate of 1.2% a year, and repays slowly. What it leaves follows the sanctuary\u2019s own law. A city at war may take the whole building fund." },
+      text: "Each decade the city takes what it needs from the surplus first, up to a ceiling, at the state\u2019s rate of 1.2% per year, and repays slowly. What it leaves follows the sanctuary\u2019s own law. A city at war may take the whole building fund." },
     civic: { label: "The city\u2019s name and the front row", short: "the festival carries the city\u2019s name",
       play: "More visitors every year, with the magistrates in the front row. Piety falls a little, and drifts down a little faster from then on.",
       text: "The magistrates take the front row at the festival, and the festival is announced in the city\u2019s name as well as the god\u2019s. More visitors come. Piety falls a little when the condition is accepted, and drifts down a little faster for as long as it is in force." },
@@ -6929,8 +6957,8 @@
     const reach = perDecade > 0 ? Math.ceil(shortBy / perDecade) : Infinity;
     const reachLine = shortBy <= 0 ? ""
       : perDecade === 0 ? " <b>Nothing is being set aside for building at present; the law on the surplus can send it to the fund. More conditions, a benefactor, or the cities' pledges would be needed.</b>"
-      : reach > 5 ? " <b>At about " + fmt(perDecade) + " dr. a decade the fund would not meet this share within the five decades the vote stands. More conditions, a benefactor, or the cities' pledges would be needed.</b>"
-      : " At about " + fmt(perDecade) + " dr. a decade the fund would meet it in about " + reach + " decade" + (reach === 1 ? "" : "s") + ".";
+      : reach > 5 ? " <b>At about " + fmt(perDecade) + " dr. per decade the fund would not meet this share within the five decades the vote stands. More conditions, a benefactor, or the cities' pledges would be needed.</b>"
+      : " At about " + fmt(perDecade) + " dr. per decade the fund would meet it in about " + reach + " decade" + (reach === 1 ? "" : "s") + ".";
     const rows = ids.map(id => {
       const t = TERMS[id];
       const on = !!(S.terms[id] || pt.sel[id]);
@@ -7064,7 +7092,7 @@
       : how === "subscription" ? "paid by the cities' pledges and the building fund"
       : how === "benefactor" ? "paid in full by " + (funded.benefactor || "a benefactor")
       : share <= 0 ? "paid in full by the sponsor"
-      : fmt(down) + " dr. down, " + (pr.installment ? fmt(pr.installment) + " dr. a year, " : "") + fmt(retention) + " dr. held to approval";
+      : fmt(down) + " dr. down, " + (pr.installment ? fmt(pr.installment) + " dr. per year, " : "") + fmt(retention) + " dr. held to approval";
     notify("Work begins: " + pr.name + " — " + pr.left + " year" + (pr.left > 1 ? "s" : "") + " of building · " + payLine, "good");
   }
 
@@ -7076,7 +7104,7 @@
     const sf = document.querySelector("#infoBox .sitefile");
     if (sf && pr) sf.insertAdjacentHTML("afterbegin",
       '<div class="fx num">Works under way: ' + pr.left + " year" + (pr.left > 1 ? "s" : "") + " to completion" +
-      (pr.installment ? ", " + fmt(pr.installment) + " dr. a year to the masons" : "") + ".</div>");
+      (pr.installment ? ", " + fmt(pr.installment) + " dr. per year to the masons" : "") + ".</div>");
   }
 
   // The enlarged stage rarely fits exactly where the old building stood; real
@@ -7851,19 +7879,21 @@
   // Advancing with the calendar below standard is the commonest novice mistake:
   // the penalty is silent and compounds. Say so once, the first time it happens.
   function advanceGuard() {
-    if (S._warnedShortfall || !S.cal) return true;
+    if (!S.cal) return true;
     // judged on the calendar as it stands, not on festivals not yet held
     const want = FEST_EXPECT[S.tier], planned = calSplendorNow();
     const short = planned >= want ? 0 : Math.round((want - planned) * 1.5);
-    if (short <= 0) return true;
+    if (short > 0 && !S._warnedShortfall) {
     S._warnedShortfall = true;
     heraldQueue({
       vig: { med: "elder", badge: "kerykeion" },
       title: "The rites fall short of this rank",
       body: "As they stand, your festivals are below the standard expected of a " +
-        TIERS[S.tier].label.toLowerCase() + " sanctuary, and the sanctuary loses <b>" + short +
-        " renown every decade</b> for it. Richer rites raise splendor: more victims, a procession, music, a feast. Renown comes from splendor.<br><br>" +
-        "You can set the calendar now, or advance and accept the loss.",
+        TIERS[S.tier].label.toLowerCase() + " sanctuary. " +
+        (S.festRep.length ? "The sanctuary loses <b>" + short + " renown every decade</b> for it."
+          : "No renown is lost in the first decade. After it, the sanctuary loses <b>" + short + " renown every decade</b> while the rites stay below the standard.") +
+        " Richer rites raise splendor: more victims, a procession, music, a feast. Renown comes from splendor.<br><br>" +
+        (S.festRep.length ? "You can set the calendar now, or advance and accept the loss." : "You can set the calendar now, or advance and set it later."),
       cite: "Buildings alone did not make a sanctuary famous: the festival did. This warning appears once.",
       choices: [
         { label: "Set the calendar", fn: () => { openCalModal(); } },
@@ -7871,10 +7901,112 @@
       ],
     });
     return false;
+    }
+    return treasurerGuard();
+  }
+
+  /* — the treasurer: one computed sentence on the state of the chest, before the audit.
+       Each line is a direct reading of a rule the game applies to the figures the panels
+       show; none is advice on what to build or in what order. — */
+  function treasurerBudget() {
+    // income for the coming decade as things stand: the land rents, the offerings of the crowd
+    // the buildings and the calendar now draw, the cult's own income, the subsidy
+    const y1 = S.cal ? calForYear(S.year + 1) : { cost: 0, rep: 0 };
+    const est = estimatePilgrims(y1);
+    const rents = landRents(), offerings = Math.round(3.4 * Math.pow(est, 0.8));
+    const extras = Math.round(incomeExtras().reduce((a, x) => a + x.amt, 0) * serviceFactor());
+    const sub = subsidy();
+    const income = rents + offerings + extras + sub;
+    const upkeep = totalUpkeep() + attendantCost();
+    const gera = Math.round(offerings * 0.05 * S.priests.length); // the priests' share of the offerings
+    const rites = y1.cost;
+    const steady = income - rites - upkeep - gera; // the yearly balance once the masons are paid off
+    // the works: one crew, one project at a time, paid by the year; the down payment is already out of the chest
+    const works = S.projects.map(p => ({ inst: p.installment || 0, left: p.left || 0, ret: p.retention || 0, name: p.name }));
+    const owed = works.reduce((a, w) => a + w.inst * w.left + w.ret, 0);
+    const masonsNow = works.length ? works[0].inst + (works[0].left <= 1 ? works[0].ret : 0) : 0;
+    const worksYears = works.reduce((a, w) => a + w.left, 0);
+    // the coming decade, year by year, in the order the loop pays: the masons, then the rites
+    // out of the chest as it stands, then the year's income less upkeep and the priests' share
+    let chest = S.treasury, cut = 0, idle = 0, idleName = "";
+    for (let y = 1; y <= 10; y++) {
+      const w = works[0];
+      if (w) {
+        const due = w.inst + (w.left <= 1 ? w.ret : 0);
+        if (chest >= due) { chest -= due; w.left -= 1; if (w.left <= 0) works.shift(); }
+        else if (!idle) { idle = y; idleName = w.name; }
+      }
+      const fc = S.cal ? calForYear(S.year + y).cost : 0;
+      if (chest < fc && !cut) cut = y;
+      chest -= Math.min(chest, fc);
+      chest += income - upkeep - gera;
+    }
+    return { income, rents, offerings, est, extras, sub, rites, upkeep, gera, steady, owed, masonsNow, worksYears, cut, idle, idleName, end: Math.round(chest) };
+  }
+  function treasurerNote() {
+    if (!S.deity || !S.cal) return null;
+    const B = treasurerBudget(), chest = S.treasury;
+    const yearWord = n => n === 1 ? "this year" : "in the " + ORD[n] + " year";
+    const hover = "Comes in: about " + fmt(B.income) + " dr. per year as things stand (rents " + fmt(B.rents) + ", offerings of ~" + fmt(B.est) + " visitors " + fmt(B.offerings) +
+      (B.extras ? ", the cult’s own income " + fmt(B.extras) : "") + (B.sub ? ", the subsidy " + fmt(B.sub) : "") + "). " +
+      "Goes out each year: " + fmt(B.rites) + " for the rites" + (B.upkeep ? ", " + fmt(B.upkeep) + " upkeep" : "") + (B.gera ? ", about " + fmt(B.gera) + " to the priests" : "") + "." +
+      (B.owed ? " Masons: " + fmt(B.masonsNow) + " this year, " + fmt(B.owed) + " in all over " + B.worksYears + " year" + (B.worksYears === 1 ? "" : "s") + "." : "");
+    const first = (B.cut && (!B.idle || B.cut <= B.idle)) ? { y: B.cut, what: "the rites are cut back" } : (B.idle ? { y: B.idle, what: "the masons wait" } : null);
+    // more goes out than comes in even with the masons paid off
+    if (B.steady < 0) {
+      if (first)
+        return { cls: "warn", key: "deficit", first, text: "More goes out than comes in: " + fmt(B.rites + B.upkeep + B.gera) + " dr. per year against " + fmt(B.income) + ". The chest of " + fmt(chest) + " runs out " + yearWord(first.y) + ".", hover };
+      return { cls: "soft", key: "deficit-slow", text: "More goes out than comes in: " + fmt(B.rites + B.upkeep + B.gera) + " dr. per year against " + fmt(B.income) + ". The chest falls from " + fmt(chest) + " to about " + fmt(B.end) + " by the audit.", hover };
+    }
+    // a squeeze while the masons are paid, from which the chest recovers
+    if (first)
+      return { cls: "soft", key: "squeeze", text: "The chest runs low while the masons are paid: " + first.what + " " + yearWord(first.y) + ". The works finish in " + B.worksYears + " year" + (B.worksYears === 1 ? "" : "s") + ", and the chest recovers to about " + fmt(B.end) + " by the audit.", hover };
+    // silver about to leave the chest at the audit
+    if (S.laws.surplus === "plate" && B.end - WORK_FLOAT[S.tier] - B.owed > 300)
+      return { cls: "soft", key: "plate", text: "At the audit the chest will hold about " + fmt(B.end) + " dr. Silver above the float of " + fmt(WORK_FLOAT[S.tier]) + " is worked into plate for the god.", hover: hover + " The surplus law is set in the Sacred law." };
+    if (!S.priests.length)
+      return { cls: "soft", key: "priest", text: "No priest serves at the altar. The services earn less than half their yield.",
+        hover: "With no one to perform them the services yield " + Math.round(serviceFactor() * 100) + "% of what they would. Appoint a priest in the Priests row." };
+    if (S.cal.monthly === 0)
+      return { cls: "soft", key: "monthly", text: "No monthly rites. Piety falls a point per year.",
+        hover: "The new-moon offering costs " + MONTHLY_COST[1] + " dr. per year. Without it the god is served a little less each year." };
+    if (S.tier < 1) return { cls: "lo", key: "ok", text: "The chest is in order.", hover };
+    return null;
+  }
+  function renderTreasurer() {
+    const el = document.getElementById("treasurerRow"), btn = document.getElementById("treasurerBtn");
+    if (btn) btn.textContent = "The treasurer\u2019s notes: " + (S.treasurerOff ? "off" : "on");
+    if (!el) return;
+    const note = S.treasurerOff ? null : treasurerNote();
+    if (!note || note.key !== "deficit") S._warnedDry = false; // the condition has cleared; it may be raised again
+    if (!note) { el.innerHTML = ""; return; }
+    el.innerHTML = '<div class="drow"><span class="dl">The treasurer</span><span class="dv stack"><span class="line"><span class="' + note.cls +
+      '" title="' + note.hover.replace(/"/g, "&quot;") + '">' + note.text + "</span></span></span></div>";
+  }
+  // the checkpoint: once per shortfall, and only when more goes out than comes in and the chest runs out within the decade
+  function treasurerGuard() {
+    const note = S.treasurerOff ? null : treasurerNote();
+    if (!note || note.key !== "deficit" || S._warnedDry) return true;
+    S._warnedDry = true;
+    const B = treasurerBudget();
+    const choices = [{ label: "Open the calendar", fn: () => { openCalModal(); } }];
+    if (S.projects.length) choices.push({ label: "Look at the works", fn: () => {
+      const c = document.getElementById("projection"); if (c) c.scrollIntoView({ behavior: "smooth", block: "center" }); } });
+    choices.push({ label: "Advance anyway", fn: () => { endYear(true); } });
+    heraldQueue({
+      vig: { med: "elder", badge: "phiale" },
+      title: "The treasurer objects",
+      body: "More goes out than comes in. About " + fmt(B.income) + " dr. per year comes in, and " + fmt(B.rites + B.upkeep + B.gera) + " goes out on the rites, the upkeep and the priests" +
+        (B.owed ? ", before the masons are paid" : "") + ". The chest holds " + fmt(S.treasury) + " dr. and runs out " + (note.first.y === 1 ? "this year" : "in the " + ORD[note.first.y] + " year") + ".<br><br>" +
+        "When the chest is empty the festival is held on a reduced scale, and the masons wait until they can be paid.",
+      cite: "Athens set officials over the sacred money and audited what had been spent (IG I³ 32); the treasurers of the Other Gods kept accounts of their own (IG I³ 52). This warning appears once for each shortfall.",
+      choices,
+    });
+    return false;
   }
 
   /* — whose shrine is this? The choice is the lesson: a sanctuary is a
-       portfolio of cults, and every one of them costs a victim a year. — */
+       portfolio of cults, and every one of them costs a victim per year. — */
   function askGuest(idx) {
     const offer = guestOffer(3);
     if (!offer.length) return;
@@ -7884,12 +8016,12 @@
       body: "The masons have finished the little building. It is for another god. One god presides here, but a sanctuary holds many altars. Each god you invite adds a rite of his own to the calendar, at his own price, every year.<br><br>Whom do you invite?",
       cite: "At Olympia only a fraction of the sixty-nine altars Pausanias counted belonged to Zeus (Paus. 5.14). The rites and prices offered here are lines from the calendar of one Attic village (CGRN 52, Erchia).",
       choices: offer.map(g => ({
-        label: g.name + " \u2014 " + g.rite + ", " + g.cost + " dr./yr",
+        label: g.name + " \u2014 " + g.rite + ", " + g.cost + " dr. per year",
         fn: () => {
           S.guests.push({ key: g.key, year: S.year });
           const b = S.built[idx];
           if (b) { b.who = g.who; b.whoCite = g.cite; delete b._askGuest; }
-          log(g.name + " is given a shrine inside the boundary: " + g.rite + ", " + g.cost + " dr. a year.", "good");
+          log(g.name + " is given a shrine inside the boundary: " + g.rite + ", " + g.cost + " dr. per year.", "good");
           if (g.deity) log("The stories of " + g.name.split(" ")[0] + " can now reach this sanctuary.", "");
           renderAll();
         },
@@ -7908,6 +8040,7 @@
     }
     const tierBefore = S.tier;
     const renownBefore = renown();
+    S._chestBefore = S.treasury; // for the ledger's arithmetic and the money picture
     const chron = [];
     const sums = { offerings: 0, hides: 0, rents: 0, sub: 0, extras: 0, upkeep: 0,
       festCost: 0, pilgrimYears: 0, peakPilgrims: 0, victims: 0, peaksHeld: 0 };
@@ -8052,6 +8185,7 @@
       // polis standing comes with renown; panhellenic standing only when the cities have recognised the sanctuary
       while (S.tier < TIERS.length - 1 && renown() >= TIERS[S.tier + 1].renownAt && (S.tier + 1 < 2 || S.recognized)) {
         S.tier += 1; S.tierAt = S.year; camRest();
+        if (S.tier === 1 && S.laws.surplus === "plate") { S.laws.surplus = "fund"; S._fundDefaulted = true; } // the fund is kept by default from polis rank
         chron.push("Yr " + S.year + " — " + (S.tier === 1
           ? "the city adopts the cult as its own and the boundary is enlarged. Festivals of splendor " +
             FEST_EXPECT[1] + " are now expected."
@@ -8242,7 +8376,8 @@
       S.dedExplained = true;
       heraldQueue({
         quiet: true, vig: "treasure", title: "The god's treasure: objects, not money",
-        body: "The treasurers enter the new dedications in the inventories, weighing each object of gold and silver. This wealth belongs to the god: it raises the sanctuary's renown and may stand as a reserve in extremity, but it is not coin for the chest. <b>The god's treasure and the sacred treasury are two different things.</b>",
+        body: "The treasurers enter the new dedications in the inventories, weighing each object of gold and silver. This wealth belongs to the god: it raises the sanctuary's renown and may stand as a reserve in extremity, but it is not coin for the chest. <b>The god's treasure and the sacred treasury are two different things.</b>" +
+          (sums.plate ? " The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest; only what stood above it at the audit was worked into plate." : ""),
         cite: "Temple inventories at Athens and Delos list vessels by weight, checked annually by magistrates; Perikles counted the gold on the Parthenos itself as a removable reserve (Thuc. 2.13; A Companion to Greek Architecture, ch. 15: temple interiors 'served as banks, as museums').",
       });
     }
@@ -8442,8 +8577,10 @@
         chron.push("The treasurers set aside " + fmt(toFund) + " dr. toward building" +
           (toFund >= fundCap() ? ", the most the law allows in a decade" : "") + "; the fund stands at " + fmt(S.fund) + " dr.");
       } else {
-        chron.push(opResult <= 0 ? "Nothing was set aside for building this decade: the accounts closed in deficit."
-          : "Nothing could be set aside for building this decade: the chest could not spare it.");
+        let why = opResult <= 0 ? "Nothing was set aside for building this decade: the accounts closed in deficit."
+          : "Nothing could be set aside for building this decade: the chest could not spare it.";
+        if (!S._floatExplained) { S._floatExplained = true; why += " The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest before anything is set aside."; }
+        chron.push(why);
       }
     }
     // the building fund can meet the sanctuary's share of a capital work: said
@@ -8544,7 +8681,7 @@
     if (sums.lent) disposed.push(fmt(sums.lent) + " dr. lent");
     if (sums.plate) disposed.push(fmt(sums.plate) + " dr. into plate");
     log("Years " + (S.year - 9) + "\u2013" + S.year + ": " + fmt(Math.round(sums.pilgrimYears / 10)) +
-      " pilgrims/yr \u00b7 result " + (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " dr." +
+      " pilgrims per year \u00b7 result " + (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " dr." +
       (disposed.length ? " \u00b7 " + disposed.join(" \u00b7 ") : ""));
 
     // the god's own instrument, where it pays in standing rather than silver:
@@ -8643,59 +8780,97 @@
     renderAll();
   }
 
+  // the rows of a decade's ledger: [label, amount, hover detail]; income and expenses
+  // are ten-year totals, so the units are said once in the section headings
+  function ledgerRows(d) {
+    const ex = incomeExtras();
+    const exLabel = ex.length === 1 ? ex[0].label : "The cult’s own income";
+    const exTitle = ex.length > 1 ? ex.map(x => x.label + ", " + fmt(x.amt) + " dr. per year").join(" · ") : "";
+    const inc = [
+      ["Offerings & tariffs (~" + fmt(Math.round(d.pilgrimYears / 10)) + " pilgrims per year)", d.offerings],
+      ["Hide sales (dermatikon, " + fmt(d.victims) + " victims; pigs are singed, not flayed)", d.hides],
+      ["Rents of sacred land", d.rents],
+      ["Polis subsidy", d.sub],
+      [exLabel, d.extras, exTitle],
+      ["Interest on the god’s loans (10% per year)", d.interest],
+      ["Interest on the city’s debt (1.2% per year)", d.cityInterest],
+      ["The city repays part of its debt", d.cityRepay],
+      ["Indemnity from the league", d.indemnity],
+      ["Sacrificial meat sold (kreanomia foregone)", d.meatSale],
+    ];
+    const exp = [
+      ["Festivals held", d.festCost],
+      ["Upkeep of " + S.built.length + " structures" + (S.attendants ? " and " + S.attendants + " attendant" + (S.attendants === 1 ? "" : "s") : ""), d.upkeep],
+      ["Paid to the contractors", d.works],
+      ["Priestly perquisites (gera)", d.gera],
+      ["Fine after the audit of the published accounts", d.fine],
+    ];
+    const disp = [
+      ["Set aside for building (to the fund)", d.fund],
+      ["Borrowed by the city", d.city],
+      ["Lent at interest (to the loan book)", d.lent],
+      ["Worked into plate (to the inventories)", d.plate],
+    ];
+    const outside = [
+      ["Pledges collected toward the " + (S.campaign ? S.campaign.name.toLowerCase() : "subscription"), d.pledges],
+      ["The league’s levy (to the fund)", d.levy],
+    ];
+    return { inc, exp, disp, outside };
+  }
+
   function showDecadeLedger(d, renownBefore, chron) {
     document.getElementById("infoHeading").textContent =
-      "Ledger \u2014 years " + (S.year - 9) + "\u2013" + S.year;
-    const income = d.offerings + d.hides + d.rents + d.sub + d.extras + (d.interest || 0) + (d.cityInterest || 0) + (d.cityRepay || 0) + (d.indemnity || 0) + (d.meatSale || 0);
-    const expense = d.festCost + d.upkeep + (d.works || 0) + (d.gera || 0) + (d.fine || 0);
+      "Ledger — years " + (S.year - 9) + "–" + S.year;
+    S._lastSums = d;
+    const R = ledgerRows(d);
+    const tot = rows => rows.reduce((a, x) => a + (x[1] || 0), 0);
+    const income = tot(R.inc), expense = tot(R.exp), beyond = tot(R.disp);
     const net = income - expense;
-    const row = (label, amt, sign) =>
-      "<tr><td>" + label + '</td><td class="amt ' + (sign > 0 ? "pos" : "neg") + '">' +
-      (sign > 0 ? "+" : "\u2212") + fmt(Math.abs(amt)) + " dr.</td></tr>";
+    const start = S._chestBefore || 0;
+    const other = S.treasury - (start + income - expense - beyond); // decisions and events during the decade
+    const short = s => s.split(" (")[0];
+    const sum = rows => rows.filter(x => x[1]).map(x => short(x[0]) + " " + fmt(x[1])).join(" · ");
+    const row = (label, amt, sign, title) =>
+      "<tr><td" + (title ? ' title="' + title.replace(/"/g, "&quot;") + '"' : "") + ">" + label + '</td><td class="amt ' + (sign > 0 ? "pos" : "neg") + '">' +
+      (sign > 0 ? "+" : "−") + fmt(Math.abs(amt)) + " dr.</td></tr>";
+    const section = t => '<tr class="section"><td colspan="2">' + t + "</td></tr>";
+    // the first rows of income and expense always show, even at zero; the rest only when they carry money
+    const list = (rows, sign, always) => rows.filter((x, i) => x[1] || i < (always || 0)).map(x => row(x[0], x[1] || 0, sign, x[2])).join("");
+    const chestRow = '<tr class="total"><td>Chest at the audit</td><td class="amt">' + fmt(S.treasury) + " dr.</td></tr>";
+    const full = "<table>" +
+      section("Income, over the ten years") + list(R.inc, 1, 3) +
+      section("Expenses, over the ten years") + list(R.exp, -1, 2) +
+      '<tr class="total"><td>Operating result</td><td class="amt ' + (net >= 0 ? "pos" : "neg") + '">' +
+        (net >= 0 ? "+" : "−") + fmt(Math.abs(net)) + " dr.</td></tr>" +
+      (beyond ? section("The surplus, disposed of at the audit") + list(R.disp, -1) : "") +
+      (tot(R.outside) ? section("Toward building, from outside") + list(R.outside, 1) : "") +
+      chestRow + "</table>";
+    // at village rank the ledger is the chest's arithmetic in five lines, the detail on hover,
+    // and the full table behind a fold; from polis rank the full table is the ledger
+    const simple = "<table>" +
+      '<tr><td>In the chest at the start</td><td class="amt">' + fmt(start) + " dr.</td></tr>" +
+      row("Came in, over the ten years", income, 1, sum(R.inc)) +
+      row("Went out", expense, -1, sum(R.exp)) +
+      (beyond ? row("Put beyond spending", beyond, -1, sum(R.disp)) : "") +
+      (Math.abs(other) >= 1 ? row("By decisions and events", other, other >= 0 ? 1 : -1) : "") +
+      chestRow + "</table>";
+    const firstClose = S.year <= 11;
+    const rentsNote = firstClose
+      ? '<div class="law-note">The sanctuary owns land. Its rents come in whether or not anyone visits, and by the old rule they pay for the ancestral festival before anything else.</div>' +
+        '<div class="law-cite">When Athens re-inscribed its sacrificial calendar, the traditional sacrifices were charged to the sacred rents (Lys. 30).</div>'
+      : "";
     document.getElementById("infoBox").innerHTML =
       '<div class="ledger">' +
-        "<table>" +
-        '<tr class="section"><td colspan="2">Income</td></tr>' +
-        row("Offerings & tariffs (~" + fmt(Math.round(d.pilgrimYears / 10)) + " pilgrims/yr)", d.offerings, 1) +
-        row("Hide sales (dermatikon, " + fmt(d.victims) + " victims; pigs are singed, not flayed)", d.hides, 1) +
-        row("Rents of sacred land", d.rents, 1) +
-        (d.sub ? row("Polis subsidy", d.sub, 1) : "") +
-        (d.extras ? row("Fees & rents of the cult", d.extras, 1) : "") +
-        (d.interest ? row("Interest on the god's loans (10%/yr)", d.interest, 1) : "") +
-        (d.cityInterest ? row("Interest on the city's debt (1.2%/yr)", d.cityInterest, 1) : "") +
-        (d.cityRepay ? row("The city repays part of its debt", d.cityRepay, 1) : "") +
-        (d.indemnity ? row("Indemnity from the league", d.indemnity, 1) : "") +
-        (d.meatSale ? row("Sacrificial meat sold (kreanomia foregone)", d.meatSale, 1) : "") +
-        '<tr class="section"><td colspan="2">Expenses</td></tr>' +
-        row("Festivals held", d.festCost, -1) +
-        row("Upkeep of " + S.built.length + " structures" +
-          (S.attendants ? " and " + S.attendants + " attendant" + (S.attendants === 1 ? "" : "s") : ""), d.upkeep, -1) +
-        (d.works ? row("Paid to the contractors", d.works, -1) : "") +
-        (d.gera ? row("Priestly perquisites (gera)", d.gera, -1) : "") +
-        (d.fine ? row("Fine after the audit of the published accounts", d.fine, -1) : "") +
-        '<tr class="total"><td>Operating result</td><td class="amt ' + (net >= 0 ? "pos" : "neg") + '">' +
-          (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " dr.</td></tr>" +
-        ((d.fund || d.city || d.lent || d.plate)
-          ? '<tr class="section"><td colspan="2">The surplus, disposed of at the audit</td></tr>' +
-            (d.fund ? row("Set aside for building (to the fund)", d.fund, -1) : "") +
-            (d.city ? row("Borrowed by the city", d.city, -1) : "") +
-            (d.lent ? row("Lent at interest (to the loan book)", d.lent, -1) : "") +
-            (d.plate ? row("Worked into plate (to the inventories)", d.plate, -1) : "")
-          : "") +
-        ((d.pledges || d.levy)
-          ? '<tr class="section"><td colspan="2">Toward building, from outside</td></tr>' +
-            (d.pledges ? row("Pledges collected toward the " + (S.campaign ? S.campaign.name.toLowerCase() : "subscription"), d.pledges, 1) : "") +
-            (d.levy ? row("The league's levy (to the fund)", d.levy, 1) : "")
-          : "") +
-        '<tr class="total"><td>Chest at the audit</td><td class="amt">' + fmt(S.treasury) + " dr.</td></tr>" +
-        "</table>" +
+        (S.tier < 1 ? simple + ev("the full ledger", full) : full) +
+        rentsNote +
+        ev("where the money went", moneyPictureHTML(d), firstClose) +
         (S.consult
           ? '<div class="renown-line">' + fmt(S.consult.served) + " heard at the hall" +
             (S.consult.turned ? ", <span class=\"bad\">" + fmt(S.consult.turned) + " turned away for want of room</span>" : "") +
-            " \u00b7 " + fmt(S.consult.income) + " dr./yr</div>"
+            " · " + fmt(S.consult.income) + " dr. per year</div>"
           : "") +
-        '<div class="renown-line">Renown ' + renownBefore + " \u2192 <b>" + renown() + "</b> \u00b7 " +
-        renownParts(" \u00b7 ") + "</div>" +
+        '<div class="renown-line">Renown ' + renownBefore + " → <b>" + renown() + "</b> · " +
+        renownParts(" · ") + "</div>" +
         '<div class="renown-line">The sanctuary is ' + independenceLabel() +
           (termsCount() ? " (" + termsCount() + " condition" + (termsCount() > 1 ? "s" : "") + " of the assembly in force)" : "") + "</div>" +
         (S.projects.length
@@ -8708,7 +8883,50 @@
     S._ledgerHeading = document.getElementById("infoHeading").textContent;
     const lb = document.getElementById("ledgerBtn");
     lb.style.display = "";
-    lb.textContent = "Accounts " + (S.year - 9) + "\u2013" + S.year;
+    lb.textContent = "Accounts " + (S.year - 9) + "–" + S.year;
+  }
+
+  // C: where the money goes — the ledger rearranged as a flow, drawn from the live figures,
+  // so the picture is the same arithmetic as the table and can never disagree with it
+  function moneyPictureHTML(d) {
+    const box = (l, v, cls) => '<div class="mbox' + (cls ? " " + cls : "") + '"><span>' + l + '</span><span class="num">' + v + "</span></div>";
+    const short = s => s.split(" (")[0];
+    let inc, out, chest, when;
+    if (d) {
+      const R = ledgerRows(d);
+      inc = R.inc.filter(x => x[1]).map(x => box(short(x[0]), "+" + fmt(x[1])));
+      out = R.exp.filter(x => x[1]).map(x => box(short(x[0]), "−" + fmt(x[1])))
+        .concat(R.disp.filter(x => x[1]).map(x => box(short(x[0]), "−" + fmt(x[1]), "beyond")));
+      chest = box("Held at the start", fmt(S._chestBefore || 0) + " dr.") + box("At the audit", fmt(S.treasury) + " dr.", "end");
+      when = "over the ten years just closed";
+    } else {
+      const y = S.cal ? calForYear(1) : { cost: 0 };
+      const ec = dEcon();
+      const est = estimatePilgrims(y); // the offerings formula mirrors the decade loop's
+      inc = [box("Rents of sacred land", "+" + fmt(landRents())), box("Offerings of ~" + fmt(est) + " visitors", "+" + fmt(Math.round(3.4 * Math.pow(est, 0.8))))]
+        .concat(ec && ec.kind === "cash" ? [box(short(ec.label), "+" + fmt(ec.amt()))] : []);
+      out = [box("Festivals", "−" + fmt(y.cost)), box("Upkeep of the buildings", "−" + fmt(totalUpkeep()))];
+      chest = box("In the chest now", fmt(S.treasury) + " dr.");
+      when = "per year, as the calendar stands";
+    }
+    const law = S.laws.surplus;
+    const lawName = law === "fund" ? "set aside for building" : law === "loans" ? "lent out at interest" : "worked into plate for the god";
+    const floatLine = "The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest. What stands above it at the audit is <b>" + lawName + "</b>" +
+      (S.tier < 1 ? ". A building fund can be kept from polis rank." : ", as the Sacred law directs.") +
+      ' <button type="button" class="ghost money-law">Sacred law</button>';
+    return '<div class="money-note">Figures are ' + when + ".</div>" +
+      '<div class="money">' +
+        '<div class="mcol"><div class="mh">Comes in</div>' + inc.join("") + "</div>" +
+        '<div class="marrow">→</div>' +
+        '<div class="mcol chest"><div class="mh">The chest</div>' + chest + "</div>" +
+        '<div class="marrow">→</div>' +
+        '<div class="mcol"><div class="mh">Goes out</div>' + out.join("") + "</div>" +
+      "</div>" +
+      '<div class="money-note">' + floatLine + "</div>" +
+      '<div class="law-cite">The god’s dedicated objects are counted apart, as his treasure, and are never spent. IG I³ 78: the remainder is spent on dedications, ‘no provision made for a surplus.’ On Delos the god lent instead — the hieropoioi put Apollo’s money out at 10% per year (Reger). Athens borrowed from its gods at interest (IG I³ 369).</div>';
+  }
+  function openMoneyPicture() {
+    openModal("Where the money goes", S._lastSums ? "the chest, over the last decade" : "the chest, as planned", moneyPictureHTML(S._lastSums || null), true);
   }
 
   function resolveEvent(ev, choice) {
@@ -8753,7 +8971,7 @@
     if (fx.grant) {
       S.grants.push({ ...fx.grant });
       log("A standing arrangement: " + fx.grant.label.toLowerCase() + ", " +
-        fmt(fx.grant.amt) + " dr./yr.", "good");
+        fmt(fx.grant.amt) + " dr. per year.", "good");
     }
     if (fx.rentPct) {
       S.rentMult = Math.max(0.4, (S.rentMult || 1) * (1 + fx.rentPct));
@@ -8796,7 +9014,7 @@
     if (fx.deeds) bit(fx.deeds, "conduct " + (fx.deeds > 0 ? "repaired" : "\u2212" + Math.abs(fx.deeds)));
     if (fx.pilgrimBonus) bit(fx.pilgrimBonus, "visitors " + (fx.pilgrimBonus > 0 ? "+" : "\u2212") + Math.abs(fx.pilgrimBonus) + " for a time");
     if (fx.capacity) bit(fx.capacity, "capacity " + (fx.capacity > 0 ? "+" : "\u2212") + Math.abs(fx.capacity));
-    if (fx.grant) fxBits.push('<span class="pos">income +' + fmt(fx.grant.amt) + " dr./yr</span>");
+    if (fx.grant) fxBits.push('<span class="pos">income +' + fmt(fx.grant.amt) + " dr. per year</span>");
     if (fx.rentPct) bit(fx.rentPct, "rents " + (fx.rentPct > 0 ? "+" : "\u2212") + Math.abs(Math.round(fx.rentPct * 100)) + "%");
     if (fx.priceShock) fxBits.push('<span class="neg">victim prices +' + Math.round(fx.priceShock * 100) + "% for a decade</span>");
     if (fx.dedication) fxBits.push('<span class="pos">a dedication enters the treasure</span>');
@@ -8846,6 +9064,7 @@
   // — the tap gloss: one sentence for one word, on click, tap, or keyboard —
   const GLOSS_EXTRA = {
     splendor: "how impressive a festival is. The average of recent years is multiplied into renown — the sanctuary’s main source of fame.",
+    standard: "the splendor a sanctuary of this rank is expected to show at its festivals: 3 at village rank, 18 at polis, 45 at panhellenic. Below it, renown falls every decade. The first decade is not judged.",
     renown: "how widely the sanctuary is known. It decides your rank, and Pausanias judges it at the end.",
     piety: "how well the god is served. It grows with rites and feasts, decays if neglected, and draws more visitors.",
     conduct: "the sanctuary’s good name. Expedient choices lower it, and it takes decades to recover.",
@@ -8940,7 +9159,7 @@
       title: "The sanctuary rises: polis standing",
       body: "The assembly of the polis votes to adopt the cult as its own. Magistrates will sit in the front row at the festival, and the festival is announced in the city's name as well as the god's. The board now answers to the assembly." +
         "<br>\u2022 <b>Polis subsidy:</b> +" + fmt(subsidy()) + " dr. enters the ledger each year." +
-        "<br>\u2022 <b>The building fund:</b> can now be kept. Switch it on under the fund\u2019s figure in the header." +
+        "<br>\u2022 <b>The building fund:</b> " + (S.laws.surplus === "fund" ? "the treasurers now set a tenth of income aside each decade toward the next large building. The switch is under the fund\u2019s figure in the header, and the rule is in the Sacred law." : "can now be kept. Switch it on under the fund\u2019s figure in the header.") +
         "<br>\u2022 <b>Higher expectations:</b> festivals are now expected to reach splendor " + FEST_EXPECT[1] + "; a calendar below that loses renown every decade. For this decade and the next the loss is halved." +
         "<br>\u2022 <b>Unlocked:</b> the polis-stage buildings, hecatomb festivals, and a wider boundary." +
         "<br><i>Most Greek sanctuaries never rose past local standing; adoption by the city was itself an achievement.</i>",
@@ -8989,9 +9208,14 @@
     if (S._incomeRate !== undefined) {
       const net = S._incomeRate - (S._expenseRate || 0);
       ts.className = "status num " + (net >= 0 ? "good" : "warn");
-      ts.textContent = (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " a year";
+      ts.textContent = (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " per year";
     } else { ts.className = "status"; ts.textContent = "spendable silver"; }
     renderFundRow();
+    // B: at village rank there is no fund to show; the header keeps five meters
+    const fm = document.getElementById("fundMeter");
+    if (fm) fm.style.display = S.tier < 1 ? "none" : "";
+    const mtr = document.querySelector(".meters");
+    if (mtr) mtr.classList.toggle("five", S.tier < 1);
     document.getElementById("mTreasure").innerHTML =
       (S.dedications.length ? fmt(treasureVal()) : "\u2014") + " <small>dr.</small>";
     document.getElementById("mTreasureSub").textContent =
@@ -9010,6 +9234,11 @@
     if (shortNow > 0) {
       rs.className = "status warn";
       rs.innerHTML = '<button type="button" class="linkish" id="mWarnFix" title="The festivals fall short of what this rank expects. Click to set the calendar.">falling ' + shortNow + " per decade</button>";
+      const fx = document.getElementById("mWarnFix");
+      if (fx) fx.addEventListener("click", openCalModal);
+    } else if (plannedBelow()) {
+      rs.className = "status soft";
+      rs.innerHTML = '<button type="button" class="linkish soft" id="mWarnFix" title="The calendar as it stands is below the standard for this rank. No renown is lost in the first decade. Click to set the calendar.">below the standard \u00b7 set the calendar</button>';
       const fx = document.getElementById("mWarnFix");
       if (fx) fx.addEventListener("click", openCalModal);
     } else { rs.className = "status"; rs.textContent = renownPhrase(); }
@@ -9039,9 +9268,9 @@
     const cb = document.getElementById("calBtn");
     if (cb && S.cal) {
       const shortNow = festivalShortfall();
-      cb.classList.toggle("due", shortNow > 0);
+      cb.classList.toggle("due", shortNow > 0 || plannedBelow());
       cb.innerHTML = "Set the festival calendar";
-      cb.title = shortNow > 0 ? "The festivals fall short of what this rank expects." : "";
+      cb.title = shortNow > 0 ? "The festivals fall short of what this rank expects." : plannedBelow() ? "The calendar as it stands is below the standard for this rank." : "";
     }
   }
 
@@ -9072,13 +9301,15 @@
     // three short lines: the plan and its cost, the splendor against the standard, the verdict
     const verdict = '<span class="line">' + (short
       ? '<span class="warn">' + (held ? "last decade " + festivalRep() : "as planned") + ": renown falls " + short + " per decade</span>"
-      : '<span class="good">' + (held ? "last decade " + festivalRep() + " \u00b7 " : "") + "meets the standard</span>") + "</span>";
+      : (!held && y.rep < want)
+        ? '<span class="soft">as planned: below the standard \u00b7 nothing is lost in the first decade</span>'
+        : '<span class="good">' + (held ? "last decade " + festivalRep() + " \u00b7 " : "") + "meets the standard</span>") + "</span>";
     rowEl.innerHTML =
       '<div class="drow"><span class="dl">Festivals</span><span class="dv stack">' +
         '<span class="line"><span title="' + hover.replace(/"/g, "&quot;") + '">' + names + "</span>" +
-          '<span><span class="num">' + fmt(y.cost) + "</span> dr./yr" + (strain ? ' <span class="bad">over income</span>' : "") +
+          '<span><span class="num">' + fmt(y.cost) + "</span> dr. per year" + (strain ? ' <span class="bad">over income</span>' : "") +
           ' <button class="ghost" id="calEditBtn">Edit</button></span></span>' +
-        '<span class="line"><span>splendor <span class="num">' + y.rep + '</span> planned <span class="lo">\u00b7 standard ' + want + "</span></span></span>" +
+        '<span class="line"><span>' + gl("splendor") + ' <span class="num">' + y.rep + '</span> planned <span class="lo">\u00b7 ' + gl("standard") + " " + want + "</span></span></span>" +
         verdict +
       "</span></div>";
     const b = document.getElementById("calEditBtn");
@@ -9095,17 +9326,17 @@
     const bld = consultBld();
     const where = S.deity === "apollo" ? "the chamber" : bld.lvl === 0 ? "the porch" : "the hall";
     const feeTip = "Each one heard pays " + fmt(consultFee()) + " dr. Demand follows the sanctuary\u2019s fame and the times.";
-    const roomTip = "Room is " + where + "\u2019s couches plus the priests and attendants who hear them. An attendant is paid " + ATTENDANT_WAGE + " dr. a year" +
-      (S.attendants ? "; " + fmt(attendantCost()) + " dr. a year in wages now" : "") + ".";
+    const roomTip = "Room is " + where + "\u2019s couches plus the priests and attendants who hear them. An attendant is paid " + ATTENDANT_WAGE + " dr. per year" +
+      (S.attendants ? "; " + fmt(attendantCost()) + " dr. per year in wages now" : "") + ".";
     // two short lines: who comes and what they pay; the room and who provides it. A third, in red, when the sick are turned away
     rowEl.innerHTML = '<div class="drow"><span class="dl">' + word.charAt(0).toUpperCase() + word.slice(1) + '</span><span class="dv stack">' +
-      '<span class="line"><span title="' + feeTip + '"><span class="num">' + fmt(dem) + "</span> a year, " + (turned ? fmt(served) + " heard" : "all heard") + "</span>" +
-        '<span><span class="num">' + fmt(consultIncome()) + "</span> dr./yr</span></span>" +
+      '<span class="line"><span title="' + feeTip + '"><span class="num">' + fmt(dem) + "</span> per year, " + (turned ? fmt(served) + " heard" : "all heard") + "</span>" +
+        '<span><span class="num">' + fmt(consultIncome()) + "</span> dr. per year</span></span>" +
       '<span class="line"><span class="lo" title="' + roomTip + '">room for ' + fmt(cap) + " \u00b7 " + where + ", " + S.priests.length + " priest" + (S.priests.length === 1 ? "" : "s") +
         (S.attendants ? ", " + S.attendants + " attendant" + (S.attendants === 1 ? "" : "s") : "") + "</span></span>" +
-      '<span class="line"><span>' + (S.attendants < ATTENDANT_CAP ? '<button class="ghost" id="hireAtt" title="Hire an attendant, ' + ATTENDANT_WAGE + ' dr. a year">Hire an attendant (' + ATTENDANT_WAGE + ' dr./yr)</button>' : "") +
+      '<span class="line"><span>' + (S.attendants < ATTENDANT_CAP ? '<button class="ghost" id="hireAtt" title="Hire an attendant, ' + ATTENDANT_WAGE + ' dr. per year">Hire an attendant (' + ATTENDANT_WAGE + ' dr. per year)</button>' : "") +
         (S.attendants > 0 ? '<button class="ghost" id="fireAtt" title="Let an attendant go">Let one go</button>' : "") + "</span></span>" +
-      (turned ? '<span class="line"><span class="warn">' + fmt(turned) + " turned away a year; more room is needed</span></span>" : "") +
+      (turned ? '<span class="line"><span class="warn">' + fmt(turned) + " turned away per year; more room is needed</span></span>" : "") +
       "</span></div>";
     const h = document.getElementById("hireAtt");
     if (h) h.addEventListener("click", () => {
@@ -9141,7 +9372,7 @@
     const y = S.cal ? calForYear(1) : { mult: 1, cost: 0 };
     const row = (label, value) => '<div class="drow"><span class="dl">' + label + '</span><span class="dv">' + value + "</span></div>";
     const est = estimatePilgrims(y), capShow = pilgrimCap();
-    let html = row("Visitors", '<span><span class="num">' + fmt(est) + "</span> a year <span class=\"lo\">\u00b7 room for " + fmt(capShow) + "</span></span>" +
+    let html = row("Visitors", '<span><span class="num">' + fmt(est) + "</span> per year <span class=\"lo\">\u00b7 room for " + fmt(capShow) + "</span></span>" +
       (est > capShow ? '<span class="warn" title="Crowds overflow the room. Every building adds room; lodging adds the most.">overflowing \u00b7 build for room</span>' : ""));
     if (S.projects.length) {
       const pr = S.projects[0];
@@ -9157,7 +9388,7 @@
       const kept = guestList().filter(g => guestKept(g.key));
       html += row("Other gods", "<span>" + guestList().map(g =>
         guestKept(g.key) ? g.name : '<span class="bad">' + g.name + " (lapsed)</span>").join(", ") + "</span>" +
-        (kept.length ? '<span><span class="num">' + fmt(guestCost()) + "</span> dr./yr</span>" : ""));
+        (kept.length ? '<span><span class="num">' + fmt(guestCost()) + "</span> dr. per year</span>" : ""));
     }
     const tl = document.getElementById("timesLine");
     if (tl) { const w = S.winds ? windOf(S.year) : null; tl.textContent = w ? WIND_SHORT[w] || "" : ""; tl.title = w ? WIND_LINE[w] || "" : ""; }
@@ -9251,8 +9482,8 @@
   function fxLine(id, l) {
     return "cost " + fmt(costOf(id, l)) + " dr. · +" + Math.round(drawOf(id, l) * 2.5) +
       " visitor capacity · +" + l.renown + " buildings" +
-      (l.income ? " · +" + l.income + " dr./yr fees" : "") +
-      " · upkeep " + l.upkeep + " dr./yr";
+      (l.income ? " · +" + l.income + " dr. per year fees" : "") +
+      " · upkeep " + l.upkeep + " dr. per year";
   }
 
   function showCatalogFile(b) {
@@ -9431,14 +9662,14 @@
     const tip = (title, body) => '<div class="t-name">' + title + "</div><div>" + body + "</div>";
     return {
       mTreasuryLabel: () => tip("Sacred treasury", "Spendable silver. It is audited each decade to a float of " + fmt(WORK_FLOAT[S.tier]) + " dr.; what stands above the float is worked into plate, lent, or set aside for building." +
-        (S._incomeRate !== undefined ? " Last decade: +" + fmt(S._incomeRate) + " and \u2212" + fmt(S._expenseRate || 0) + " dr. a year." : "") +
-        (oblig ? " " + fmt(oblig) + " dr. is reserved for the building contracts." : "")),
+        (S._incomeRate !== undefined ? " Last decade: +" + fmt(S._incomeRate) + " and \u2212" + fmt(S._expenseRate || 0) + " dr. per year." : "") +
+        (oblig ? " " + fmt(oblig) + " dr. is reserved for the building contracts." : "") + " Click the meter for a picture of where the money goes."),
       mFundLabel: () => tip("Building fund", S.tier < 1 ? "Silver set aside for capital works. A fund can be kept from polis rank."
         : "Silver set aside for capital works. While the switch is on, a tenth of income goes in each decade, up to " + fmt(fundCap()) + " dr., and only out of a surplus."),
       mTreasureLabel: () => tip("The god\u2019s treasure", "Dedicated objects: plate, statues, spits. They add renown and can be lent to the city, but are never spent."),
       mRenownLabel: () => tip("Renown", "Where it comes from:") + renownRows(),
       mPietyLabel: () => tip("Piety", "How faithfully the god is served. Monthly rites and the right victims raise it; neglect lowers it. It counts toward renown, the demos looks for 30 before it votes money, and the cities pledge and answer the theoroi more readily when it is high." +
-        " It falls a point a year on its own" + (S.tier >= 1 ? ", and " + (S.tier === 2 ? "half a point" : "a quarter point") + " more at this rank" : "") + "; the rites hold it up. The cap is " + pietyCap() + " at this rank."),
+        " It falls a point per year on its own" + (S.tier >= 1 ? ", and " + (S.tier === 2 ? "half a point" : "a quarter point") + " more at this rank" : "") + "; the rites hold it up. The cap is " + pietyCap() + " at this rank."),
       mYearLabel: () => tip("Year of the sanctuary", "Each step advances ten years."),
     };
   }
@@ -9475,11 +9706,11 @@
       const need = TIERS[1].renownAt, R = renown();
       const pct = Math.max(0, Math.min(100, Math.round(100 * R / need)));
       el.innerHTML = '<span class="sarrow">\u2192 polis</span><span class="sbar"><span class="sfill" style="width:' + pct + '%"></span></span>' +
-        "<span>" + fmt(Math.min(R, need)) + " of " + need + " renown</span>";
+        '<span class="sep">\u00b7</span><span>' + fmt(Math.min(R, need)) + " of " + need + " renown</span>";
       return;
     }
     el.innerHTML = '<span class="sarrow">\u2192 panhellenic</span>' +
-      standingShort().map((t, i) => (i ? '<span class="sep">\u00b7</span>' : "") +
+      standingShort().map(t => '<span class="sep">\u00b7</span>' +
         '<span class="tok ' + (t.ok ? "ok" : "no") + '" data-how="' + t.how.replace(/"/g, "&quot;") + '">' + t.label + (t.ok ? " \u2713" : "") + "</span>").join("");
   }
   function showStandingModal() {
@@ -9612,6 +9843,7 @@
     tipHide(); // the element under the pointer may be gone after a render
     renderMeters();
     renderFestivalSelect();
+    renderTreasurer();
     renderProjection();
     renderPersonnel();
     renderConsult();
@@ -9650,7 +9882,7 @@
         '<div class="law-cite">Mikalson lists the monthly festival days positively attested at Athens: the new moon and the second, and the days of Athena, Herakles, Artemis, Apollo and Poseidon. Most gods have none (<i>Sacred and Civil Calendar</i>, 24).</div></div>';
     const guestRow = guestList().length
       ? '<div class="law-row"><div class="law-name"><b>The other gods in the precinct</b></div>' +
-        '<div style="font-size:.82rem; margin-bottom:.35rem">One god presides here; these were invited in, and each takes a victim a year. Letting a rite lapse saves the money and costs piety.</div>' +
+        '<div style="font-size:.82rem; margin-bottom:.35rem">One god presides here; these were invited in, and each takes a victim per year. Letting a rite lapse saves the money and costs piety.</div>' +
         guestList().map(g => {
           const on = guestKept(g.key);
           return '<div class="law-opts" style="align-items:baseline">' +
@@ -9670,7 +9902,7 @@
       '<div class="law-row"><div class="law-name"><b>Monthly rites</b></div>' +
       '<div class="law-opts">' +
       [0, 1, 2].map(i => '<button class="' + (cal.monthly === i ? "cur" : "ghost") + '" data-cal="monthly" data-v="' + i + '">' +
-        ["None", "New-moon offering (12 dr./yr)", "New-moon + purifications (48 dr./yr)"][i] + "</button>").join("") +
+        ["None", "New-moon offering (12 dr. per year)", "New-moon + purifications (48 dr. per year)"][i] + "</button>").join("") +
       '</div><div class="law-note">Regular ' + gl("monthly rites") + ' maintain ' + gl("piety") + '; skipping them costs piety every year.' +
       (DY ? " Keeping them also observes the " + ORD[DY.n] + ", the god\u2019s own day of the month." : "") + "</div>" +
       ev("where this comes from",
@@ -9757,8 +9989,8 @@
     const totals =
       '<div class="cal-totals sticky">' +
         '<div class="ct"><div class="ct-l lapidary">Cost of the calendar</div>' +
-          '<div class="ct-v num' + (strain ? " warn" : "") + '">' + fmt(yNow.cost) + ' <small>dr./yr</small></div>' +
-          '<div class="ct-s">' + (inc !== null ? "against about " + fmt(inc) + " dr./yr of income" : "set the rites, then advance the decade") +
+          '<div class="ct-v num' + (strain ? " warn" : "") + '">' + fmt(yNow.cost) + ' <small>dr. per year</small></div>' +
+          '<div class="ct-s">' + (inc !== null ? "against about " + fmt(inc) + " dr. per year of income" : "set the rites, then advance the decade") +
             (S.tier >= 1 && cal.peak ? " \u00b7 the greater year costs " + fmt(calForYear(4).cost) + " dr." : "") + "</div></div>" +
         '<div class="ct"><div class="ct-l lapidary">Splendor over a decade</div>' +
           '<div class="ct-v num' + (avg < want || kept < have ? " warn" : " good") + '">' + avg +
@@ -9967,7 +10199,7 @@
       '<div class="law-row"><b>' + document.getElementById("deityLine").textContent + "</b> \u2014 year " + S.year + ", " +
         TIERS[S.tier].label + " rank, renown " + fmt(renown()) + " (" + renownPhrase() + ")</div>" +
       '<div class="law-row"><b>The calendar</b>: ' + S.cal.heortai.map(h => h.name).join(", ") +
-        (S.cal.monthly ? " \u00b7 monthly rites" : "") + " \u00b7 splendor " + y.rep + " on " + fmt(y.cost) + " dr./yr</div>" +
+        (S.cal.monthly ? " \u00b7 monthly rites" : "") + " \u00b7 splendor " + y.rep + " on " + fmt(y.cost) + " dr. per year</div>" +
       '<div class="law-row"><b>The law</b>: ' + lawLine + "</div>" +
       (() => { // the cult's own measure, not the general one
         const d = DMAP[S.deity] || {}, ec = dEcon() || (d.econ && d.econ.kind === "dedication" ? d.econ : {});
@@ -10369,6 +10601,9 @@
     Object.keys(tips).forEach(id => { const el = document.getElementById(id); if (el) hoverTip(el, tips[id]); });
   })();
   document.getElementById("endYearBtn").addEventListener("click", () => endYear());
+  document.querySelector(".meter.treasury").addEventListener("click", () => { if (S.deity) openMoneyPicture(); });
+  document.getElementById("moneyBtn").addEventListener("click", () => { if (S.deity) openMoneyPicture(); });
+  document.addEventListener("click", e => { if (e.target.closest && e.target.closest(".money-law")) { e.preventDefault(); openLawModal(); } });
   document.getElementById("log").addEventListener("click", e => { const en = e.target.closest(".log-entry"); if (en) en.classList.toggle("open"); });
   const stripEl = document.getElementById("standingStrip");
   stripEl.addEventListener("mouseover", e => { const t = e.target.closest(".tok"); if (t && t.dataset.how) tipShow("<div>" + t.dataset.how + "</div>", e); });
@@ -10380,7 +10615,7 @@
     if (!e.target || e.target.id !== "fundToggle") return;
     S.laws.surplus = S.laws.surplus === "fund" ? "plate" : "fund";
     log(S.laws.surplus === "fund"
-      ? "The treasurers will set aside up to " + fmt(fundCap()) + " dr. a decade toward building."
+      ? "The treasurers will set aside up to " + fmt(fundCap()) + " dr. per decade toward building."
       : "The treasurers will work the whole surplus into plate again.", "");
     renderAll();
   });
@@ -10406,6 +10641,7 @@
     focusSiteFile();
   });
   document.getElementById("calBtn").addEventListener("click", openCalModal);
+  document.getElementById("treasurerBtn").addEventListener("click", () => { S.treasurerOff = !S.treasurerOff; renderAll(); });
   (function wireReference() {
     const btn = document.getElementById("refBtn"), pop = document.getElementById("refPop");
     const close = () => { pop.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); };
