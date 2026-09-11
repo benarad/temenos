@@ -10,6 +10,7 @@
     --ink-soft: #5A5040;
     --ink-faint: #8C8068;
     --line: #C9BFA6;
+    --wash: rgba(138, 109, 59, .16); /* the brief tint on a row that changed */
     --terra: #A64B2A;
     --terra-soft: #C4693F;
     --verdigris: #4E7E6B;
@@ -28,6 +29,7 @@
       --danger: #D2505C; --plan-line: #D8CDB4; --plan-faint: #574C37;
       --water: #7FA3B8;
       --shadow: 0 1px 3px rgba(0,0,0,.4);
+      --wash: rgba(192, 161, 102, .18);
     }
   }
   :root[data-theme="light"] {
@@ -36,6 +38,7 @@
     --terra: #A64B2A; --terra-soft: #C4693F; --verdigris: #4E7E6B; --bronze: #8A6D3B;
     --danger: #A32E3B; --plan-line: #3A3123; --plan-faint: #B8AD90; --water: #5E7E93;
     --shadow: 0 1px 3px rgba(44,37,25,.12);
+    --wash: rgba(138, 109, 59, .16);
   }
   :root[data-theme="dark"] {
     --ground: #211C15; --ground-2: #2A241B; --panel: #2A241B;
@@ -43,6 +46,7 @@
     --terra: #D0693C; --terra-soft: #A64B2A; --verdigris: #6FA98F; --bronze: #C0A166;
     --danger: #D06A55; --plan-line: #D8CDB4; --plan-faint: #574C37; --water: #7FA3B8;
     --shadow: 0 1px 3px rgba(0,0,0,.4);
+    --wash: rgba(192, 161, 102, .18);
   }
 
   * { box-sizing: border-box; }
@@ -141,6 +145,66 @@
   .meter .status button.switch.ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); }
   .meter .pbar { margin-top: .3rem; }
   .meter.treasury .value { color: var(--bronze); }
+  /* motion that states a fact, three moves used everywhere:
+     the count, a figure runs to its new value over half a second;
+     the chip, a small +9 or −4 beside the figure, then gone;
+     the wash, a row whose figures changed takes a brief tint */
+  .meter { position: relative; }
+  .mchip { position: absolute; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums;
+    font-size: .64rem; line-height: 1; white-space: nowrap; pointer-events: none; opacity: 0; }
+  .mchip.up { color: var(--verdigris); }
+  .mchip.down { color: var(--danger); }
+  .mchip.show { animation: chipLife 2.4s ease-out forwards; }
+  @keyframes chipLife {
+    0% { opacity: 0; transform: translateY(4px); }
+    12% { opacity: 1; transform: translateY(0); }
+    70% { opacity: 1; transform: translateY(-1px); }
+    100% { opacity: 0; transform: translateY(-7px); }
+  }
+  .meter .pbar .pfill, .standing-strip .sfill, .fbar .pfill { transition: width .55s ease; }
+  @keyframes rowWash {
+    0% { background: var(--wash); box-shadow: 0 0 0 .3rem var(--wash); }
+    100% { background: transparent; box-shadow: 0 0 0 .3rem transparent; }
+  }
+  .drow.changed { animation: rowWash 1.5s ease-out; }
+  /* a choice under the pointer says which figures it would move, and which way */
+  .meter { transition: box-shadow .15s ease; }
+  .meter.will-up { box-shadow: inset 0 -3px 0 0 var(--verdigris); }
+  .meter.will-down { box-shadow: inset 0 -3px 0 0 var(--danger); }
+  /* an entry written this turn arrives marked, and the mark fades */
+  @keyframes logNew {
+    0% { background: var(--wash); box-shadow: 0 0 0 .25rem var(--wash); transform: translateY(-3px); }
+    10% { transform: translateY(0); }
+    60% { background: var(--wash); box-shadow: 0 0 0 .25rem var(--wash); }
+    100% { background: transparent; box-shadow: 0 0 0 .25rem transparent; }
+  }
+  .log-entry.new, .log-decade.new { animation: logNew 5s ease-out both; }
+  /* a promotion: the badge changes over and the boundary is drawn anew */
+  @keyframes badgeSwap { 0% { opacity: 1; } 45% { opacity: 0; transform: translateY(2px); } 55% { opacity: 0; } 100% { opacity: 1; transform: none; } }
+  .tier-badge.swap { animation: badgeSwap .6s ease-in-out; }
+  @keyframes periRise { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: none; } }
+  #plan.promoted .peri-piece { animation: periRise .9s ease-out both; }
+  /* the receipt: an answered card keeps its place, with what was chosen and what followed */
+  .event-card.resolved h3::after { content: " \00b7 resolved"; color: var(--ink-faint); font-weight: 400; font-size: .74rem; }
+  .event-card .receipt { margin-top: .6rem; padding-top: .5rem; border-top: 1px dashed var(--line); animation: receiptIn .35s ease-out both; }
+  .event-card .receipt .chosen { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; color: var(--terra); font-family: Optima, Candara, "Gill Sans", sans-serif; }
+  .event-card .receipt p { margin: .25rem 0 0; }
+  @keyframes receiptIn { 0% { opacity: 0; transform: translateY(4px); } 100% { opacity: 1; transform: none; } }
+  /* a dot on what has just become available, until it is first looked at */
+  .newdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--terra); margin-left: .4rem; vertical-align: middle; }
+  .bcard.fresh .btier { color: var(--terra); }
+  /* the last decades of a figure, as small bars in its explanation */
+  .t-trend { display: flex; align-items: flex-end; gap: .5rem; margin-top: .4rem; }
+  .t-bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 18px; }
+  .t-bars i { display: inline-block; width: 7px; background: var(--ink-faint); border-radius: 1px; }
+  .t-bars i:last-child { background: var(--terra); }
+  .t-tl { font-size: .62rem; color: var(--ink-faint); }
+  @media (prefers-reduced-motion: reduce) {
+    .mchip.show { animation: none; opacity: 1; }
+    .meter .pbar .pfill, .standing-strip .sfill, .fbar .pfill { transition: none; }
+    .drow.changed { animation: none; }
+    .log-entry.new, .log-decade.new, .tier-badge.swap, #plan.promoted .peri-piece, .event-card .receipt { animation: none; }
+  }
   .drow.block .fbar { font-size: .72rem; margin: .2rem 0 .1rem; }
   .drow.block .fbar .pbar { height: 3px; background: var(--line); margin-top: .2rem; }
   .drow.block .fbar .pfill { height: 100%; background: var(--bronze); }
@@ -255,13 +319,17 @@
   .tally.terms .trow .twhy { grid-column: 1 / -1; }
   .tally .trow .tag { margin-left: 0; justify-self: start; }
   /* the figures of a card in one strip */
-  .herald .hstrip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: .5rem 0 .35rem; }
-  .herald .hs { background: var(--panel); padding: .3rem .55rem .35rem; min-width: 0; }
-  .herald .hs .hl { font-size: .54rem; color: var(--ink-soft); letter-spacing: .12em; }
-  .herald .hs .hv { font-size: .92rem; line-height: 1.2; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .herald .hs .hv small { font-size: .6rem; color: var(--ink-faint); font-family: inherit; }
-  .herald .hs.good .hv { color: var(--verdigris); }
-  .herald .hs.warn .hv { color: var(--danger); }
+  .hstrip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: .5rem 0 .35rem; }
+  .hs { background: var(--panel); padding: .3rem .55rem .35rem; min-width: 0; }
+  .hs .hl { font-size: .54rem; color: var(--ink-soft); letter-spacing: .12em; }
+  .hs .hv { font-size: .92rem; line-height: 1.2; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hs .hv small { font-size: .6rem; color: var(--ink-faint); font-family: inherit; }
+  .hs.good .hv { color: var(--verdigris); }
+  .hs.warn .hv { color: var(--danger); }
+  .ledger .hstrip { margin: 0 0 .6rem; }
+  /* the panel holds still while the years pass, then the accounts appear */
+  #infoSection { transition: opacity .35s ease; }
+  #infoSection.holding { opacity: 0; transition: none; }
   .herald .lo { color: var(--ink-faint); }
   .herald .ev { margin-top: .45rem; }
   .herald .ev > summary { font-size: .72rem; }
@@ -877,13 +945,13 @@
     <div class="value num" id="mRenown">&mdash;</div>
     <div class="status" id="mRenownSub"></div>
   </div>
-  <div class="meter">
+  <div class="meter piety">
     <div class="label lapidary" id="mPietyLabel">Piety</div>
     <div class="value num" id="mPiety">&mdash;</div>
     <div class="status" id="mPietySub"></div>
     <div class="pbar"><div class="pfill" id="mPietyBar" style="width:35%"></div></div>
   </div>
-  <div class="meter">
+  <div class="meter year">
     <div class="label lapidary" id="mYearLabel">Year</div>
     <div class="value num" id="mYear">1</div>
     <div class="status" id="mYearSub">the founding</div>
@@ -978,7 +1046,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. sphragis</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. semeia</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -6097,7 +6165,7 @@
     const wallLvl = periIdx >= 0 ? S.built[periIdx].lvl : 2;
     const PERI = curPeribolos();
     const wallPiece = (d, fn) => items.push({ d, draw: parent => {
-      const wg = el("g", { class: "built-g" }, parent);
+      const wg = el("g", { class: "built-g peri-piece" }, parent);
       fn(wg);
       if (periIdx >= 0) {
         wg.addEventListener("click", ev => {
@@ -6472,6 +6540,7 @@
 
   const heraldQ = [];
   let heraldOpen = false;
+  let heraldHold = false; // the decade's cards wait while the years pass before the eye
 
   /* — portrait medallions: cited details of museum vase photographs — */
   const MEDB = {
@@ -6655,7 +6724,8 @@
 
   function updateAdvance() {
     const b = document.getElementById("endYearBtn");
-    if (S._heraldBlocking) { b.disabled = true; b.textContent = "Answer the herald first"; }
+    if (replaying) { b.disabled = true; b.textContent = PASSING; }
+    else if (S._heraldBlocking) { b.disabled = true; b.textContent = "Answer the herald first"; }
     else { b.disabled = false; b.textContent = "Advance the decade \u2014 ten years pass"; }
   }
 
@@ -6707,10 +6777,10 @@
       return;
     }
     heraldQ.push(card);
-    if (!heraldOpen) heraldNext();
+    if (!heraldOpen && !heraldHold) heraldNext();
   }
   function heraldNext() {
-    if (heraldOpen) return;
+    if (heraldOpen || heraldHold) return; // held cards wait for the years to pass
     const card = heraldQ.shift();
     if (card) heraldShow(card);
   }
@@ -6963,8 +7033,8 @@
 
   // the figures of a card in one strip: a label and a number per cell
   function hstrip(cells) {
-    return '<div class="hstrip">' + cells.filter(Boolean).map(([l, v, cls]) =>
-      '<div class="hs' + (cls ? " " + cls : "") + '"><div class="hl lapidary">' + l + '</div><div class="hv num">' + v + "</div></div>").join("") + "</div>";
+    return '<div class="hstrip">' + cells.filter(Boolean).map(([l, v, cls, title]) =>
+      '<div class="hs' + (cls ? " " + cls : "") + '"' + (title ? ' title="' + String(title).replace(/"/g, "&quot;") + '"' : "") + '><div class="hl lapidary">' + l + '</div><div class="hv num">' + v + "</div></div>").join("") + "</div>";
   }
   // a funding bar, as on the treasure meter and the funding card
   function fundBar(label, have, need, unit) {
@@ -8312,6 +8382,7 @@
   }
 
   function endYear(skipGuard) { // one press: ten years pass
+    if (replaying) return; // the last decade is still passing before the eye
     if (!skipGuard && !advanceGuard()) return;
     if (S._heraldBlocking) { updateAdvance(); return; } // a decision is open on the map
     heraldClear(); // heralds without real choices lapse with the decade
@@ -8320,6 +8391,10 @@
       document.getElementById("infoSection").scrollIntoView();
       return;
     }
+    const ticks = []; // one snapshot a year, replayed before the eye once the arithmetic is done
+    heraldHold = true; // the decade's cards wait until the years have passed
+    const tierWas = S.tier;
+    try {
     const tierBefore = S.tier;
     const renownBefore = renown();
     S._chestBefore = S.treasury; // for the ledger's arithmetic and the money picture
@@ -8602,6 +8677,7 @@
         const ev = drawEvent("event");
         if (ev) S.pendingEvents.push(ev);
       }
+      ticks.push({ year: S.year, treasury: S.treasury, pilgrims: S.pilgrims });
     }
 
     // priestly tenures end; most successions pass quietly in the chronicle,
@@ -8988,6 +9064,9 @@
     judgeLaurels();
     S._pietyDelta = pietyR() - (S._pietyPrev !== undefined ? S._pietyPrev : pietyR());
     S._pietyPrev = pietyR();
+    (S._hist = S._hist || []).push({ year: S.year, treasury: S.treasury, fund: S.fund || 0, treasure: treasureVal(),
+      renown: renown(), piety: pietyR(), visitors: Math.round(sums.pilgrimYears / 10) });
+    if (S._hist.length > 8) S._hist.shift();
     showDecadeLedger(sums, renownBefore, chron);
     if (S.tier > tierBefore) tierCeremony(S.tier);
     // festival milestones, each announced once
@@ -9059,7 +9138,12 @@
         ],
       });
     }
-    renderAll();
+    } finally {
+      replayDecade(ticks, () => {
+        const release = () => { heraldHold = false; heraldNext(); };
+        if (S.tier > tierWas) promotionFlourish(renderAll, release); else { renderAll(); release(); }
+      });
+    }
   }
 
   // the rows of a decade's ledger: [label, amount, hover detail]; income and expenses
@@ -9100,6 +9184,21 @@
     return { inc, exp, disp, outside };
   }
 
+  // what changed over the decade, in one row at the head of the accounts: the home of the
+  // decade's changes, of which the chips in the header are the passing echo
+  function changedStrip(d, renownBefore) {
+    const R = renown(), pv = pietyR(), pd = S._pietyDelta || 0;
+    const vis = Math.round((d.pilgrimYears || 0) / 10), visPrev = S._lastVisitors;
+    S._lastVisitors = vis;
+    const start = S._chestBefore || 0;
+    return hstrip([
+      ["Renown", fmt(R) + chip(R - renownBefore), "", "From " + renownBefore + " to " + R + ". " + renownParts(", ") + "."],
+      ["Piety", pv + " <small>of " + pietyCap() + "</small>" + chip(pd), "", "Piety at this close, against the last."],
+      ["Chest", fmt(S.treasury) + " <small>dr.</small>" + chip(S.treasury - start), "", "The chest at the audit, against " + fmt(start) + " dr. at the start of the decade."],
+      ["Visitors", fmt(vis) + " <small>a year</small>" + (visPrev !== undefined ? chip(vis - visPrev) : ""), "",
+        "Pilgrims a year over the decade" + (visPrev !== undefined ? ", against " + fmt(visPrev) + " the decade before." : ".")],
+    ]);
+  }
   function showDecadeLedger(d, renownBefore, chron) {
     document.getElementById("infoHeading").textContent =
       "Ledger — years " + (S.year - 9) + "–" + S.year;
@@ -9143,6 +9242,7 @@
       : "";
     document.getElementById("infoBox").innerHTML =
       '<div class="ledger">' +
+        changedStrip(d, renownBefore) +
         (S.tier < 1 ? simple + ev("the full ledger", full) : full) +
         rentsNote +
         ev("where the money went", moneyPictureHTML(d), firstClose) +
@@ -9151,8 +9251,6 @@
             (S.consult.turned ? ", <span class=\"bad\">" + fmt(S.consult.turned) + " turned away for want of room</span>" : "") +
             " · " + fmt(S.consult.income) + " dr. per year</div>"
           : "") +
-        '<div class="renown-line">Renown ' + renownBefore + " → <b>" + renown() + "</b> · " +
-        renownParts(" · ") + "</div>" +
         '<div class="renown-line">The sanctuary is ' + independenceLabel() +
           (termsCount() ? " (" + termsCount() + " condition" + (termsCount() > 1 ? "s" : "") + " of the assembly in force)" : "") + "</div>" +
         (S.projects.length
@@ -9213,6 +9311,8 @@
 
   function resolveEvent(ev, choice) {
     const fx = choice.fx || {};
+    previewChoice(null, false);
+    const before = { treasury: S.treasury, piety: pietyR(), renown: renown(), treasure: treasureVal() }; // measured afterwards, for the receipt
     if (ev._succName) {
       const di = S.priests.findIndex(pp => pp.name === ev._succName);
       if (di >= 0) {
@@ -9291,15 +9391,20 @@
     const bit = (v, label, flip) => { if (!v) return;
       const good = flip ? v < 0 : v > 0;
       fxBits.push('<span class="' + (good ? "pos" : "neg") + '">' + label + "</span>"); };
-    if (fx.treasury) bit(fx.treasury, "treasury " + (fx.treasury > 0 ? "+" : "\u2212") + fmt(Math.abs(fx.treasury)) + " dr.");
-    if (fx.piety) bit(fx.piety, "piety " + (fx.piety > 0 ? "+" : "\u2212") + Math.abs(fx.piety));
+    // the figures as they actually moved, not as the card nominally priced them
+    const moved = { treasury: Math.round(S.treasury - before.treasury), piety: Math.round(pietyR() - before.piety),
+      renown: Math.round(renown() - before.renown), treasure: Math.round(treasureVal() - before.treasure) };
+    const sg = v => (v > 0 ? "+" : "\u2212") + fmt(Math.abs(v));
+    if (moved.treasury) bit(moved.treasury, "treasury " + sg(moved.treasury) + " dr.");
+    if (moved.piety) bit(moved.piety, "piety " + sg(moved.piety));
+    if (moved.renown) bit(moved.renown, "renown " + sg(moved.renown));
+    if (moved.treasure) bit(moved.treasure, "treasure " + sg(moved.treasure) + " dr.");
     if (fx.deeds) bit(fx.deeds, "conduct " + (fx.deeds > 0 ? "repaired" : "\u2212" + Math.abs(fx.deeds)));
     if (fx.pilgrimBonus) bit(fx.pilgrimBonus, "visitors " + (fx.pilgrimBonus > 0 ? "+" : "\u2212") + Math.abs(fx.pilgrimBonus) + " for a time");
     if (fx.capacity) bit(fx.capacity, "capacity " + (fx.capacity > 0 ? "+" : "\u2212") + Math.abs(fx.capacity));
     if (fx.grant) fxBits.push('<span class="pos">income +' + fmt(fx.grant.amt) + " dr. per year</span>");
     if (fx.rentPct) bit(fx.rentPct, "rents " + (fx.rentPct > 0 ? "+" : "\u2212") + Math.abs(Math.round(fx.rentPct * 100)) + "%");
     if (fx.priceShock) fxBits.push('<span class="neg">victim prices +' + Math.round(fx.priceShock * 100) + "% for a decade</span>");
-    if (fx.dedication) fxBits.push('<span class="pos">a dedication enters the treasure</span>');
     if (fx.projectDelay) fxBits.push('<span class="neg">works +' + fx.projectDelay + " yr</span>");
     if (fx.lend) fxBits.push("silver out at interest");
     if (fx.extendBoundary) fxBits.push('<span class="pos">the temenos is enlarged</span>');
@@ -9320,12 +9425,26 @@
       S.keyDecisions.push({ year: ev._year || S.year, title: ev.title, label: choice.label, cite: ev.cite, score });
       if (S.keyDecisions.length > 14) S.keyDecisions.sort((a, b) => b.score - a.score).length = 14;
     }
-    document.getElementById("infoBox").innerHTML =
-      '<div class="sitefile"><h3>' + ev.title + " — resolved</h3><p>" + choice.log + "</p>" +
-      fxLineHtml +
-      '<div class="cite">' + ev.cite + "</div></div>";
+    // the receipt: the card keeps its place, its choices gone, with what was chosen and what followed
+    const card = document.querySelector("#infoBox .event-card");
+    const receipt = '<div class="receipt"><div class="chosen">' + choice.label + "</div><p>" + choice.log + "</p>" + fxLineHtml + "</div>";
+    if (card) {
+      card.classList.add("resolved");
+      const row = card.querySelector(".choices");
+      if (row) row.remove();
+      card.insertAdjacentHTML("beforeend", receipt);
+    } else {
+      document.getElementById("infoBox").innerHTML =
+        '<div class="event-card resolved"><h3>' + ev.title + "</h3><p>" + ev.body + '</p><div class="cite">' + ev.cite + "</div>" + receipt + "</div>";
+    }
     document.getElementById("infoHeading").textContent = "Event — resolved";
-    if (S.pendingEvents.length) showEvent(S.pendingEvents[0]);
+    if (S.pendingEvents.length) { // the next card waits until the receipt has been read
+      const next = S.pendingEvents[0];
+      clearTimeout(receiptT);
+      receiptT = setTimeout(() => {
+        if (S.pendingEvents[0] === next && document.querySelector("#infoBox .event-card.resolved")) showEvent(next);
+      }, reducedMotion() ? 0 : 2400);
+    }
     renderAll();
   }
 
@@ -9484,8 +9603,233 @@
       .concat(short > 0 ? ["below its rank \u2212" + short] : []).join(sep);
   }
 
+  /* ---------- motion that states a fact ---------- */
+  // Every figure in the header keeps the number it last showed. When a different one arrives,
+  // the figure runs to it over half a second and a chip beside it says by how much, then
+  // fades. The comparison is made here, at render, so every cause is covered without
+  // touching the causes: a card's choice, a hire, a build, the close of the decade. Changes
+  // that come within a breath of each other add up in one chip. Under reduced motion the
+  // count is dropped and the chip simply appears and goes.
+  const shownFig = {};  // meter id -> the number last shown, once the sanctuary is founded
+  const chipBase = {};  // meter id -> { base, t }: the figure a showing chip counts from
+  const chipT = {};     // meter id -> the timer that retires the chip
+  const tweens = {};    // meter id -> { cur, raf } while a count runs
+  const reducedMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  const dispFig = {};   // meter id -> the number on screen right now, whoever wrote it
+  function setFigure(id, num, html) {
+    // num: the figure as a number, or null for a dash; html(v) renders a value for the cell
+    const el = document.getElementById(id);
+    if (!el) return;
+    const paint = v => { el.innerHTML = html(v); dispFig[id] = v; };
+    const stop = () => { if (tweens[id]) { cancelAnimationFrame(tweens[id].raf); delete tweens[id]; } };
+    const prev = shownFig[id];
+    const target = num === null ? null : Math.round(num);
+    if (!S.deity || prev === undefined || target === null) {
+      // nothing to compare against yet: show it plainly
+      stop();
+      paint(target);
+      shownFig[id] = S.deity ? target : undefined;
+      return;
+    }
+    const base = prev === null ? 0 : prev; // a dash counts as nothing
+    if (target === base) { if (!tweens[id]) paint(target); return; }
+    shownFig[id] = target;
+    const now = performance.now();
+    // changes within a breath of each other add up in one chip, unless the latest runs the
+    // other way: then the chip starts again and says only the latest
+    let cb = chipBase[id];
+    if (!cb || now - cb.t >= 2400 || Math.sign(target - cb.base) !== Math.sign(target - base)) cb = { base: base, t: now };
+    cb.t = now; chipBase[id] = cb;
+    // the count starts from whatever is on screen: a running count, or the replay's last year
+    const from = tweens[id] ? tweens[id].cur : (typeof dispFig[id] === "number" ? dispFig[id] : base);
+    figureChip(id, el, target - cb.base, html(target), html(Math.round(from)));
+    stop();
+    if (reducedMotion() || Math.abs(target - from) < 1) { paint(target); return; }
+    const tw = tweens[id] = { cur: from, raf: 0 };
+    const dur = 520;
+    const step = t => {
+      const k = Math.min(1, (t - now) / dur), e = 1 - Math.pow(1 - k, 3);
+      tw.cur = from + (target - from) * e;
+      paint(k < 1 ? Math.round(tw.cur) : target);
+      if (k < 1) tw.raf = requestAnimationFrame(step); else delete tweens[id];
+    };
+    paint(Math.round(from));
+    tw.raf = requestAnimationFrame(step);
+    // a tab in the background gets no frames: the figure must still arrive
+    setTimeout(() => { if (tweens[id] === tw) { cancelAnimationFrame(tw.raf); delete tweens[id]; paint(target); } }, dur + 250);
+  }
+  // the replay writes a figure without judging it: no chip, no count, and the value last
+  // shown is left as it was, so the close of the decade is measured from its start
+  function showFigure(id, num, html) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (tweens[id]) { cancelAnimationFrame(tweens[id].raf); delete tweens[id]; }
+    const v = Math.round(num);
+    el.innerHTML = html(v); dispFig[id] = v;
+  }
+  // The ten years pass before the eye: one tick a year, the chest and the crowd moving with
+  // it, and only then the accounts, the cards and the rest of the panel. The arithmetic is
+  // already done when this runs; only the telling waits.
+  let replaying = false;
+  const PASSING = "The years pass…";
+  function replayDecade(ticks, done) {
+    if (!ticks.length || reducedMotion()) { done(); return; }
+    replaying = true;
+    const btn = document.getElementById("endYearBtn");
+    if (btn) { btn.disabled = true; btn.textContent = PASSING; }
+    const info = document.getElementById("infoSection");
+    if (info) info.classList.add("holding");
+    const yearEl = document.getElementById("mYear");
+    const visitorsNum = () => {
+      const row = [...document.querySelectorAll("#projection .drow")].find(r => { const l = r.querySelector(".dl"); return l && l.textContent.trim() === "Visitors"; });
+      return row ? row.querySelector(".num") : null;
+    };
+    const finish = () => {
+      replaying = false;
+      if (info) info.classList.remove("holding");
+      done();
+    };
+    // the year shown follows the clock, not the count of calls: a tab whose timers are
+    // slowed still reaches the close in a moment
+    const t0 = performance.now(), PACE = 110;
+    const tick = () => {
+      const k = Math.min(ticks.length - 1, Math.floor((performance.now() - t0) / PACE));
+      const t = ticks[k];
+      if (yearEl) yearEl.textContent = t.year;
+      showFigure("mTreasury", t.treasury, v => fmt(v) + " <small>dr.</small>");
+      const vn = visitorsNum();
+      if (vn) vn.textContent = fmt(t.pilgrims);
+      if (k < ticks.length - 1) setTimeout(tick, PACE); else setTimeout(finish, 180);
+    };
+    tick();
+  }
+  function figureChip(id, valueEl, delta, finalHTML, startHTML) {
+    const meter = valueEl.closest(".meter");
+    if (!meter) return;
+    let chip = meter.querySelector(".mchip");
+    if (!chip) { chip = document.createElement("span"); chip.className = "mchip"; meter.appendChild(chip); }
+    clearTimeout(chipT[id]);
+    if (!delta) { chip.className = "mchip"; delete chipBase[id]; return; }
+    // measure the figure at both ends of its count, so the chip sits beside the wider one and never under it
+    const keep = valueEl.innerHTML, mb = meter.getBoundingClientRect();
+    const r = document.createRange();
+    let vb = null;
+    [finalHTML, startHTML || finalHTML].forEach(h => {
+      valueEl.innerHTML = h;
+      r.selectNodeContents(valueEl);
+      const b = r.getBoundingClientRect();
+      if (!vb || b.right > vb.right) vb = b;
+    });
+    valueEl.innerHTML = keep;
+    chip.textContent = (delta > 0 ? "+" : "\u2212") + fmt(Math.abs(delta));
+    chip.className = "mchip " + (delta > 0 ? "up" : "down");
+    chip.style.left = Math.round(vb.right - mb.left + 5) + "px";
+    chip.style.top = Math.round(vb.top - mb.top + (vb.height - chip.offsetHeight) / 2 + 1) + "px";
+    void chip.offsetWidth; // a chip already showing starts its life again
+    chip.classList.add("show");
+    chipT[id] = setTimeout(() => { chip.classList.remove("show"); delete chipBase[id]; }, 2500);
+  }
+  // a bar rebuilt with its row would jump to its new width; start it where the old one stood
+  function growFill(fill, prevWidth) {
+    if (!fill || prevWidth == null || prevWidth === "" || prevWidth === fill.style.width || reducedMotion()) return;
+    const w = fill.style.width;
+    fill.style.transition = "none";
+    fill.style.width = prevWidth;
+    void fill.offsetWidth;
+    fill.style.transition = "";
+    fill.style.width = w;
+  }
+  function fillWidths(root) {
+    const m = {};
+    root.querySelectorAll(".fbar").forEach(f => {
+      const l = f.querySelector(".flabel"), p = f.querySelector(".pfill");
+      if (l && p) m[l.textContent.split(":")[0]] = p.style.width;
+    });
+    return m;
+  }
+  function regrowFills(root, before) {
+    root.querySelectorAll(".fbar").forEach(f => {
+      const l = f.querySelector(".flabel"), p = f.querySelector(".pfill");
+      if (l && p) growFill(p, before[l.textContent.split(":")[0]]);
+    });
+  }
+  // The Decade's rows: one whose text changed since the last render takes a brief wash, so
+  // that after a turn the eye knows which rows to read. A row is known by its label.
+  const rowSig = {};
+  let rowSigPrimed = false;
+  function markChangedRows() {
+    const root = document.querySelector(".drows");
+    if (!root || !S.deity) return;
+    root.querySelectorAll(".drow").forEach(r => {
+      const lab = r.querySelector(".dl") || r.querySelector(".flabel");
+      const key = (lab ? lab.textContent : r.textContent).split(":")[0].replace(/\s+/g, " ").trim();
+      const sig = r.textContent.replace(/\s+/g, " ").trim();
+      if (rowSigPrimed && rowSig[key] !== undefined && rowSig[key] !== sig && !reducedMotion()) {
+        r.classList.add("changed");
+        r.addEventListener("animationend", () => r.classList.remove("changed"), { once: true });
+      }
+      rowSig[key] = sig;
+    });
+    rowSigPrimed = true;
+  }
+
+  // a promotion gets its beat: the strip fills to the end, the badge changes over while the
+  // new rank renders, the boundary rises into place on the plan, and only then the ceremony's card
+  function promotionFlourish(render, release) {
+    if (reducedMotion()) { render(); release(); return; }
+    const fill = document.querySelector("#standingStrip .sfill");
+    if (fill) fill.style.width = "100%";
+    setTimeout(() => {
+      const tb = document.getElementById("tierBadge");
+      if (tb) { tb.classList.add("swap"); setTimeout(() => tb.classList.remove("swap"), 700); }
+      setTimeout(() => {
+        render();
+        const plan = document.getElementById("plan");
+        if (plan) { plan.classList.add("promoted"); setTimeout(() => plan.classList.remove("promoted"), 1300); }
+        setTimeout(release, 900);
+      }, 280);
+    }, fill ? 700 : 0);
+  }
+  // marks on what has just become available: a dot until it is first looked at
+  const seenMarks = {};
+  let palPrimed = false;
+  function primeMarks() { // what the founding already offers is not news
+    Object.entries(LAWS).forEach(([k, L]) => Object.entries(L.options).forEach(([ok, o]) => {
+      if ((o.minTier || 0) <= S.tier) seenMarks["law:" + k + ":" + ok] = 1;
+    }));
+  }
+  function markSeen(el, key) {
+    const see = () => { seenMarks[key] = 1; el.classList.remove("fresh"); const dot = el.querySelector(".newdot"); if (dot) dot.remove(); };
+    el.addEventListener("mouseenter", see);
+    el.addEventListener("focus", see);
+  }
+  function bindFreshMarks() {
+    const root = document.getElementById("modalBody");
+    if (!root || !S.deity) return;
+    root.querySelectorAll("[data-mark]").forEach(el => markSeen(el, el.dataset.mark));
+    // the calendar's unlocks: the greater year from polis rank, the hecatomb with the monumental altar
+    [["[data-peak]", "cal:peak"], ['[data-tog="hecatomb"]:not([disabled])', "cal:hecatomb"]].forEach(([sel, key]) => {
+      if (seenMarks[key]) return;
+      const el = root.querySelector(sel);
+      if (!el) return;
+      el.classList.add("fresh");
+      el.insertAdjacentHTML("beforeend", '<span class="newdot" title="Newly available"></span>');
+      markSeen(el, key);
+    });
+  }
+  // the last decades of a figure, as small bars under its explanation
+  function trendBars(key) {
+    const h = (S._hist || []).slice(-5);
+    if (h.length < 2) return "";
+    const vals = h.map(x => Math.max(0, Number(x[key]) || 0)), max = Math.max.apply(null, vals.concat([1]));
+    return '<div class="t-trend"><span class="t-bars">' + vals.map((v, i) =>
+      '<i style="height:' + Math.max(2, Math.round(18 * v / max)) + 'px" title="year ' + h[i].year + ': ' + fmt(v) + '"></i>').join("") +
+      '</span><span class="t-tl">the last ' + h.length + ' decades</span></div>';
+  }
+
   function renderMeters() {
-    document.getElementById("mTreasury").innerHTML = fmt(S.treasury) + " <small>dr.</small>";
+    setFigure("mTreasury", S.treasury, v => fmt(v) + " <small>dr.</small>");
     const ts = document.getElementById("mTreasurySub");
     if (S._incomeRate !== undefined) {
       const net = S._incomeRate - (S._expenseRate || 0);
@@ -9498,14 +9842,13 @@
     if (fm) fm.style.display = S.tier < 1 ? "none" : "";
     const mtr = document.querySelector(".meters");
     if (mtr) mtr.classList.toggle("five", S.tier < 1);
-    document.getElementById("mTreasure").innerHTML =
-      (S.dedications.length ? fmt(treasureVal()) : "\u2014") + " <small>dr.</small>";
+    setFigure("mTreasure", S.dedications.length ? treasureVal() : null, v => (v === null ? "\u2014" : fmt(v)) + " <small>dr.</small>");
     document.getElementById("mTreasureSub").textContent =
       (S.dedications.length ? S.dedications.length + (S.dedications.length === 1 ? " object" : " objects") : "no objects yet") +
       (S.loansOut ? " \u00b7 lent " + fmt(S.loansOut) + " dr." : "") +
       (S.cityDebt ? " \u00b7 the city owes " + fmt(S.cityDebt) + " dr." : "");
     renderStandingStrip();
-    document.getElementById("mRenown").textContent = fmt(renown());
+    setFigure("mRenown", renown(), v => fmt(v));
     if (S.deity) document.getElementById("planCaption").textContent =
       "Fig. 1 \u2014 Sanctuary of " + cultName() + ", restored \u00b7 bird\u2019s-eye view \u00b7 year " + S.year;
     if (S.deity) document.getElementById("deityLine").textContent = "Sanctuary of " + cultName() + ", " +
@@ -9527,12 +9870,10 @@
       if (fx) fx.addEventListener("click", openCalModal);
     } else { rs.className = "status"; rs.textContent = renownPhrase(); }
     const pv = pietyR();
-    document.getElementById("mPiety").innerHTML = pv + " <small>of " + pietyCap() + "</small>";
+    setFigure("mPiety", pv, v => v + " <small>of " + pietyCap() + "</small>");
     document.getElementById("mPietyBar").style.width = Math.round(pv / pietyCap() * 100) + "%";
-    const pd = S._pietyDelta;
     document.getElementById("mPietySub").textContent =
-      (pv < 8 ? "neglected" : pv < 16 ? "low" : pv < 27 ? "kept" : "well served") +
-      (pd ? " \u00b7 " + (pd > 0 ? "+" : "\u2212") + Math.abs(pd) + " this decade" : "");
+      (pv < 8 ? "neglected" : pv < 16 ? "low" : pv < 27 ? "kept" : "well served");
     document.getElementById("mYear").textContent = S.year;
     document.getElementById("mYearSub").textContent = yearPhrase();
     const t = TIERS[S.tier];
@@ -9676,7 +10017,10 @@
     }
     const tl = document.getElementById("timesLine");
     if (tl) { const w = S.winds ? windOf(S.year) : null; tl.textContent = w ? WIND_SHORT[w] || "" : ""; tl.title = w ? WIND_LINE[w] || "" : ""; }
-    document.getElementById("projection").innerHTML = html;
+    const pj = document.getElementById("projection");
+    const fills = fillWidths(pj);
+    pj.innerHTML = html;
+    regrowFills(pj, fills);
   }
 
   function countBuilt(id) {
@@ -9714,6 +10058,7 @@
   function renderPalette() {
     const pal = document.getElementById("palette");
     pal.innerHTML = "";
+    const priming = !!S.deity && !palPrimed; // the first offer after the founding is not news
     BUILDINGS.filter(b => !b.eventOnly && (!b.deities || b.deities.includes(S.deity)) && (!b.consultOnly || isConsultCult())).forEach(b => {
       const lvl0 = b.levels[0];
       const t0 = tierOf(b.id, 0, lvl0);
@@ -9728,6 +10073,10 @@
       const maxed = !canBuild && upgIdx < 0 && !locked;
       const isUpg = !canBuild && upgIdx >= 0;
       const nxt = isUpg ? BID[b.id].levels[S.built[upgIdx].lvl + 1] : null;
+      const avail = !locked && !maxed;
+      const mkey = "pal:" + b.id + ":" + (isUpg ? S.built[upgIdx].lvl + 1 : 0);
+      if (priming && avail) seenMarks[mkey] = 1;
+      const fresh = !priming && avail && !!S.deity && !seenMarks[mkey];
       const card = document.createElement("div");
       card.className = "bcard" + (locked ? " locked" : "") + (maxed ? " built-max" : "") +
         (isUpg ? " upgrade" : "") + (S.placingId === b.id ? " selected" : "");
@@ -9735,7 +10084,7 @@
       card.setAttribute("role", "button");
       const tag = isUpg ? "upgrade" : maxed ? "built" : TIERS[t0].label;
       card.innerHTML =
-        '<div class="btier lapidary">' + tag + "</div>" +
+        '<div class="btier lapidary">' + tag + (fresh ? '<span class="newdot" title="Newly available"></span>' : "") + "</div>" +
         '<div class="bname">' + (isUpg ? nxt.name : b.name) + "</div>" +
         (isUpg ? '<div class="bgk">' + b.name.toLowerCase() + ", next stage</div>"
                : (gkOf(b) ? '<div class="bgk">' + gkOf(b) + "</div>" : "")) +
@@ -9744,6 +10093,7 @@
           : (lvl0.cost ? fmt(costOf(b.id, lvl0)) + " dr." +
               (costOf(b.id, lvl0) >= MAJOR_COST ? " · capital work" : "") : "gift of a polis") +
             (upgIdx >= 0 ? " · upgrade available" : (b.levels.length > 1 ? " · upgradeable" : ""))) + "</div>";
+      if (fresh) { card.classList.add("fresh"); markSeen(card, mkey); }
       if (isUpg) {
         const act = () => { S.placingId = null; clearGhost(); inspect(upgIdx); };
         card.addEventListener("click", act);
@@ -9771,6 +10121,7 @@
       banner.classList.remove("bad");
       banner.textContent = "Move over the map to site the " + BID[S.placingId].name.toLowerCase() + " — Esc to cancel";
     }
+    if (priming) palPrimed = true;
   }
 
   function fxLine(id, l) {
@@ -9936,8 +10287,8 @@
     if (!el || !v) return;
     if (!S.deity) { el.innerHTML = ""; v.textContent = "\u2014"; return; }
     const on = S.laws.surplus === "fund";
-    if (S.tier < 1) { v.innerHTML = "\u2014"; el.innerHTML = "kept from polis rank"; return; }
-    v.innerHTML = fmt(S.fund) + " <small>dr.</small>";
+    if (S.tier < 1) { setFigure("mFund", null, () => "\u2014"); el.innerHTML = "kept from polis rank"; return; }
+    setFigure("mFund", S.fund, x => fmt(x) + " <small>dr.</small>");
     el.innerHTML = (on ? "filling" : "not filling") +
       '<button type="button" class="switch' + (on ? "" : " ghost") + '" id="fundToggle" title="' + (on ? "Click to stop setting aside" : "Click to set aside a tenth of income each decade") + '">' + (on ? "on" : "off") + "</button>";
   }
@@ -9964,13 +10315,13 @@
     return {
       mTreasuryLabel: () => tip("Sacred treasury", "Spendable silver. It is audited each decade to a float of " + fmt(WORK_FLOAT[S.tier]) + " dr.; what stands above the float is worked into plate, lent, or set aside for building." +
         (S._incomeRate !== undefined ? " Last decade: +" + fmt(S._incomeRate) + " and \u2212" + fmt(S._expenseRate || 0) + " dr. per year." : "") +
-        (oblig ? " " + fmt(oblig) + " dr. is reserved for the building contracts." : "") + " Click the meter for a picture of where the money goes."),
+        (oblig ? " " + fmt(oblig) + " dr. is reserved for the building contracts." : "") + " Click the meter for a picture of where the money goes.") + trendBars("treasury"),
       mFundLabel: () => tip("Building fund", S.tier < 1 ? "Silver set aside for capital works. A fund can be kept from polis rank."
-        : "Silver set aside for capital works. While the switch is on, a tenth of income goes in each decade, up to " + fmt(fundCap()) + " dr., and only out of a surplus."),
-      mTreasureLabel: () => tip("The god\u2019s treasure", "Dedicated objects: plate, statues, spits. They add renown and can be lent to the city, but are never spent."),
-      mRenownLabel: () => tip("Renown", "Where it comes from:") + renownRows(),
+        : "Silver set aside for capital works. While the switch is on, a tenth of income goes in each decade, up to " + fmt(fundCap()) + " dr., and only out of a surplus.") + trendBars("fund"),
+      mTreasureLabel: () => tip("The god\u2019s treasure", "Dedicated objects: plate, statues, spits. They add renown and can be lent to the city, but are never spent.") + trendBars("treasure"),
+      mRenownLabel: () => tip("Renown", "Where it comes from:") + renownRows() + trendBars("renown"),
       mPietyLabel: () => tip("Piety", "How faithfully the god is served. Monthly rites and the right victims raise it; neglect lowers it. It counts toward renown, the demos looks for 30 before it votes money, and the cities pledge and answer the theoroi more readily when it is high." +
-        " It falls a point per year on its own" + (S.tier >= 1 ? ", and " + (S.tier === 2 ? "half a point" : "a quarter point") + " more at this rank" : "") + "; the rites hold it up. The cap is " + pietyCap() + " at this rank."),
+        " It falls a point per year on its own" + (S.tier >= 1 ? ", and " + (S.tier === 2 ? "half a point" : "a quarter point") + " more at this rank" : "") + "; the rites hold it up. The cap is " + pietyCap() + " at this rank.") + trendBars("piety"),
       mYearLabel: () => tip("Year of the sanctuary", "Each step advances ten years."),
     };
   }
@@ -10006,8 +10357,10 @@
     if (S.tier === 0) {
       const need = TIERS[1].renownAt, R = renown();
       const pct = Math.max(0, Math.min(100, Math.round(100 * R / need)));
+      const was = el.querySelector(".sfill"), prevW = was ? was.style.width : null;
       el.innerHTML = '<span class="sarrow">\u2192 polis</span><span class="sbar"><span class="sfill" style="width:' + pct + '%"></span></span>' +
         '<span class="sep">\u00b7</span><span>' + fmt(Math.min(R, need)) + " of " + need + " renown</span>";
+      growFill(el.querySelector(".sfill"), prevW);
       return;
     }
     el.innerHTML = '<span class="sarrow">\u2192 panhellenic</span>' +
@@ -10071,6 +10424,30 @@
       "</div>";
   }
 
+  // which header figures a choice would move, and which way: a preview by direction only,
+  // shown while the choice is under the pointer; the number comes afterwards, in the chip
+  function fxDirections(fx) {
+    const d = {};
+    const mark = (sel, dir) => { if (dir) d[sel] = (d[sel] || 0) + dir; };
+    if (!fx) return d;
+    if (fx.treasury) mark(".meter.treasury", Math.sign(fx.treasury));
+    if (fx.lend) mark(".meter.treasury", -1);
+    if (fx.grant) mark(".meter.treasury", 1);
+    if (fx.rentPct) mark(".meter.treasury", Math.sign(fx.rentPct));
+    if (fx.priceShock) mark(".meter.treasury", -1);
+    if (fx.piety) mark(".meter.piety", Math.sign(fx.piety));
+    if (fx.deeds) mark(".meter.renown", Math.sign(fx.deeds));
+    if (fx.dedication) { mark("#treasureMeter", 1); mark(".meter.renown", 1); }
+    if (fx.meltFrac) { mark("#treasureMeter", -1); mark(".meter.renown", -1); }
+    return d;
+  }
+  function previewChoice(fx, on) {
+    document.querySelectorAll(".meter.will-up, .meter.will-down").forEach(m => m.classList.remove("will-up", "will-down"));
+    if (!on) return;
+    const d = fxDirections(fx);
+    Object.keys(d).forEach(sel => { const m = document.querySelector(sel); if (m && d[sel]) m.classList.add(d[sel] > 0 ? "will-up" : "will-down"); });
+  }
+  let receiptT = null; // the next card waits until the receipt has been read
   function showEvent(ev) {
     document.getElementById("infoHeading").textContent =
       (ev.kind === "agenda" ? "Before the hieropoioi — Year " : "Event — Year ") + (ev._year || S.year);
@@ -10092,6 +10469,10 @@
       const btn = document.createElement("button");
       btn.textContent = c.label;
       btn.addEventListener("click", () => resolveEvent(ev, c));
+      btn.addEventListener("mouseenter", () => previewChoice(c.fx, true));
+      btn.addEventListener("focus", () => previewChoice(c.fx, true));
+      btn.addEventListener("mouseleave", () => previewChoice(c.fx, false));
+      btn.addEventListener("blur", () => previewChoice(c.fx, false));
       row.appendChild(btn);
     });
     card.appendChild(row);
@@ -10136,11 +10517,17 @@
       d.innerHTML = '<span class="lrow"><span class="lh">' + head + '</span><span class="ly num">yr ' + year + "</span></span>" +
         (rest ? '<span class="lr">' + rest + "</span>" : "");
     }
+    if (S.deity) { // entries arrive marked; those written while the years pass wait for the close
+      d.classList.add("new");
+      if (heraldHold) d.style.animationDelay = "1.4s";
+      d.addEventListener("animationend", () => { d.classList.remove("new"); d.style.animationDelay = ""; }, { once: true });
+    }
     l.prepend(d);
     while (l.childNodes.length > 60) l.removeChild(l.lastChild);
   }
 
   function renderAll() {
+    if (replaying) return; // the years are passing before the eye; the close will render
     tipHide(); // the element under the pointer may be gone after a render
     renderMeters();
     renderFestivalSelect();
@@ -10148,6 +10535,7 @@
     renderProjection();
     renderPersonnel();
     renderConsult();
+    markChangedRows();
     renderPalette();
     renderIso();
     if (S.placingId) drawGhost(ghostPos); // the allowed ground shows as soon as a work is chosen
@@ -10551,8 +10939,10 @@
     const body = Object.entries(LAWS).map(([k, L]) => {
       const opts = Object.entries(L.options).map(([ok, o]) => {
         const locked = (o.minTier || 0) > S.tier;
-        return '<button class="' + (S.laws[k] === ok ? "cur" : "ghost") + '" data-law="' + k +
-          '" data-opt="' + ok + '"' + (locked ? " disabled" : "") + ">" + o.label + "</button>";
+        const mkey = "law:" + k + ":" + ok, fresh = !locked && !seenMarks[mkey];
+        return '<button class="' + (S.laws[k] === ok ? "cur" : "ghost") + (fresh ? " fresh" : "") + '" data-law="' + k +
+          '" data-opt="' + ok + '"' + (fresh ? ' data-mark="' + mkey + '"' : "") + (locked ? " disabled" : "") + ">" + o.label +
+          (fresh ? '<span class="newdot" title="Newly available"></span>' : "") + "</button>";
       }).join("");
       return '<div class="law-row"><div class="law-name"><b>' + L.name + '</b> <span class="gk">\u00b7 ' +
         L.gk + "</span></div>" +
@@ -10590,6 +10980,7 @@
     document.getElementById("modalBody").innerHTML = bodyHtml;
     document.querySelector("#modalBack .modal").classList.toggle("wide", !!wide);
     document.getElementById("modalBack").classList.add("open");
+    bindFreshMarks();
   }
 
   function pausanias() {
@@ -10796,6 +11187,7 @@
     log("The sanctuary is consecrated to " + cultName() + ".", "good");
     if (asp && asp.rule && asp.rule.line) log(asp.rule.line, "");
     showHowTo(d);
+    primeMarks();
     renderAll();
   }
 
