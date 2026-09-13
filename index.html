@@ -424,6 +424,7 @@
   .railbar { position: sticky; top: 0; z-index: 6; flex: none; display: flex; gap: .5rem; align-items: stretch;
     background: var(--panel); padding: .6rem 1.2rem .55rem; margin: 0; border-bottom: 1px solid var(--line); }
   .railbar button.act, .railbar button.endyear { flex: 1 1 50%; width: auto; margin: 0; }
+  .railbar .mini { display: none; } /* the phone's strip of figures: see the phone block */
   button.endyear:hover { background: var(--terra-soft); }
   .projection { margin-top: 0; font-size: .72rem; color: var(--ink-soft); }
   .rail .times { font-style: italic; color: var(--ink-faint); font-size: .74rem; margin: -.45rem 0 .55rem; cursor: help; }
@@ -902,6 +903,12 @@
     .rail { overflow: visible; min-width: 0; }
     .railbar { top: 0; padding: .5rem .8rem; flex-wrap: wrap; }
     .railbar button.act, .railbar button.endyear { flex: 1 1 100%; white-space: normal; padding: .55rem .7rem; }
+    /* the five figures that matter, riding under the buttons as the page scrolls */
+    .railbar .mini { display: flex; flex-basis: 100%; justify-content: space-between; gap: .4rem; padding-top: .15rem; font-size: .7rem; color: var(--ink); }
+    .railbar .mini:empty { display: none; }
+    .railbar .mini .mc { display: flex; align-items: baseline; gap: .25rem; min-width: 0; white-space: nowrap; }
+    .railbar .mini .ml { font-family: Optima, Candara, "Gill Sans", sans-serif; letter-spacing: .1em; text-transform: uppercase; font-size: .5rem; color: var(--ink-faint); }
+    .railbar .mini .mv.warn { color: var(--danger); }
     .rail section { padding-left: .8rem; padding-right: .8rem; }
     header { gap: .4rem .8rem; padding: .7rem .9rem .6rem; }
     header h1 { font-size: 1.1rem; }
@@ -1023,6 +1030,7 @@
     <div class="railbar" id="railBar">
       <button class="act" id="calBtn">Set the festival calendar</button>
       <button class="endyear" id="endYearBtn">Advance the decade</button>
+      <div class="mini" id="miniRow"></div>
     </div>
     <section>
       <h2 class="lapidary">The Decade</h2>
@@ -1080,7 +1088,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron VIII</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron IX</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -8417,6 +8425,7 @@
     drawGhost({ x: v.ok ? v.x : b.x, y: v.ok ? v.y : b.y });
     if (v.ok) notify("Site the enlarged " + bld.name.toLowerCase() + " on any permitted ground; the old stands until the new is dedicated. Click to begin the work.", "");
     else noRoom(v, nCost >= MAJOR_COST); // nothing fits nearby: what stands in the way is lit, and the siting is open for ground elsewhere
+    focusMap(); // one column: and then up to the map
     return true;
   }
   // an enlargement may stand on any permitted ground (BR, 12 Sep 2026): the old building
@@ -8495,6 +8504,7 @@
     renderAll();
     drawGhost({ x: b.x, y: b.y });
     notify("Site the rebuilt " + (b.who ? b.who.replace(/^Treasury/, "treasury") : BID[b.id].name.toLowerCase()) + ": click where it is to stand.", "");
+    focusMap();
     return true;
   }
   // leaving a siting: a donor's envoys are sent away, the city's temple waits for another decade
@@ -9047,6 +9057,7 @@
             S.placingDonor = { city, cite: "Treasuries carried their donors' names: the treasuries of Sikyon, Megara, Gela, Kyrene and Byzantion stood in the row at Olympia (Paus. 6.19)." };
             renderAll();
             notify("Site the treasury of " + city + ": click where it is to stand.", "");
+            focusMap();
           } },
         { label: "Refuse the ground", fn: () => {
             log(city + "'s envoys build their treasury elsewhere.", "");
@@ -10585,7 +10596,8 @@
     } };
     renderAll();
     drawGhost({ x: v.x, y: v.y });
-    notify("Site the temple of stone: it must cover the ground of the old shrine. Click to begin the work.", "");
+    notify("Site the temple of stone on any permitted ground; the old shrine stands until it is dedicated. Click to begin the work.", "");
+    focusMap();
   }
 
   function tierCeremony(tier) {
@@ -10910,6 +10922,7 @@
     document.getElementById("mPietySub").textContent =
       (pv < 8 ? "neglected" : pv < 16 ? "low" : pv < 27 ? "kept" : "well served");
     document.getElementById("mYear").textContent = S.year;
+    renderMini(pv);
     document.getElementById("mYearSub").textContent = yearPhrase();
     const t = TIERS[S.tier];
     const tb = document.getElementById("tierBadge");
@@ -11155,7 +11168,7 @@
       if (fresh) { card.classList.add("fresh"); markSeen(card, mkey); }
       if (paced) card.title = paced;
       if (isUpg) {
-        const act = () => { cancelPlacing(); inspect(upgIdx); };
+        const act = () => { cancelPlacing(); inspect(upgIdx); focusSiteFile(true); }; // one column: up to the file, as a new work does
         card.addEventListener("click", act);
         card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
       } else if (!locked && !maxed) {
@@ -11385,6 +11398,16 @@
 
   // the building fund, beside the treasure: its switch, its balance, and the
   // bar for whatever it is filling toward
+  // the phone's strip: chest, fund, renown, piety and year in one line under the action
+  // bar, which stays at the top of the screen while the page scrolls
+  function renderMini(pv) {
+    const el = document.getElementById("miniRow");
+    if (!el) return;
+    if (!S.deity) { el.innerHTML = ""; return; }
+    const cell = (l, v, cls) => '<span class="mc"><span class="ml">' + l + '</span><span class="mv num' + (cls ? " " + cls : "") + '">' + v + "</span></span>";
+    el.innerHTML = cell("chest", fmt(S.treasury)) + cell("fund", S.tier >= 1 ? fmt(S.fund) : "\u2014") +
+      cell("renown", fmt(renown())) + cell("piety", pv, pv < 8 ? "warn" : "") + cell("year", S.year);
+  }
   function renderFundRow() {
     const el = document.getElementById("fundRow"), v = document.getElementById("mFund");
     if (!el || !v) return;
