@@ -1111,7 +1111,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron XIX</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron XX</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -11089,12 +11089,12 @@
     S.cityTemple = Object.assign(S.cityTemple || {}, { state: "offered", year: S.year });
     heraldQueue({
       sites: true, cls: "wide", vig: { med: "elder", badge: "kerykeion" }, title: "The city offers to upgrade the temple",
-      body: '<div class="hline">The assembly proposes to rebuild the shrine as ' + (S.templeIIForm === "samos" ? "a peripteral temple of timber, colonnaded round" : "a peripteral temple of poros stone, colonnaded round") + ', at the city\u2019s charge, on one of two conditions, at the board\u2019s choice, kept for good.</div>' +
-        hstrip([["Cost", fmt(cost) + " <small>dr.</small>"], ["The city pays", fmt(city) + " <small>dr.</small>"], ["The sanctuary", fmt(share) + " <small>dr.</small>"], ["Due now", fmt(down) + " <small>dr.</small>", short ? "warn" : ""]]) +
-        '<div class="hline"><b>The accounts on stone:</b> the city reads the books, borrows the surplus first at 1.2%, and in war takes the plate it asks for. ' +
-        '<b>The city\u2019s right to borrow:</b> the city takes the whole surplus, the fund stands empty while it owes, and the debt may stand in for the sanctuary\u2019s share of a capital work. ' +
-        'Accept, and polis standing follows the dedication. Refuse, and it waits until the sanctuary raises a peripteral temple itself, with a building fund kept from today.' +
-        (short ? " <b>The chest holds " + fmt(S.treasury) + " dr., short of the " + fmt(down) + " dr. due now.</b>" : "") + "</div>" +
+      body: '<div class="hline">The assembly offers to rebuild the shrine as ' + (S.templeIIForm === "samos" ? "a peripteral temple of timber, with a colonnade all round" : "a peripteral temple of poros stone, with a colonnade all round") + '. The city pays most of the cost. In return the board must accept one of two conditions, and the condition is permanent.</div>' +
+        hstrip([["Cost", fmt(cost) + " <small>dr.</small>"], ["The city pays", fmt(city) + " <small>dr.</small>"], ["The sanctuary pays", fmt(share) + " <small>dr.</small>"], ["Due now", fmt(down) + " <small>dr.</small>", short ? "warn" : ""]]) +
+        '<div class="hline"><b>The accounts on stone.</b> The sanctuary publishes its accounts every decade, and the city borrows part of the surplus and repays it over time. ' +
+        '<b>The city\u2019s right to borrow.</b> The city takes the whole surplus as a loan it never repays, and nothing goes into the building fund while the debt stands. ' +
+        'Accept, and the sanctuary reaches polis standing when the temple is dedicated. Refuse, and polis standing waits until the sanctuary builds a peripteral temple of its own, saving toward it from today.' +
+        (short ? " <b>The chest holds " + fmt(S.treasury) + " dr., less than the " + fmt(down) + " dr. due now. The city will ask again next decade.</b>" : "") + "</div>" +
         ev("the accounts on stone, in full", '<div class="hline">' + TERMS.accounts.text + "</div>") +
         ev("the city\u2019s right to borrow, in full", '<div class="hline">' + TERMS.lendable.text + "</div>") +
         ev("where this comes from", '<div class="law-cite">Temples were the city\u2019s works: Athens let the contract for the temple of Athena Nike by decree (IG I\u00b3 35), and at Delphi the Amphictyony let the temple to the Alkmaionidai, who built its front in marble beyond what the contract required (Hdt. 5.62). ' + TERMS_CITE + "</div>"),
@@ -11103,10 +11103,10 @@
         { label: "Accept, with the accounts on stone", disabled: short, fn: () => acceptCityTemple(ti, cost, city, "accounts") },
         { label: "Accept, with the city's right to borrow", disabled: short, fn: () => acceptCityTemple(ti, cost, city, "lendable") },
         { label: "Not yet: let the city ask again next decade", ghost: true, fn: () => { S.cityTemple.state = "later"; renderAll(); } },
-        { label: "Refuse: the sanctuary will raise its own temple", ghost: true, fn: () => {
+        { label: "Refuse: the sanctuary will build its own temple", ghost: true, fn: () => {
             S.cityTemple.state = "refused";
             if (S.laws.surplus === "plate") { S.laws.surplus = "fund"; S._fundDefaulted = true; }
-            log("The board declines the city's temple. Polis standing must wait until the sanctuary has raised a peripteral temple of its own; the treasurers begin to set aside everything the chest can spare above the float, up to " + fmt(fundCap()) + " dr. per decade, toward it.", "");
+            log("The board declines the city's temple. Polis standing must wait until the sanctuary has built a peripteral temple of its own. From now on the treasurers set aside everything the chest can spare above the float, up to " + fmt(fundCap()) + " dr. per decade, toward it.", "");
             renderAll();
           } },
       ],
