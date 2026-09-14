@@ -1112,7 +1112,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXVI</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXVII</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -1871,7 +1871,7 @@
     },
     {
       id: "grove", tip: "Trees of one species planted for the god and protected by sacred law.", name: "Sacred grove", gk: "alsos", shape: "grove", max: 3, planting: true,
-      blurb: "A grove is planted, not only found: pits cut for trees at Kourion in the seventh or sixth century, two dozen cypress pits about the temple of Nemean Zeus, and Herakles planting the bare Altis with the olive. The species is chosen at planting; the trees take a decade to take root and two to grow. Sacred laws regulated groves closely, and felling protected timber carried penalties.",
+      blurb: "Groves were planted as well as found. Pits were cut for trees at Kourion in the seventh or sixth century, two dozen cypress pits were cut around the temple of Nemean Zeus, and Herakles was said to have planted the bare Altis with the olive. The species is chosen at planting. The trees take a decade to take root and two decades to grow. Sacred laws regulated groves closely, and felling protected timber carried penalties.",
       outside: true,   // stood outside the sacred boundary at Olympia and Epidauros
       levels: [
         { name: "Stand of trees", cost: 80, upkeep: 3, draw: 6, renown: 5, tier: 0, fp: [70, 60], real: "Real size: not recorded in our sources. At Olympia no wall round the grove can be traced before the late 4th century BCE, and the wall built then was low, about 1.5 m, and could be stepped over (Mallwitz, Olympia und seine Bauten, 121–2).",
@@ -1880,15 +1880,15 @@
     },
     {
       id: "waytrees", tip: "A row of trees beside the sacred way, from the entrance toward the altar.", name: "Trees along the way", gk: "dendra", shape: "waytrees", max: 1, planting: true, constraint: "fixed", outside: true,
-      blurb: "A row of trees planted beside the sacred way inside the boundary. Within the sanctuary of Poseidon at the Isthmus pine trees grew in a row, and Kimon planted the Agora of Athens with plane trees. The trees shade the way to the altar and are laid out where the way runs; no siting is needed.",
+      blurb: "The trees along the way are a row planted beside the sacred way inside the boundary. Within the sanctuary of Poseidon at the Isthmus pine trees grew in a row, and Kimon planted the Agora of Athens with plane trees. The trees shade the way to the altar. They are laid out where the way runs, so no siting is needed.",
       levels: [
-        { name: "Trees along the way", cost: 60, upkeep: 2, draw: 5, renown: 3, tier: 1, fp: [0, 0], real: "Real size: not recorded for the Isthmian row; the trees here stand about five metres apart on either side of the way.",
+        { name: "Trees along the way", cost: 60, upkeep: 2, draw: 5, renown: 3, tier: 1, fp: [0, 0], real: "Real size: not recorded for the Isthmian row; the trees here stand about five meters apart on either side of the way.",
           cite: "Within the Isthmian sanctuary \u201cpine trees growing in a row, the greater number of them rising up straight\u201d (Paus. 2.1.7); Kimon planted the Agora with plane trees (Plut. Cim. 13.7)." },
       ],
     },
     {
       id: "temple2", tip: "A second temple of the god beside the first, of stone from the start.", name: "Second temple", gk: "naos", shape: "temple2", max: 1, requires: "temple", requiresLvl: 2,
-      blurb: "A second temple of the same god, standing beside the first rather than replacing it. Kalapodi kept twin temples of Apollo side by side from the eighth century; Kos raised a second temple of Asklepios on the terrace above the first; three temples of Apollo stood together on Delos. It is built of stone at once and is never enlarged, and the image stays in the first temple.",
+      blurb: "The second temple is a temple of the same god, standing beside the first rather than replacing it. Kalapodi kept twin temples of Apollo side by side from the eighth century. Kos built a second temple of Asklepios on the terrace above the first. Three temples of Apollo stood together on Delos. In the game it is built of stone at once and is never enlarged, and the image stays in the first temple.",
       levels: [
         { name: "Poros temple", cost: 500, upkeep: 12, draw: 12, renown: 8, tier: 2, fp: [58, 28], hgt: 20, real: "",
           cite: "At Kalapodi a second monumental temple was built beside the first about 700 BCE and \u201cboth temples remained in use\u201d (A Companion to Greek Architecture, ch. 2); on Kos the Ionic Temple B of Asklepios of the 3rd century BCE and the Doric Temple A of the 2nd stood on two terraces (ch. 29); the Athenians built a temple of Apollo on Delos in 425\u2013417 BCE beside the older temples (Lawrence, Greek Architecture, 5th ed., 135)." },
@@ -3002,11 +3002,11 @@
 
     { id: "a8-city-timber", kind: "event", minTier: 1, requires: "grove", when: () => (S.laws.wood || "none") !== "ban" && S.built.some(b => b.id === "grove" && groveStage(b) === 2),
       title: "The city asks for the god\u2019s timber",
-      body: "A public work wants beams, and the assembly asks the board for trees from the god\u2019s grove: what the sacred law forbids to private hands it may allow to the city\u2019s public works.",
+      body: "The city needs beams for a public work, and the assembly asks the board for trees from the god\u2019s grove. The sacred law forbids private cutting, but it may allow the city\u2019s public works.",
       cite: "The fifth-century Koan decree fined the cutting of the sacred cypresses a thousand drachmas but let the assembly use the wood for public projects; at Argos the sanctuary\u2019s trees might serve a public work or the shrine itself (LSCG 150 A, 57; Dillon, ZPE 118 (1997) 118).",
       choices: [
-        { label: "Grant the timber", fx: { treasury: 150, piety: -4 }, then: () => groveCutBack(), log: "The city\u2019s carpenters fell what they need under the board\u2019s eye and pay the god for it. The grove looks thinner." },
-        { label: "Refuse: the trees are the god\u2019s", fx: { piety: 3, deeds: 2 }, then: () => { S.demosSlighted = S.year; }, log: "The city buys its beams inland and remembers the refusal." },
+        { label: "Grant the timber", fx: { treasury: 150, piety: -4 }, then: () => groveCutBack(), log: "The city\u2019s carpenters fell what they need under the board\u2019s supervision and pay the god for it. The grove looks thinner." },
+        { label: "Refuse the timber", fx: { piety: 3, deeds: 2 }, then: () => { S.demosSlighted = S.year; }, log: "The city buys its beams inland and remembers the refusal." },
       ] },
 
     { id: "a9-army-grove", kind: "event", minTier: 0, requires: "grove", era: "war", eraOnly: true,
@@ -4101,7 +4101,7 @@
     pine: { name: "pine", plural: "pines", shape: "pine", kind: "crown", hue: ["#3F5A3F", "#4E6C4A"], why: "The Isthmian sanctuary of Poseidon was shaded by a grove of pine trees, and pines grew in a row within it (Strabo 8.6.22; Paus. 2.1.7)." },
     pear: { name: "wild pear", plural: "wild pears", shape: "low", kind: "fruit", hue: ["#7A9459", "#94AC70"], dots: "#B9A24A", why: "The image of Hera at Tiryns was of wild-pear wood (Burkert, Greek Religion, 86)." },
     pomegranate: { name: "pomegranate", plural: "pomegranates", shape: "low", kind: "fruit", hue: ["#5F7A46", "#78925C"], dots: "#B8412F", why: "A possible planting of the rows about the Hephaisteion, at the spacing Theophrastos gives for it (Thompson, Hesperia 6 (1937) 421, 423)." },
-    myrtle: { name: "myrtle", plural: "myrtles", shape: "shrub", kind: "crown", hue: ["#4A6A46", "#5C7E57", "#6A8C64"], why: "Named with laurel and pomegranate for the nine-foot spacing of the Hephaisteion\u2019s rows (Thompson, Hesperia 6 (1937) 421)." },
+    myrtle: { name: "myrtle", plural: "myrtles", shape: "shrub", kind: "crown", hue: ["#4A6A46", "#5C7E57", "#6A8C64"], why: "Thompson names myrtle, with laurel and pomegranate, as a shrub that fits the nine-foot spacing of the Hephaisteion\u2019s rows (Hesperia 6 (1937) 421)." },
   };
   const GOD_TREES = {
     zeus: { own: ["oak", "wildolive", "poplar"], also: ["cypress", "plane"] },
@@ -4144,7 +4144,7 @@
   function plantLine(b) {
     const T = TREES[speciesOf(b)], st = groveStage(b);
     const per = 10;
-    const state = st === 2 ? "grown" : st === 1 ? "taking root; grown in year " + (b.planted + 2 * per) : "planted; they take root in year " + (b.planted + per) + " and are grown in year " + (b.planted + 2 * per);
+    const state = st === 2 ? "grown" : st === 1 ? "taking root, grown in year " + (b.planted + 2 * per) : "planted, taking root in year " + (b.planted + per) + " and grown in year " + (b.planted + 2 * per);
     const fx = [];
     if (isOwnTree(b)) fx.push("the god\u2019s own tree: renown and piety once grown");
     if (T.kind === "fruit") fx.push("first-fruits to the chest once the trees bear");
@@ -4192,7 +4192,7 @@
       if (!BID[b.id].planting) return;
       if (b.planted != null && groveStage(b) < 2 && Math.random() < pHit) { // a young planting lopped or grazed before it takes
         b.planted += 10;
-        chron.push("The " + plantName(b) + " are lopped by wood-gatherers" + (law === "none" ? ", there being no rule against it" : " in spite of the law") + ": they will take a decade longer.");
+        chron.push("The " + plantName(b) + " are lopped by wood-gatherers" + (law === "none" ? ", since no rule forbids it" : " in spite of the law") + ". They will take a decade longer.");
       }
       const st = groveStage(b);
       if (b.planted != null && (b._stage || 0) !== st) {
@@ -4311,9 +4311,9 @@
       name: "The trees of the sanctuary", gk: "xyla",
       cite: "The priest of Apollo Erithaseos forbade cutting or carrying off wood, branches, firewood or fallen leaves: fifty lashes for a slave, fifty drachmas for a free man, and the names sent to the king and the Council (IG II\u00b2 1362, c. 350\u2013300 BCE). Kos fined the cutting of its sacred cypresses a thousand drachmas, the assembly keeping the wood for public works, and a century later forbade even a motion to cut them (LSCG 150 A\u2013B; Dillon, ZPE 118 (1997) 116, 118).",
       options: {
-        none: { label: "No rule", note: "the trees stand under custom alone: villagers gather wood, and a young planting may be lopped or grazed before it takes root" },
-        fine: { label: "A fine of fifty drachmas", note: "no wood, branches or fallen leaves leave the precinct; a free man pays fifty drachmas and a slave takes fifty lashes, the informer having half the fine. Young plantings are mostly safe. The city may still ask the god for timber for a public work." },
-        ban: { label: "The Koan ban", note: "polis rank: no cutting at all, and no motion about the trees may even be put; the city gets no timber from the god, and the demos, wanting firewood, asks five points more of piety before it votes the sanctuary money", minTier: 1 },
+        none: { label: "No rule", note: "the trees are protected by custom alone: villagers gather wood, and a young planting may be lopped or grazed before it takes root" },
+        fine: { label: "A fine of fifty drachmas", note: "no wood, branches or fallen leaves leave the precinct. A free man pays fifty drachmas and a slave takes fifty lashes, and the informer gets half the fine. Young plantings are mostly safe. The city may still ask the god for timber for a public work." },
+        ban: { label: "The Koan ban", note: "polis rank: no cutting at all, and no motion about the trees may even be put. The city gets no timber from the god, and the demos, which wants firewood, asks five points more of piety before it votes the sanctuary money", minTier: 1 },
       },
     },
     land: {
@@ -11979,13 +11979,13 @@
     if (b.preplaced) return "That has stood here since the founding. It is upgraded, not built new.";
     if (b.id === "grove" && countBuilt("grove") >= GROVE_MAX[S.tier])
       return S.tier >= 2 ? "No more groves can be planted. The limit is three."
-        : "At " + ["village", "polis", "panhellenic"][S.tier] + " rank the sanctuary keeps " + (GROVE_MAX[S.tier] === 1 ? "one grove" : "two groves") + "; the next rank allows another.";
+        : "At " + ["village", "polis", "panhellenic"][S.tier] + " rank the sanctuary keeps " + (GROVE_MAX[S.tier] === 1 ? "one grove" : "two groves") + ". The next rank allows another.";
     const cap = maxOf(b), have = countBuilt(b.id);
     if (have >= cap) {
       const later = b.maxBy ? b.maxBy.findIndex((n, t) => t > S.tier && n > cap) : -1; // a rank that allows more
-      if (cap === 1) return later >= 0 ? "One stands already; a second may be raised at " + TIERS[later].label + " rank."
+      if (cap === 1) return later >= 0 ? "One stands already. A second may be built at " + TIERS[later].label + " rank."
                                        : "Only one can be built, and the sanctuary already has it.";
-      return later >= 0 ? "No more at this rank: " + cap + " stand, and " + b.maxBy[later] + " may stand at " + TIERS[later].label + " rank."
+      return later >= 0 ? "No more at this rank. " + cap + " stand, and " + b.maxBy[later] + " may stand at " + TIERS[later].label + " rank."
                         : "No more of these can be built. The limit is " + cap + ".";
     }
     if (b.requires && !hasBld(b.requires, b.requiresLvl || 0))
@@ -12264,7 +12264,7 @@
       const disabled = tierLocked || !canPay || boardNo || singleNo;
       let note = "";
       if (tierLocked) note += "Requires " + TIERS[nTier].label + " standing.";
-      else if (singleNo) note += "Only one " + next.name.toLowerCase() + " can stand in the sanctuary; this one keeps its form.";
+      else if (singleNo) note += "Only one " + next.name.toLowerCase() + " can stand in the sanctuary, so this one keeps its form.";
       else if (boardNo) note += "The city\u2019s officials have named the " + priorityNames() + " as the next capital work. This waits until it is under way.";
       else if (!roomV.ok) note += "Nothing fits within 75 m: " + roomV.reason.toLowerCase() + ". It may be sited on any permitted ground elsewhere.";
       else if (!canPay) note += "The down payment needs " + fmt(minNeed) + " dr.; the treasury holds " + fmt(S.treasury) + " dr.";
@@ -13082,7 +13082,7 @@
           (k === "surplus" && (S.terms.lendable || S.cityBooks) ? " The city takes the whole surplus first, up to its ceiling, by the assembly's condition; while it owes, nothing goes to the fund, and the debt may stand in for the sanctuary's share of a capital work." :
            k === "surplus" && S.terms.accounts ? " The accounts on stone show the city the surplus, and it borrows first, by the assembly's condition." : "") +
           (k === "hides" && S.terms.epistatai ? (/[.!?]$/.test(L.options[S.laws[k]].note) ? "" : ".") + " With city officials on the board the dermatikon goes to the city." : "") +
-          (k === "land" && S.laws.land === "olives" && S.landLease != null ? " The lease runs from year " + S.landLease + " to year " + (S.landLease + 20) + (S.year - S.landLease >= 20 ? "; the olives bear, and the rent stands a third higher." : "; the rent stands a third lower while the shoots grow.") : "") + "</div>" +
+          (k === "land" && S.laws.land === "olives" && S.landLease != null ? " The lease runs from year " + S.landLease + " to year " + (S.landLease + 20) + (S.year - S.landLease >= 20 ? ". The olives bear, and the rent stands a third higher." : ". The rent stands a third lower while the shoots grow.") : "") + "</div>" +
         '<div class="law-cite">' + L.cite + "</div></div>";
     }).join("");
     openModal("The Sacred Law", "standing rules \u00b7 ancestral custom is not lightly changed",
