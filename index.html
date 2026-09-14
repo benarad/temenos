@@ -464,6 +464,7 @@
     padding: .8rem .9rem; border-radius: 2px;
   }
   .sitefile h3 { margin: 0 0 .15rem; font-size: .95rem; }
+  .sitefile .species-row select { font: inherit; font-size: .8rem; padding: .1rem .3rem; max-width: 100%; margin-left: .2rem; }
   .sitefile .gk { font-style: italic; color: var(--terra); font-size: .85rem; }
   .sitefile .lvl { font-size: .66rem; color: var(--ink-soft); letter-spacing: .12em; }
   .sitefile p { margin: .45rem 0 0; font-size: .82rem; color: var(--ink-soft); }
@@ -1099,7 +1100,7 @@
 
     <section>
       <h2 class="lapidary">Build</h2>
-      <p class="pal-note">A work is paid for as it goes up: three-tenths down, the rest by the year, and a tenth held until the work is approved. Upkeep is charged per year.</p>
+      <p class="pal-note">A work is paid for as it goes up: a fifth down, the rest by the year, and a tenth held until the work is approved. Upkeep is charged per year.</p>
       <div class="palette" id="palette"></div>
     </section>
 
@@ -1111,7 +1112,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron XX</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXVI</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -1869,16 +1870,32 @@
       ],
     },
     {
-      id: "grove", tip: "Trees consecrated to the god, protected by sacred law.", name: "Sacred grove", gk: "alsos", shape: "grove", max: 1,
-      blurb: "The sacred grove is a stand of trees consecrated to the god. Sacred laws regulated groves closely, and felling protected timber carried penalties.",
+      id: "grove", tip: "Trees of one species planted for the god and protected by sacred law.", name: "Sacred grove", gk: "alsos", shape: "grove", max: 3, planting: true,
+      blurb: "A grove is planted, not only found: pits cut for trees at Kourion in the seventh or sixth century, two dozen cypress pits about the temple of Nemean Zeus, and Herakles planting the bare Altis with the olive. The species is chosen at planting; the trees take a decade to take root and two to grow. Sacred laws regulated groves closely, and felling protected timber carried penalties.",
       outside: true,   // stood outside the sacred boundary at Olympia and Epidauros
       levels: [
-        { name: "Sacred grove", cost: 80, upkeep: 3, draw: 6, renown: 5, tier: 0, fp: [70, 60], real: "Real size: not recorded in our sources. At Olympia no wall round the grove can be traced before the late 4th century BCE, and the wall built then was low, about 1.5 m, and could be stepped over (Mallwitz, Olympia und seine Bauten, 121–2).",
-          cite: "The Altis at Olympia (Paus. 5.10.1); the oracular oak of Zeus at Dodona (Hom. Od. 14.327–8)." },
+        { name: "Stand of trees", cost: 80, upkeep: 3, draw: 6, renown: 5, tier: 0, fp: [70, 60], real: "Real size: not recorded in our sources. At Olympia no wall round the grove can be traced before the late 4th century BCE, and the wall built then was low, about 1.5 m, and could be stepped over (Mallwitz, Olympia und seine Bauten, 121–2).",
+          cite: "The Altis at Olympia (Paus. 5.10.1); the oracular oak of Zeus at Dodona (Hom. Od. 14.327–8); pits and trenches cut for trees in the temenos of Apollo at Kourion in the 7th or 6th century BCE (Carroll, in A History of Groves, 2017)." },
       ],
     },
     {
-      id: "stoa", tip: "Roofed colonnade for shelter and display.", name: "Stoa", gk: "stoa", shape: "stoa", max: 1,
+      id: "waytrees", tip: "A row of trees beside the sacred way, from the entrance toward the altar.", name: "Trees along the way", gk: "dendra", shape: "waytrees", max: 1, planting: true, constraint: "fixed", outside: true,
+      blurb: "A row of trees planted beside the sacred way inside the boundary. Within the sanctuary of Poseidon at the Isthmus pine trees grew in a row, and Kimon planted the Agora of Athens with plane trees. The trees shade the way to the altar and are laid out where the way runs; no siting is needed.",
+      levels: [
+        { name: "Trees along the way", cost: 60, upkeep: 2, draw: 5, renown: 3, tier: 1, fp: [0, 0], real: "Real size: not recorded for the Isthmian row; the trees here stand about five metres apart on either side of the way.",
+          cite: "Within the Isthmian sanctuary \u201cpine trees growing in a row, the greater number of them rising up straight\u201d (Paus. 2.1.7); Kimon planted the Agora with plane trees (Plut. Cim. 13.7)." },
+      ],
+    },
+    {
+      id: "temple2", tip: "A second temple of the god beside the first, of stone from the start.", name: "Second temple", gk: "naos", shape: "temple2", max: 1, requires: "temple", requiresLvl: 2,
+      blurb: "A second temple of the same god, standing beside the first rather than replacing it. Kalapodi kept twin temples of Apollo side by side from the eighth century; Kos raised a second temple of Asklepios on the terrace above the first; three temples of Apollo stood together on Delos. It is built of stone at once and is never enlarged, and the image stays in the first temple.",
+      levels: [
+        { name: "Poros temple", cost: 500, upkeep: 12, draw: 12, renown: 8, tier: 2, fp: [58, 28], hgt: 20, real: "",
+          cite: "At Kalapodi a second monumental temple was built beside the first about 700 BCE and \u201cboth temples remained in use\u201d (A Companion to Greek Architecture, ch. 2); on Kos the Ionic Temple B of Asklepios of the 3rd century BCE and the Doric Temple A of the 2nd stood on two terraces (ch. 29); the Athenians built a temple of Apollo on Delos in 425\u2013417 BCE beside the older temples (Lawrence, Greek Architecture, 5th ed., 135)." },
+      ],
+    },
+    {
+      id: "stoa", tip: "Roofed colonnade for shelter and display.", name: "Stoa", gk: "stoa", shape: "stoa", max: 1, maxBy: [1, 2, 4],
       blurb: "A stoa is a roofed colonnade. It shelters visitors and displays dedications and spoils.",
       levels: [
         { name: "Stoa", cost: 300, upkeep: 8, draw: 15, renown: 7, tier: 1, fp: [52, 12], hgt: 11, real: "Real size: about 26 x 6 m, the one-aisled West Stoa in the sanctuary of Apollo Pythaeus at Argos, of the 6th century BCE (Coulton, Greek Stoa, 217); the Stoa of the Athenians at Delphi was 31.60 m long and only 3.71 m deep (Coulton, 234).",
@@ -1888,13 +1905,13 @@
       ],
     },
     {
-      id: "hestiatorion", tip: "Dining rooms for the meal after sacrifice.", name: "Dining rooms", gk: "hestiatorion", shape: "hestiatorion", max: 1,
+      id: "hestiatorion", tip: "Dining rooms for the meal after sacrifice.", name: "Dining rooms", gk: "hestiatorion", shape: "hestiatorion", max: 1, maxBy: [1, 2, 4],
       blurb: "Dining rooms are fitted with couches for the formal meals that followed sacrifice, when the meat of the victims was cooked and eaten.",
       outside: true,   // the banqueting hall at Epidauros stood outside the sacred core
       levels: [
         { name: "Dining rooms", cost: 250, upkeep: 8, draw: 12, renown: 4, tier: 1, fp: [58, 25], hgt: 11, real: "Real size: a porch 29.19 m long and about 6.20 m deep, with six dining rooms about 6 m square behind it, the north wing of the stoa at Brauron (Coulton, Greek Stoa, 226); the rooms are 6.10 m, with sockets for the feet of the couches (Lawrence, Greek Architecture, 5th ed., 193, 227).",
           cite: "In the sanctuary of Demeter at Corinth a row of six archaic dining rooms, each about 4.5 x 5 m, held seven couches apiece (Bookidis and Stroud, Corinth XVIII.3, 25\u201331); the stoa at Brauron of the 420s had six rooms of 6 m (Coulton, The Architectural Development of the Greek Stoa, 226)." },
-        { name: "Courtyard hestiatorion", cost: 300, upkeep: 12, draw: 18, renown: 8, tier: 2, fp: [66, 60], hgt: 13, real: "Real size: 33.30 x 30.40 m, the West Building of the Argive Heraion, a courtyard 12.24 x 10.12 m with two-aisled porticoes on three sides and rooms behind the fourth, of the late 6th century BCE (Coulton, Greek Stoa, 217).",
+        { name: "Courtyard hestiatorion", single: true, cost: 300, upkeep: 12, draw: 18, renown: 8, tier: 2, fp: [66, 60], hgt: 13, real: "Real size: 33.30 x 30.40 m, the West Building of the Argive Heraion, a courtyard 12.24 x 10.12 m with two-aisled porticoes on three sides and rooms behind the fourth, of the late 6th century BCE (Coulton, Greek Stoa, 217).",
           cite: "The banqueting hall at Epidauros, long called a gymnasium, was 75.36 x 69.54 m (Tomlinson, Epidauros, 78), the largest of its kind; the Pompeion at Athens had dining rooms for seven, eleven and fifteen couches round a court 43 x 17.5 m (Lawrence, Greek Architecture, 5th ed., 194)." },
       ],
     },
@@ -1923,7 +1940,7 @@
       ],
     },
     {
-      id: "propylon", tip: "Built gateway at the sanctuary entrance: a porch with a door, later a columned hall.", name: "Gateway", gk: "propylaion", shape: "propylon", max: 1,
+      id: "propylon", tip: "Built gateway at the sanctuary entrance: a porch with a door, later a columned hall.", name: "Gateway", gk: "propylaion", shape: "propylon", max: 1, maxBy: [1, 1, 2],
       blurb: "The gateway is a built entrance to the sanctuary. It stands astride the boundary at the entrance: first a porch with a door, later a columned hall.",
       constraint: "at-entrance",
       levels: [
@@ -1946,7 +1963,7 @@
       ],
     },
     {
-      id: "treasury", tip: "One city's building for its own dedications.", name: "Treasury", gk: "thēsauros", shape: "treasury", max: 6, eventOnly: true,
+      id: "treasury", tip: "One city's building for its own dedications.", name: "Treasury", gk: "thēsauros", shape: "treasury", max: 6, maxBy: [6, 6, 12], eventOnly: true,
       blurb: "A treasury is a small temple-shaped building that one city builds at a major sanctuary to house its own dedications. Cities offer to build them once the sanctuary is famous enough, and the donor city maintains its own building.",
       levels: [
         { name: "Treasury", cost: 0, upkeep: 0, draw: 6, renown: 4, tier: 2, fp: [13, 19], hgt: 16, real: "Real size: 6.68 x 9.75 m, the Athenians' treasury at Delphi, like most treasuries 'a miniature temple' with a porch of two columns (Lawrence, Greek Architecture, 5th ed., 99); the treasury of Metapontum at Olympia stood on a footing 9.47 x 13.95 m (Mallwitz, Olympia und seine Bauten, 174).",
@@ -1979,7 +1996,7 @@
       ],
     },
     {
-      id: "sidealtar", tip: "A lesser altar of another god.", name: "Secondary altar", gk: "bōmos", shape: "sidealtar", max: 4, eventOnly: true,
+      id: "sidealtar", tip: "A lesser altar of another god.", name: "Secondary altar", gk: "bōmos", shape: "sidealtar", max: 4, maxBy: [4, 4, 6], eventOnly: true,
       blurb: "A secondary altar is one of the many lesser altars that accumulated in a great sanctuary beside the main altar of the god.",
       levels: [
         { name: "Secondary altar", cost: 0, upkeep: 0, draw: 1, renown: 1, tier: 1, fp: [6, 5], hgt: 3, real: "Real size: 2.77 x 2.25 m, the 4th-century altar at the west end of the terrace at Olympia, usually taken to be Pausanias' altar of Herakles (Yavis, Greek Altars, 246).",
@@ -2042,6 +2059,7 @@
   ];
 
   const BID = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
+  BID.temple2.levels[0].real = BID.temple.levels[1].real; // the same building as the first temple's second stage
 
   const FESTIVALS = [
     { key: "modest", label: "Modest rites — a goat at the altar (10 dr.)", cost: 10, mult: 1.0, piety: 1, rep: 4, victims: 5, tier: 0 },
@@ -2793,7 +2811,7 @@
             let spot = null;
             for (let x = 120; x < 700 && !spot; x += 20) for (let y = 60; y < 520 && !spot; y += 20) if (validate("stoa", 1, x, y).ok) spot = [x, y];
             S.dedications.push({ name: "Statue of King " + name, val: 400, ren: 3, year: S.year, king: name });
-            if (spot && countBuilt("stoa") < BID.stoa.max) {
+            if (spot && countBuilt("stoa") < maxOf(BID.stoa)) {
               S.projects.push({ kind: "place", id: "stoa", x: spot[0], y: spot[1], toLvl: 1, left: yearsOf("stoa", 1), name: BID.stoa.levels[1].name,
                 total: 0, installment: 0, retention: 0, funded: { how: "king", year: S.year, benefactor: name } });
               log("King " + name + "'s masons lay out the stoa. His statue goes up first.", "good");
@@ -2973,13 +2991,31 @@
         { label: "Keep the border land empty", fx: { piety: 2, deeds: 2 }, log: "The ground stays as it is, and so does the claim it stands for." },
       ] },
 
-    { id: "a7-timber", kind: "event", minTier: 0, requires: "grove",
+    { id: "a7-timber", kind: "event", minTier: 0, requires: "grove", when: () => (S.laws.wood || "none") !== "ban",
       title: "Timber from the grove",
       body: "A shipbuilder asks to fell six trees in the god's grove, and offers well above the market price.",
       cite: "Felling in sacred groves was regulated and supervised — the Klytidai appointed epignomones specifically to oversee wood-cutting transactions (SEG XXII 508; cf. Papazarkadas, 265 n. 18).",
       choices: [
-        { label: "Sell the timber under supervision", fx: { treasury: 90, piety: -5 }, log: "Six trees come down under the eye of two supervisors. The grove looks thinner." },
+        { label: "Sell the timber under supervision", fx: { treasury: 90, piety: -5 }, then: () => groveCutBack(), log: "Six trees come down under the eye of two supervisors. The grove looks thinner." },
         { label: "Refuse to sell", fx: { piety: 5, deeds: 3 }, log: "The offer is declined. The shipbuilder buys his timber inland." },
+      ] },
+
+    { id: "a8-city-timber", kind: "event", minTier: 1, requires: "grove", when: () => (S.laws.wood || "none") !== "ban" && S.built.some(b => b.id === "grove" && groveStage(b) === 2),
+      title: "The city asks for the god\u2019s timber",
+      body: "A public work wants beams, and the assembly asks the board for trees from the god\u2019s grove: what the sacred law forbids to private hands it may allow to the city\u2019s public works.",
+      cite: "The fifth-century Koan decree fined the cutting of the sacred cypresses a thousand drachmas but let the assembly use the wood for public projects; at Argos the sanctuary\u2019s trees might serve a public work or the shrine itself (LSCG 150 A, 57; Dillon, ZPE 118 (1997) 118).",
+      choices: [
+        { label: "Grant the timber", fx: { treasury: 150, piety: -4 }, then: () => groveCutBack(), log: "The city\u2019s carpenters fell what they need under the board\u2019s eye and pay the god for it. The grove looks thinner." },
+        { label: "Refuse: the trees are the god\u2019s", fx: { piety: 3, deeds: 2 }, then: () => { S.demosSlighted = S.year; }, log: "The city buys its beams inland and remembers the refusal." },
+      ] },
+
+    { id: "a9-army-grove", kind: "event", minTier: 0, requires: "grove", era: "war", eraOnly: true,
+      title: "An army cuts the grove",
+      body: "Soldiers camped on the god\u2019s land have felled the trees of the grove for their fires and their siege-works. No law of the sanctuary reached them.",
+      cite: "Kleomenes burned the sacred grove at Argos (Hdt. 6.75, 80); Sulla felled the trees of the Academy and the Lykeion for his siege engines (Plut. Sulla 12.3); Antony\u2019s admiral cut the Koan grove of Asklepios for ships and was put to death for it after Actium (Dio 51.8.3; Dillon, ZPE 118 (1997) 119, 124).",
+      choices: [
+        { label: "Replant the grove (80 dr.)", fx: { treasury: -80, piety: 2 }, then: () => groveFelled(true), log: "Seedlings are set in the old pits and anchored with stones. It will be a generation before they give shade." },
+        { label: "Leave the stumps to the god\u2019s curse", fx: { piety: -3 }, then: () => groveFelled(false), log: "The stumps stand as they were left, and those who cut them are cursed at the altar. Shoots come slowly from the roots." },
       ] },
 
     /* --- B · money, accounts, and the chest --- */
@@ -3583,10 +3619,23 @@
   // the south stretch with the entrance kept
   const PERI_HUGE  = [[165,520],[625,520],[625,330],[595,156],[395,120],[203,150],[165,326]];
   const curPeribolos = () => S.periExtended ? PERI_HUGE
-    : (S.tier >= 2 ? PERI_PAN : (S.tier >= 1 ? PERI_LARGE : PERI_SMALL));
+    : (S.tier >= 2 ? PERI_PAN : (S.tier >= 1 || S.periGrown ? PERI_LARGE : PERI_SMALL)); // the polis plot from the city's offer on
   const ENTRANCE = { x: 430, y: 470 };      // the one opening in the boundary, at village and polis rank
   const ENTRANCE_PAN = { x: 430, y: 520 };  // at panhellenic rank the south wall stands 25 m further out
   function entrance() { return S.tier >= 2 ? ENTRANCE_PAN : ENTRANCE; }
+  // a second opening in the south wall at panhellenic rank: the Greek wall of the Altis had two gates (Mallwitz 122)
+  const GATE2_PAN = { x: 300, y: 520 };
+  function gatePoints() { return S.tier >= 2 ? [entrance(), GATE2_PAN] : [entrance()]; }
+  function gateOpen(p) { // a gateway stands, or rises, astride this point
+    const near = o => Math.hypot(o.x - p.x, o.y - p.y) <= 16;
+    return S.built.some(o => o.id === "propylon" && near(o)) || S.projects.some(pr => pr.kind === "place" && pr.id === "propylon" && near(pr));
+  }
+  // the openings in the south wall, as ranges of x: the entrance always, the second gate once its gateway stands
+  function wallGaps() {
+    const g = [[entrance().x - 15, entrance().x + 15]];
+    if (S.tier >= 2 && gateOpen(GATE2_PAN)) g.push([GATE2_PAN.x - 15, GATE2_PAN.x + 15]);
+    return g.sort((p, q) => p[0] - q[0]);
+  }
   const ALTAR_POS = { x: 442, y: 416 };
   // both springs sit well inside the smaller boundary, so a fountain house
   // never ends up hard against the peribolos wall when the temenos is enlarged
@@ -3657,7 +3706,11 @@
     const P = curPeribolos(), sY = P[0][1], wallSegs = [];
     for (let i = 0; i < P.length; i++) {
       const a = P[i], b = P[(i + 1) % P.length];
-      if (a[1] >= sY - 2 && b[1] >= sY - 2) { wallSegs.push([a, [415, a[1]]]); wallSegs.push([[445, b[1]], b]); }
+      if (a[1] >= sY - 2 && b[1] >= sY - 2) { // the south stretch, with its openings
+        const xs = [Math.min(a[0], b[0]), Math.max(a[0], b[0])]; let x0 = xs[0];
+        wallGaps().forEach(([g0, g1]) => { if (g0 > x0) wallSegs.push([[x0, a[1]], [g0, a[1]]]); x0 = Math.max(x0, g1); });
+        if (x0 < xs[1]) wallSegs.push([[x0, a[1]], [xs[1], a[1]]]);
+      }
       else wallSegs.push([a, b]);
     }
     const blocked = (x, y) => {
@@ -3742,7 +3795,7 @@
       const nx = nx0 * sgn * 8, ny = ny0 * sgn * 8;
       for (let sd = 10; sd < L - 8; sd += 14) {
         const u = sd / L, px = x1 + dx * u + nx, py = y1 + dy * u + ny;
-        if (Math.hypot(px - en.x, py - en.y) < 30) continue; // clear of the entrance and the way's mouth
+        if (gatePoints().some(p => Math.hypot(px - p.x, py - p.y) < 30)) continue; // clear of the gates and the way's mouth
         out.push({ x: Math.round(px), y: Math.round(py) });
       }
     }
@@ -3792,6 +3845,7 @@
     rentMult: 1,      // the terms on which the god's land is let
     priceShock: null, // {pct, until} — a decade of dear victims
     periExtended: false, // the boundary can be drawn anew once, at panhellenic rank
+    periGrown: false,    // the village plot grows to the polis plot when the city offers its temple (BR, 14 Sep 2026)
     cityTemple: null,    // the city's offer to build the temple of stone: offered, later, siting, refused, building, done
     placingUp: null,     // an enlargement being sited: { idx, lvl, onSite? }
     placingDonor: null,  // a city's treasury being sited: { city, cite }
@@ -3805,7 +3859,9 @@
     consult: null,      // last decade's consultation figures
     cultIncome: 0,      // lifetime yield of the god's own instrument
     gamesStreak: 0, cleanStreak: 0,
-    laws: { hides: "god", fees: "modest", access: "customary", surplus: "plate" },
+    laws: { hides: "god", fees: "modest", access: "customary", surplus: "plate", wood: "none", land: "grain" },
+    pick: {},           // the species chosen in the file for the next planting, by work
+    landLease: null,    // the year the god's land was let on a planting lease
     loansOut: 0,
     fund: 0,            // silver set aside for building: coin, not plate, so a city at war can borrow it
     honoredAt: null,    // the year a private benefactor was last honoured here
@@ -3850,7 +3906,7 @@
 
   function monuments() {
     // a building whose dedication carries a benefactor's name earns the god a little less
-    return S.built.reduce((a, b) => a + BID[b.id].levels[b.lvl].renown * (b.funded && b.funded.benefactor ? 0.8 : 1), 0);
+    return S.built.reduce((a, b) => a + bldRenown(b), 0);
   }
   function festivalRep() {
     if (!S.festRep.length) return S.cal ? calSplendorNow() : 0; // before the first festival, the calendar as planned
@@ -3997,8 +4053,8 @@
   function dmods() { return (DMAP[S.deity] && DMAP[S.deity].mods) || {}; }
   // building takes years: the timescale engine of the game
   const BUILD_YEARS = {
-    altar: [1, 2, 4], perirrhanterion: [1], temple: [2, 8, 15], statue: [1, 2, 3],
-    springhouse: [2, 3], grove: [1], stoa: [4, 6], hestiatorion: [3, 5], abaton: [1, 5, 6],
+    altar: [1, 2, 4], perirrhanterion: [1], temple: [2, 8, 15], temple2: [8], statue: [1, 2, 3],
+    springhouse: [2, 3], grove: [1], waytrees: [1], stoa: [4, 6], hestiatorion: [3, 5], abaton: [1, 5, 6],
     theater: [3, 8], propylon: [3, 4], stadium: [3, 5], treasury: [3], katagogion: [6],
     adyton: [2], telesterion: [4, 6, 8], gymnasion: [5], ergasteria: [2, 3], peribolos: [0, 4, 8],
   };
@@ -4028,9 +4084,154 @@
     if (c >= 600) c = Math.round(c * 1.5);
     return c;
   }
-  function drawOf(id, level) {
+  /* — the trees: what a grove may be planted with, by god (BR, 13 Sep 2026; groves-spec.md) — */
+  const TREES = {
+    oak: { name: "oak", plural: "oaks", shape: "round", kind: "sacred", hue: ["#5E7248", "#6E8256", "#57683F"], why: "The oak of Zeus at Dodona, among the oldest trees the Greeks knew (Paus. 8.23.5)." },
+    wildolive: { name: "wild olive", plural: "wild olives", shape: "olive", kind: "crown", hue: ["#8C9B70", "#A3AE85", "#7F8F66"], why: "Herakles brought the olive to the bare precinct of Pelops at Olympia, for shade and for the victors\u2019 crowns (Pind. Ol. 3.13\u201334)." },
+    poplar: { name: "white poplar", plural: "white poplars", shape: "column", kind: "wood", hue: ["#8FA383", "#B5C2A6"], why: "At Olympia the god\u2019s woodman sold wood of the white poplar, and of no other tree, for the sacrifices (Paus. 5.13.3)." },
+    cypress: { name: "cypress", plural: "cypresses", shape: "cypress", kind: "shade", hue: ["#4A6344"], why: "Cypresses stood about the temple of Nemean Zeus (Paus. 2.15.2), and on Kos two decrees guarded the cypresses of Apollo and Asklepios (Dillon, ZPE 118 (1997) 118)." },
+    plane: { name: "plane", plural: "plane trees", shape: "round", kind: "shade", hue: ["#5E7248", "#6E8256", "#57683F"], why: "Kimon planted the Agora of Athens with plane trees and made the Academy a well-watered grove (Plut. Cim. 13.7)." },
+    laurel: { name: "laurel", plural: "laurels", shape: "shrub", kind: "crown", hue: ["#3F5A3A", "#4E6B47", "#587552"], why: "The laurel of Apollo at Didyma (Burkert, Greek Religion, 86); the likeliest shrub of the rows about the Hephaisteion (Thompson, Hesperia 6 (1937) 423)." },
+    palm: { name: "palm", plural: "palms", shape: "palm", kind: "sacred", hue: ["#6E8A4E", "#86A062"], why: "The palm of Apollo at Delos, and the olive there among the oldest trees the Greeks knew (Burkert, Greek Religion, 86; Paus. 8.23.5)." },
+    olive: { name: "olive", plural: "olives", shape: "olive", kind: "fruit", hue: ["#8C9B70", "#A3AE85", "#7F8F66"], why: "Athens leased the temenos of Neleus on condition that the tenant plant no fewer than two hundred olive shoots (IG I\u00b3 84, 418/7 BCE); the olive on the Acropolis was Athena\u2019s gift (Paus. 8.23.5)." },
+    fig: { name: "fig", plural: "fig trees", shape: "low", kind: "fruit", hue: ["#6F8A50", "#86A066"], dots: "#5A4A6A", why: "The sacred fig in the Eleusinion at Athens had a structure of its own (Papazarkadas, Sacred and Public Land in Ancient Athens, 282)." },
+    fruit: { name: "fruit trees", plural: "fruit trees", shape: "low", kind: "fruit", hue: ["#6F8A50", "#86A066"], dots: "#C9553D", why: "\u201cImmediately surrounding the temple is a grove of cultivated trees, producing all sorts of dessert fruits in their season\u201d: Xenophon\u2019s sanctuary of Artemis at Skillous (Xen. Anab. 5.3.12)." },
+    willow: { name: "willow", plural: "willows", shape: "willow", kind: "sacred", hue: ["#8AA070", "#A9BC8C"], why: "The withy in the Samian sanctuary of Hera was the oldest tree of all (Paus. 8.23.5); Artemis Orthia was called Lygodesma, found in a thicket of willows (Paus. 3.16.11)." },
+    vine: { name: "vines", plural: "vines", shape: "vine", kind: "fruit", hue: ["#6F8A50", "#86A066"], why: "Vines grew in sanctuaries: the Athenians cut the vines of the precinct at Delion for their wall, and vine-poles cut from a temenos on Kerkyra cost a stater each (Dillon, ZPE 118 (1997) 124, 120)." },
+    pine: { name: "pine", plural: "pines", shape: "pine", kind: "crown", hue: ["#3F5A3F", "#4E6C4A"], why: "The Isthmian sanctuary of Poseidon was shaded by a grove of pine trees, and pines grew in a row within it (Strabo 8.6.22; Paus. 2.1.7)." },
+    pear: { name: "wild pear", plural: "wild pears", shape: "low", kind: "fruit", hue: ["#7A9459", "#94AC70"], dots: "#B9A24A", why: "The image of Hera at Tiryns was of wild-pear wood (Burkert, Greek Religion, 86)." },
+    pomegranate: { name: "pomegranate", plural: "pomegranates", shape: "low", kind: "fruit", hue: ["#5F7A46", "#78925C"], dots: "#B8412F", why: "A possible planting of the rows about the Hephaisteion, at the spacing Theophrastos gives for it (Thompson, Hesperia 6 (1937) 421, 423)." },
+    myrtle: { name: "myrtle", plural: "myrtles", shape: "shrub", kind: "crown", hue: ["#4A6A46", "#5C7E57", "#6A8C64"], why: "Named with laurel and pomegranate for the nine-foot spacing of the Hephaisteion\u2019s rows (Thompson, Hesperia 6 (1937) 421)." },
+  };
+  const GOD_TREES = {
+    zeus: { own: ["oak", "wildolive", "poplar"], also: ["cypress", "plane"] },
+    apollo: { own: ["laurel", "cypress", "palm"], also: ["plane", "olive"] },
+    athena: { own: ["olive"], also: ["plane", "laurel"] },
+    demeter: { own: ["fig", "poplar"], also: ["plane"] },
+    artemis: { own: ["fruit", "willow"], also: ["cypress", "plane"] },
+    dionysus: { own: ["vine", "pine"], also: ["plane"] },
+    poseidon: { own: ["pine"], also: ["plane", "olive"] },
+    hera: { own: ["willow", "pear"], also: ["plane", "cypress"] },
+    asklepios: { own: ["cypress"], also: ["plane", "laurel"] },
+    hephaistos: { own: ["laurel", "pomegranate"], also: ["plane"] },
+    herakles: { own: ["olive", "poplar"], also: ["plane"] },
+    amphiaraos: { own: ["plane"], also: ["cypress", "laurel"] },
+  };
+  const GROVE_MAX = [1, 2, 3]; // groves by rank: a village keeps one stand, a polis two, a panhellenic sanctuary three
+  function speciesOptions(id) {
+    const G = GOD_TREES[S.deity] || { own: [], also: ["plane", "cypress"] };
+    return G.own.map(k => ({ k, own: true })).concat(G.also.map(k => ({ k, own: false })));
+  }
+  function pickSpecies(id) {
+    const o = speciesOptions(id), cur = S.pick && S.pick[id];
+    return o.some(x => x.k === cur) ? cur : o[0].k;
+  }
+  function isOwnTree(b) { const G = GOD_TREES[S.deity]; return !!(G && b.species && G.own.includes(b.species)); }
+  function speciesOf(b) { return b.species || "plane"; }
+  // growth: planted, taken root after a decade, grown after two
+  function groveStage(b) {
+    if (b.planted == null) return 2;
+    const per = 10;
+    return Math.max(0, Math.min(2, Math.floor((S.year - b.planted) / per)));
+  }
+  function groveMult(b) { return [0.15, 0.55, 1][groveStage(b)]; }
+  function plantWhere(b) { return b.id === "grove" ? " of the grove" : " along the way"; }
+  function plantName(b) { return TREES[speciesOf(b)].plural + plantWhere(b); }
+  function plantShort(b) {
+    const T = TREES[speciesOf(b)], st = groveStage(b);
+    return T.plural + (isOwnTree(b) ? ", the god\u2019s own" : "") + " \u00b7 " + (st === 0 ? "planted" : st === 1 ? "taking root" : "grown");
+  }
+  function plantLine(b) {
+    const T = TREES[speciesOf(b)], st = groveStage(b);
+    const per = 10;
+    const state = st === 2 ? "grown" : st === 1 ? "taking root; grown in year " + (b.planted + 2 * per) : "planted; they take root in year " + (b.planted + per) + " and are grown in year " + (b.planted + 2 * per);
+    const fx = [];
+    if (isOwnTree(b)) fx.push("the god\u2019s own tree: renown and piety once grown");
+    if (T.kind === "fruit") fx.push("first-fruits to the chest once the trees bear");
+    if (T.kind === "shade") fx.push("shade: more visitors");
+    return '<div class="fx">' + T.plural.charAt(0).toUpperCase() + T.plural.slice(1) + (b.planted != null ? ", planted in year " + b.planted : "") + " \u00b7 " + state + (fx.length ? " \u00b7 " + fx.join("; ") : "") + ".</div>" +
+      '<div class="fx">' + T.why + "</div>";
+  }
+  function speciesLabel(k, own) {
+    const T = TREES[k];
+    return T.name + (own ? " \u00b7 the god\u2019s own" : T.kind === "fruit" ? " \u00b7 bears fruit" : T.kind === "shade" ? " \u00b7 shade" : "");
+  }
+  function speciesNote(id, k) {
+    const T = TREES[k], G = GOD_TREES[S.deity], own = !!(G && G.own.includes(k));
+    const fx = [];
+    if (own) fx.push("the god\u2019s own tree: renown and piety once grown");
+    if (T.kind === "fruit") fx.push("first-fruits to the chest once the trees bear");
+    if (T.kind === "shade") fx.push("shade: more visitors");
+    return T.why + (fx.length ? " " + fx.join("; ").charAt(0).toUpperCase() + fx.join("; ").slice(1) + "." : "");
+  }
+  function speciesRow(b) {
+    const o = speciesOptions(b.id), cur = pickSpecies(b.id);
+    return '<div class="fx species-row">Plant: <select id="speciesPick">' +
+      o.map(x => '<option value="' + x.k + '"' + (x.k === cur ? " selected" : "") + ">" + speciesLabel(x.k, x.own) + "</option>").join("") +
+      "</select></div>" + '<div class="fx" id="speciesNote">' + speciesNote(b.id, cur) + "</div>";
+  }
+  function wireSpeciesPick(b) {
+    const sel = document.getElementById("speciesPick");
+    if (!sel) return;
+    sel.addEventListener("change", () => {
+      S.pick = S.pick || {}; S.pick[b.id] = sel.value;
+      const n = document.getElementById("speciesNote"); if (n) n.innerHTML = speciesNote(b.id, sel.value);
+      if (S.placingId === b.id) drawGhost(ghostPos); // the ghost shows the species chosen
+    });
+  }
+  // the ground a fixed planting is laid out on: beside the way
+  function fixedSpot(id) {
+    if (id === "waytrees") { const A = wayAnchors(), e = wayEntry(), p = A[Math.min(A.length - 2, e + 1)]; return { x: p[0], y: p[1] }; }
+    return { x: 420, y: 470 };
+  }
+  // the decade's turn for the plantings: growth, the wood-gatherers, and the god's own trees
+  function plantingsDecade(chron) {
+    const law = S.laws.wood || "none", pHit = { none: 0.2, fine: 0.06, ban: 0.02 }[law];
+    let ownGrown = 0;
+    S.built.forEach(b => {
+      if (!BID[b.id].planting) return;
+      if (b.planted != null && groveStage(b) < 2 && Math.random() < pHit) { // a young planting lopped or grazed before it takes
+        b.planted += 10;
+        chron.push("The " + plantName(b) + " are lopped by wood-gatherers" + (law === "none" ? ", there being no rule against it" : " in spite of the law") + ": they will take a decade longer.");
+      }
+      const st = groveStage(b);
+      if (b.planted != null && (b._stage || 0) !== st) {
+        b._stage = st;
+        chron.push("The " + plantName(b) + (st === 1 ? " have taken root." : " stand grown" + (isOwnTree(b) ? ", the god\u2019s own trees." : ".")));
+      }
+      if (st === 2 && isOwnTree(b)) ownGrown += 1;
+    });
+    if (ownGrown) gainPiety(Math.min(2, ownGrown));
+  }
+  function groveCutBack() { // the first grown grove loses a decade's growth
+    const b = S.built.find(o => o.id === "grove" && groveStage(o) === 2) || S.built.find(o => o.id === "grove");
+    if (!b) return;
+    b.planted = S.year - 10; b._stage = 1;
+  }
+  function groveFelled(replant) { // an army has cut the grove: seedlings now, or shoots from the stumps later
+    const b = S.built.find(o => o.id === "grove");
+    if (!b) return;
+    b.planted = replant ? S.year : S.year + 10; b._stage = 0;
+  }
+  function leaseMult() {
+    if ((S.laws.land || "grain") !== "olives" || S.landLease == null) return 1;
+    return S.year - S.landLease < 20 ? 0.67 : 1.33;
+  }
+  function leaseRuns() { return (S.laws.land || "grain") === "olives" && S.landLease != null && S.year - S.landLease < 20; }
+  function bldRenown(b) {
+    const l = BID[b.id].levels[b.lvl];
+    let r = l.renown * (b.funded && b.funded.benefactor ? 0.8 : 1);
+    if (BID[b.id].planting) r = r * groveMult(b) + (groveStage(b) === 2 && isOwnTree(b) ? 2 : 0);
+    return r;
+  }
+  function drawOf(id, level, b) {
     const m = dmods().draw;
-    return Math.round(level.draw * ((m && m[id]) || 1));
+    let d = level.draw * ((m && m[id]) || 1);
+    if (b && BID[id].planting) { // a planting draws as it grows; shade trees more
+      d *= groveMult(b);
+      if (TREES[speciesOf(b)].kind === "shade") d *= 1.5;
+    }
+    return Math.round(d);
   }
   function tierOf(id, lvlIdx, level) {
     const m = dmods().levelTier;
@@ -4056,6 +4257,16 @@
       out.push({ label: (CONSULT[S.deity] || {}).who || "Consultation fees", amt: consultIncome() });
     }
     (S.grants || []).forEach(g => out.push(g)); // standing arrangements made by decision
+    S.built.forEach(b => { // the fruit of the god's trees, once they bear
+      if (!BID[b.id].planting || groveStage(b) < 2) return;
+      const T = TREES[speciesOf(b)];
+      if (T.kind !== "fruit") return;
+      out.push({ label: "First-fruits of the " + T.plural + plantWhere(b), amt: b.id === "grove" ? 15 : 8 });
+    });
+    if ((S.laws.wood || "none") === "fine") { // the informer has half; the god keeps the rest
+      const n = S.built.filter(b => BID[b.id].planting).length;
+      if (n) out.push({ label: "Fines for wood taken from the precinct", amt: 3 * n });
+    }
     return out;
   }
 
@@ -4094,6 +4305,23 @@
         plate: { label: "Worked into plate", note: "surplus silver is weighed into phialai and entered in the inventories (IG I\u00b3 78). This adds renown and no income." },
         loans: { label: "Lent at interest", note: "polis rank and above: surplus goes out at 10% per year, as Apollo's money did on Delos. This adds income and no renown.", minTier: 1 },
         fund: { label: "Set aside for building", note: "from polis rank, or from the day the city offers its temple: a tenth of each decade's income is kept in coin toward the next large building, up to half the working float per decade; the surplus above the float is worked into plate. A village saving for its own temple sets aside everything above the float instead, up to the same cap. The fund earns no renown, and a city at war may borrow it.", minTier: 1 },
+      },
+    },
+    wood: {
+      name: "The trees of the sanctuary", gk: "xyla",
+      cite: "The priest of Apollo Erithaseos forbade cutting or carrying off wood, branches, firewood or fallen leaves: fifty lashes for a slave, fifty drachmas for a free man, and the names sent to the king and the Council (IG II\u00b2 1362, c. 350\u2013300 BCE). Kos fined the cutting of its sacred cypresses a thousand drachmas, the assembly keeping the wood for public works, and a century later forbade even a motion to cut them (LSCG 150 A\u2013B; Dillon, ZPE 118 (1997) 116, 118).",
+      options: {
+        none: { label: "No rule", note: "the trees stand under custom alone: villagers gather wood, and a young planting may be lopped or grazed before it takes root" },
+        fine: { label: "A fine of fifty drachmas", note: "no wood, branches or fallen leaves leave the precinct; a free man pays fifty drachmas and a slave takes fifty lashes, the informer having half the fine. Young plantings are mostly safe. The city may still ask the god for timber for a public work." },
+        ban: { label: "The Koan ban", note: "polis rank: no cutting at all, and no motion about the trees may even be put; the city gets no timber from the god, and the demos, wanting firewood, asks five points more of piety before it votes the sanctuary money", minTier: 1 },
+      },
+    },
+    land: {
+      name: "The god\u2019s land", gk: "temenos",
+      cite: "Athens leased the temenos of Neleus and Basile for twenty years on condition that the lessee fence it at his own cost and \u201cplant young sprouts of olive trees, no fewer than 200\u201d (IG I\u00b3 84, 418/7 BCE); the estate of Zeus Temenites on Amorgos was let with its fig orchard and a boundary wall to keep (IG XII 7, 62; Carroll, in A History of Groves, 2017). Olives take some twenty years to bear (Migeotte, The Economy of the Greek Cities, 70).",
+      options: {
+        grain: { label: "Let for grain and pasture", note: "the god\u2019s fields are let year by year for their crop, and the rent is what the land yields now" },
+        olives: { label: "A planting lease of twenty years", note: "polis rank: a tenant fences the land at his own cost and plants olive shoots by the hundred. The rent falls by a third while they grow and rises by a third once they bear, twenty years on. The lease cannot be broken.", minTier: 1 },
       },
     },
   };
@@ -4143,6 +4371,7 @@
   function validate(id, lvl, cx, cy, selfIdx) {
     const bld = BID[id];
     if (bld.constraint === "boundary") return { ok: true }; // the boundary is the frame, not a siting problem
+    if (bld.constraint === "fixed") return { ok: true }; // the trees along the way: laid out where they belong
     const fp = bld.levels[lvl].fp;
     const r = { x: cx - fp[0]/2, y: cy - fp[1]/2, w: fp[0], h: fp[1] };
     const rd = bld.constraint === "in-temple" ? r : drawnRectOf(id, lvl, cx, cy); // what the drawing covers
@@ -4168,7 +4397,12 @@
       if (dEntr > 26) return { ok: false, reason: "The basin must stand at the main entrance" };
       if (inPoly(cx, cy)) return { ok: false, reason: "The basin belongs outside the entrance" };
     } else if (bld.constraint === "at-entrance") {
-      if (dEntr > 16) return { ok: false, reason: "The gateway must stand astride the entrance" };
+      // astride the entrance, or at panhellenic rank astride the second opening in the south wall; not where a gateway stands already
+      const near = (o, p) => Math.hypot(o.x - p.x, o.y - p.y) <= 16;
+      const free = gatePoints().filter(p => !S.built.some((o, i) => i !== selfIdx && o.id === "propylon" && near(o, p)) &&
+        !S.projects.some(pr => pr.kind === "place" && pr.id === "propylon" && near(pr, p)));
+      if (!free.some(p => Math.hypot(cx - p.x, cy - p.y) <= 16))
+        return { ok: false, reason: gatePoints().length > 1 ? "The gateway must stand astride the entrance or the second opening in the south wall" : "The gateway must stand astride the entrance" };
     } else {
       const corners = [[rd.x, rd.y], [rd.x + rd.w, rd.y], [rd.x, rd.y + rd.h], [rd.x + rd.w, rd.y + rd.h]];
       const nIn = corners.filter(([x, y]) => inPoly(x, y)).length;
@@ -4202,7 +4436,7 @@
     }
     // everything else wants level ground: at one measure the slope rises 25 m, so
     // a long building set across it would have to be cut into the hill
-    if (bld.constraint !== "hillside" && id !== "grove") {
+    if (bld.constraint !== "hillside" && !bld.planting) {
       const zs = [[rd.x, rd.y], [rd.x + rd.w, rd.y], [rd.x, rd.y + rd.h], [rd.x + rd.w, rd.y + rd.h]]
         .map(([x, y]) => elevAt(x, y));
       if (Math.max.apply(null, zs) - Math.min.apply(null, zs) > 6) {
@@ -4347,8 +4581,9 @@
         (staged ? ' <span class="t-gk">· stage ' + roman(b.lvl + 1) + "</span>" : "") + "</div>" +
       (gkOf(bld) ? '<div class="t-gk">' + gkOf(bld) + "</div>" : "") +
       "<div>" + (bld.tip || "") + "</div>" +
+      (bld.planting ? '<div class="t-gk">' + plantShort(b) + "</div>" : "") +
       (inside.length ? '<div class="t-inside">Inside: ' + inside.map(x => insideName(x.o)).join(" · ") + "</div>" : "") +
-      '<div class="t-stats num">+' + drawOf(bld.id, l) + " pilgrims per year · +" + l.renown + " monuments · upkeep " + l.upkeep + " dr. per year</div>" +
+      '<div class="t-stats num">+' + drawOf(bld.id, l, b) + " pilgrims per year · +" + l.renown + " monuments · upkeep " + l.upkeep + " dr. per year</div>" +
       (coarse ? "" : '<div class="t-hint">Click to inspect' + (bld.levels[b.lvl + 1] ? " & upgrade" : "") + "</div>");
   }
 
@@ -4640,7 +4875,7 @@
       SPRINGS.forEach(sp => isoDiamond(g, sp.x, sp.y, sp.w / 2 + 4, sp.h / 2 + 4, "hint-target"));
     }
     if (bld.constraint === "entrance") isoRing(g, entrance().x, entrance().y, 26, "hint-target");
-    if (bld.constraint === "at-entrance") isoRing(g, entrance().x, entrance().y, 16, "hint-target");
+    if (bld.constraint === "at-entrance") gatePoints().forEach(p => isoRing(g, p.x, p.y, 16, "hint-target"));
     if (bld.constraint === "in-temple") {
       const t = S.built.find(b => b.id === "temple");
       if (t) {
@@ -4705,7 +4940,7 @@
       const sg = el("g", { class: "ghost-sprite" }, ghostLayer);
       const az = anchorZ({ id: S.placingId, lvl: lv, x: p.x, y: p.y });
       const [gx, gy] = az === null ? isoT(p.x - F.dxp, p.y - F.dyp, 0) : isoG(p.x - F.dxp, p.y - F.dyp, az);
-      ISO_SY = F.sy; CAVEA_CTX = S.placingId === "theater" ? { id: "theater", lvl: lv, x: p.x, y: p.y } : null;
+      ISO_SY = F.sy; CAVEA_CTX = S.placingId === "theater" ? { id: "theater", lvl: lv, x: p.x, y: p.y } : null; PLANT_CTX = null;
       try { F.fn(sg, gx, gy, F.k, false); } finally { ISO_SY = 1; CAVEA_CTX = null; }
     }
     banner.classList.toggle("bad", !v.ok || short);
@@ -6498,38 +6733,107 @@
 
   window.addEventListener("resize", camApply);
 
-  // sacred grove (alsos): planted plane trees inside a post fence on cleared
-  // earth — a tended stand, unlike the wild scatter (cf. the Altis planes)
-  function groveSprite(g, x, y, k) {
-    el("ellipse", { cx: x + 2, cy: y + 3, rx: 41 * k, ry: 19 * k, fill: "#D8C9A0" }, g);
-    el("ellipse", { cx: x + 2, cy: y + 3, rx: 41 * k, ry: 19 * k, fill: "none", stroke: "#B9A87C", "stroke-width": 1 }, g);
+  // one tree of a species at a screen point, scaled by k and by its growth
+  let PLANT_CTX = null; // the planting being drawn: its species and its growth
+  const cone = (x, y, h, cw) => "M " + x + " " + (y - h) + " L " + (x - cw) + " " + (y - h * 0.32) + " L " + (x - cw * 0.4) + " " + y + " L " + (x + cw * 0.4) + " " + y + " L " + (x + cw) + " " + (y - h * 0.32) + " Z";
+  function drawTree(g, tx, ty, k, sp, stage) {
+    const T = TREES[sp] || TREES.plane, s = k * [0.38, 0.72, 1][stage], H = T.hue;
+    const sh = (rx, ry, dx, dy) => el("ellipse", { cx: tx + dx, cy: ty + dy, rx, ry, fill: C.shadow }, g);
+    const trunk = (w, h, col) => el("rect", { x: tx - w / 2, y: ty - h, width: w, height: h, fill: col || "#7A6647" }, g);
+    switch (T.shape) {
+      case "cypress": { sh(4.2 * s, 1.6 * s, 1.5, 0.8); el("path", { d: cone(tx, ty, 30 * s, 2.8 * s), fill: H[0] }, g); break; }
+      case "column": { sh(4.6 * s, 1.7 * s, 1.5, 0.8); trunk(1.4 * s, 6 * s, "#9A8B6E"); el("path", { d: cone(tx, ty - 4 * s, 34 * s, 3.4 * s), fill: H[0] }, g); el("path", { d: cone(tx - 0.8 * s, ty - 6 * s, 27 * s, 1.7 * s), fill: H[1] }, g); break; }
+      case "pine": { sh(8 * s, 3 * s, 3, 1.4); trunk(1.6 * s, 14 * s, "#6B4E35"); el("ellipse", { cx: tx, cy: ty - 15 * s, rx: 9 * s, ry: 4.2 * s, fill: H[0] }, g); el("ellipse", { cx: tx - 2 * s, cy: ty - 17 * s, rx: 5.5 * s, ry: 2.6 * s, fill: H[1] }, g); break; }
+      case "olive": { sh(6.5 * s, 2.5 * s, 2.5, 1.2); trunk(1.8 * s, 5.5 * s); el("ellipse", { cx: tx, cy: ty - 7 * s, rx: 6.4 * s, ry: 3 * s, fill: H[0] }, g); el("ellipse", { cx: tx - 2.2 * s, cy: ty - 8.4 * s, rx: 4.2 * s, ry: 2.2 * s, fill: H[1] }, g); el("ellipse", { cx: tx + 2.6 * s, cy: ty - 6 * s, rx: 3.8 * s, ry: 2 * s, fill: H[2] || H[0] }, g); break; }
+      case "round": { sh(8.5 * s, 3.1 * s, 3, 1.4); trunk(1.4 * s, 10.5 * s, "#6B573C"); el("circle", { cx: tx, cy: ty - 12.8 * s, r: 6.6 * s, fill: H[0] }, g); el("circle", { cx: tx - 2.3 * s, cy: ty - 14.6 * s, r: 4.2 * s, fill: H[1] }, g); el("circle", { cx: tx + 3 * s, cy: ty - 11.4 * s, r: 4.4 * s, fill: H[2] || H[0] }, g); break; }
+      case "low": { sh(6 * s, 2.3 * s, 2.2, 1); trunk(1.4 * s, 4 * s); el("circle", { cx: tx, cy: ty - 7 * s, r: 5.2 * s, fill: H[0] }, g); el("circle", { cx: tx - 2 * s, cy: ty - 8.2 * s, r: 3.2 * s, fill: H[1] }, g);
+        if (stage === 2 && T.dots) [[-2, -6], [1.5, -8.5], [3, -5.5]].forEach(([dx, dy]) => el("circle", { cx: tx + dx * s, cy: ty + dy * s, r: 0.7 * s, fill: T.dots }, g)); break; }
+      case "shrub": { sh(2.4 * s, 0.9 * s, 0.6, 0.4); el("circle", { cx: tx, cy: ty - 1.6 * s, r: 2.2 * s, fill: H[0] }, g); el("circle", { cx: tx - 1.2 * s, cy: ty - 1 * s, r: 1.4 * s, fill: H[1] }, g); el("circle", { cx: tx + 1.3 * s, cy: ty - 1.1 * s, r: 1.3 * s, fill: H[2] || H[0] }, g); break; }
+      case "willow": { sh(7 * s, 2.6 * s, 2.5, 1.2); trunk(1.6 * s, 7 * s, "#6B573C"); el("ellipse", { cx: tx, cy: ty - 10 * s, rx: 6.5 * s, ry: 4 * s, fill: H[0] }, g);
+        for (let i = -2; i <= 2; i++) el("path", { d: "M " + (tx + i * 2.4 * s) + " " + (ty - 9 * s) + " q " + (0.6 * s) + " " + (5 * s) + " " + (-0.4 * s) + " " + (8.5 * s), stroke: H[1], "stroke-width": 0.9 * s, fill: "none" }, g); break; }
+      case "palm": { sh(5 * s, 1.9 * s, 2, 1); trunk(1.4 * s, 18 * s, "#8A7350");
+        for (let i = 0; i < 6; i++) { const a = -Math.PI * (0.15 + i * 0.14); el("path", { d: "M " + tx + " " + (ty - 18 * s) + " q " + (Math.cos(a) * 5 * s) + " " + (Math.sin(a) * 5 * s - 2 * s) + " " + (Math.cos(a) * 9 * s) + " " + (Math.sin(a) * 9 * s + 4 * s), stroke: H[i % 2], "stroke-width": 1.2 * s, fill: "none" }, g); } break; }
+      case "vine": { sh(3 * s, 1.1 * s, 0.8, 0.4); el("rect", { x: tx - 0.5 * s, y: ty - 6 * s, width: 1 * s, height: 6 * s, fill: "#8A7350" }, g); el("circle", { cx: tx, cy: ty - 5 * s, r: 2.6 * s, fill: H[0] }, g); el("circle", { cx: tx - 1.4 * s, cy: ty - 3.6 * s, r: 1.8 * s, fill: H[1] }, g); break; }
+    }
+  }
+  // sacred grove (alsos): a stand of seven trees of one species inside a post fence on cleared
+  // earth, a tended planting unlike the wild scatter (the two dozen pits at Nemea: Miller, Nemea: A Guide, 157)
+  const GROVE_SPOTS_I = [[-20, -8], [4, -24], [28, -6], [-8, 4], [18, 14], [-22, 12], [0, 30]];
+  function plantSpeciesOf(b, id) { return b ? speciesOf(b) : pickSpecies(id); }
+  function groveTrees(g, x, y, k) {
+    const b = PLANT_CTX, sp = plantSpeciesOf(b, "grove"), st = b ? groveStage(b) : 2;
+    const rx = 41 * k, ry = 19 * k;
+    el("ellipse", { cx: x + 2, cy: y + 3, rx, ry, fill: "#D8C9A0" }, g);
+    el("ellipse", { cx: x + 2, cy: y + 3, rx, ry, fill: "none", stroke: "#B9A87C", "stroke-width": 1 }, g);
     const post = th => {
-      const px = x + 2 + Math.cos(th) * 41 * k, py = y + 3 + Math.sin(th) * 19 * k;
+      const px = x + 2 + Math.cos(th) * rx, py = y + 3 + Math.sin(th) * ry;
       el("rect", { x: px - 0.8, y: py - 4.2, width: 1.6, height: 4.2, fill: C.wallPost }, g);
     };
-    for (let a2 = 0; a2 < 14; a2++) { const th = a2 / 14 * Math.PI * 2; if (Math.sin(th) < 0) post(th); }
-    const trees = [[-20, -8], [4, -24], [28, -6], [-8, 4], [18, 14], [-22, 12], [0, 30]];
-    const pts = trees.map(([dx, dy], ti) => [x + (dx - dy) * 0.9 * k, y + (dx + dy) * 0.45 * k, dx + dy, ti]);
+    const nPost = 14;
+    for (let a2 = 0; a2 < nPost; a2++) { const th = a2 / nPost * Math.PI * 2; if (Math.sin(th) < 0) post(th); }
+    const pts = GROVE_SPOTS_I.map(([dx, dy]) => [x + (dx - dy) * 0.9 * k, y + (dx + dy) * 0.45 * k, dx + dy]);
     pts.sort((a3, b3) => a3[2] - b3[2]);
-    // planted alternately: cypresses of about 15 m among olives of 5, the two-tone
-    // grove Pausanias describes at Nemea and in the Altis
-    pts.forEach(([tx, ty, , ti]) => {
-      if (ti % 2 === 0) {
-        const h = 30 * k, cw = 2.8 * k;
-        el("ellipse", { cx: tx + 1.5, cy: ty + 0.8, rx: 4.2 * k, ry: 1.6 * k, fill: C.shadow }, g);
-        el("path", { d: "M " + tx + " " + (ty - h) + " L " + (tx - cw) + " " + (ty - h * 0.32) +
-          " L " + (tx - cw * 0.4) + " " + ty + " L " + (tx + cw * 0.4) + " " + ty +
-          " L " + (tx + cw) + " " + (ty - h * 0.32) + " Z", fill: "#4A6344" }, g);
-      } else {
-        el("ellipse", { cx: tx + 2, cy: ty + 1, rx: 7 * k, ry: 2.6 * k, fill: C.shadow }, g);
-        el("rect", { x: tx - 0.8 * k, y: ty - 5 * k, width: 1.6 * k, height: 5 * k, fill: "#7A6647" }, g);
-        el("ellipse", { cx: tx, cy: ty - 7.2 * k, rx: 6 * k, ry: 3 * k, fill: "#8C9B70" }, g);
-        el("ellipse", { cx: tx - 1.8 * k, cy: ty - 8.6 * k, rx: 3.6 * k, ry: 1.8 * k, fill: "#A3AE85" }, g);
-      }
-    });
-    for (let a2 = 0; a2 < 14; a2++) { const th = a2 / 14 * Math.PI * 2; if (Math.sin(th) >= 0) post(th); }
+    pts.forEach(([tx, ty]) => drawTree(g, tx, ty, k, sp, st));
+    for (let a2 = 0; a2 < nPost; a2++) { const th = a2 / nPost * Math.PI * 2; if (Math.sin(th) >= 0) post(th); }
   }
-
+  function groveSprite(g, x, y, k) { groveTrees(g, x, y, k); }
+  // trees along the way: a row either side of the sacred way from the entrance toward the altar, staggered,
+  // about thirteen metres apart, and set back beyond the dedications that stand nearer the way. None where
+  // a building or a work under way, a spring, the oak, a wild tree, a monument's slot or the altar's ground is
+  // (BR, 13 Sep 2026: the trees ran into the dedications and stood too thick to see through)
+  function waytreePoints() {
+    const A = wayAnchors(), e = wayEntry(), pts = [], off = wayHalf() + 16, slots = monSlots();
+    const inRect = (x, y, r, m) => x > r.x - m && x < r.x + r.w + m && y > r.y - m && y < r.y + r.h + m;
+    const blocked = (x, y) => {
+      if (Math.hypot(x - ALTAR_POS.x, y - ALTAR_POS.y) < 24) return true;
+      for (const o of S.built) {
+        if (o.id === "peribolos" || o.id === "waytrees" || BID[o.id].constraint === "in-temple") continue;
+        if (inRect(x, y, drawnRectOfB(o), 6)) return true;
+      }
+      for (const pr of S.projects) if (pr.kind === "place" && inRect(x, y, drawnRectOf(pr.id, pr.toLvl, pr.x, pr.y), 6)) return true;
+      for (const sp of SPRINGS) if (Math.abs(x - sp.x) < 20 && Math.abs(y - sp.y) < 16) return true;
+      if (Math.abs(x - OAK.x) < 24 && Math.abs(y - OAK.y) < 24) return true;
+      for (const f of FLORA) if (f.kind !== "tuft" && f.kind !== "shrub" && Math.hypot(x - f.x, y - f.y) < 10) return true;
+      for (const sl of slots) if (Math.hypot(x - sl.x, y - sl.y) < 7) return true;
+      return false;
+    };
+    for (let i = e; i < A.length - 1; i++) {
+      const [x1, y1] = A[i], [x2, y2] = A[i + 1], L = Math.hypot(x2 - x1, y2 - y1) || 1, n = Math.max(1, Math.round(L / 26));
+      const nx = -(y2 - y1) / L, ny = (x2 - x1) / L;
+      for (let j = 0; j < n; j++) {
+        const uL = (j + 0.25) / n, uR = (j + 0.75) / n;
+        const pL = [x1 + (x2 - x1) * uL + nx * off, y1 + (y2 - y1) * uL + ny * off];
+        const pR = [x1 + (x2 - x1) * uR - nx * off, y1 + (y2 - y1) * uR - ny * off];
+        if (!blocked(pL[0], pL[1])) pts.push(pL);
+        if (!blocked(pR[0], pR[1])) pts.push(pR);
+      }
+    }
+    return pts;
+  }
+  function waytreesSprite(g) { // the ghost and the fit: the row drawn as one
+    const b = PLANT_CTX, sp = plantSpeciesOf(b, "waytrees"), st = b ? groveStage(b) : 2;
+    const pts = waytreePoints();
+    pts.sort((p, q) => (p[0] + p[1]) - (q[0] + q[1]));
+    pts.forEach(([px, py]) => { const [sx, sy] = isoT(px, py, 0); drawTree(g, sx, sy, ISO_K, sp, st); });
+  }
+  // on the map each tree of the row is its own item in the depth order, so the figures walking behind a tree
+  // are drawn behind it and those before it in front (BR, 13 Sep 2026)
+  function waytreeItems(items, b, idx) {
+    const sp = speciesOf(b), st = groveStage(b);
+    waytreePoints().forEach(([px, py]) => {
+      items.push({ d: px + py + 0.5, r: ptRect(px, py, 3), draw: parent => {
+        const wrap = el("g", { class: "built-g" + (S.inspected === idx ? " inspected" : ""), "data-bid": b.id }, parent);
+        const [sx, sy] = isoT(px, py, 0);
+        drawTree(wrap, sx, sy, ISO_K, sp, st);
+        wrap.addEventListener("click", ev => {
+          if (S.placingId) return;
+          ev.stopPropagation(); tipHide(); inspect(idx);
+          if (coarse) tipPin(builtTip(idx), ev, true);
+        });
+        hoverTip(wrap, () => builtTip(idx));
+      }});
+    });
+  }
   // The shrine of another god, 8 x 5.5 m: a one-room temple with a porch of two
   // columns and its own small altar before the door. Poros under stucco with a
   // terracotta roof — the ordinary materials; marble tiles were for the greatest
@@ -6751,8 +7055,8 @@
     return hi;
   }
   const ISO_FAMILY = {
-    grove: [groveSprite],
-    temple: [naiskos, templeII, marbleTemple],
+    grove: [groveSprite], waytrees: [waytreesSprite],
+    temple: [naiskos, templeII, marbleTemple], temple2: [templeII],
     hestiatorion: [diningI, diningII],
     altar: [altarI, altarII, altarIII],
     stoa: [stoaI, stoaII],
@@ -6855,7 +7159,7 @@
     const lvlIdx = Math.min(lvl, fns.length - 1), fn = fns[lvlIdx];
     const fp = BID[id].levels[lvl].fp;
     const fpRect = { x0: -fp[0] / 2, x1: fp[0] / 2, y0: -fp[1] / 2, y1: fp[1] / 2 };
-    if (id === "grove") return { fn, k: ISO_K, sy: 1, kz: 1, dxp: 0, dyp: 0, rect: fpRect }; // trees, not a building
+    if (id === "grove" || BID[id].planting || BID[id].constraint === "fixed") return { fn, k: ISO_K, sy: 1, kz: 1, dxp: 0, dyp: 0, rect: fpRect }; // trees, not a building
     const key = id + ":" + lvlIdx + ":" + (S.naiskosForm || "") + ":" + (S.templeIIForm || "") + ":" + (S.altarForm || "");
     let m = ISO_EXT[key];
     if (!m) {
@@ -7014,7 +7318,12 @@
       const sY = PERI[0][1], gap = y1 >= sY - 2 && y2 >= sY - 2; // the south stretch carries the entrance
       const yAt = x => y1 + (x - x1) / ((x2 - x1) || 1) * (y2 - y1);
       const segs = gap
-        ? [[x1, y1, 415, yAt(415)], [445, yAt(445), x2, y2]]
+        ? (function () { // the south stretch, broken at each opening
+            const xs = [Math.min(x1, x2), Math.max(x1, x2)], out = []; let x0 = xs[0];
+            wallGaps().forEach(([g0, g1]) => { if (g0 > x0) out.push([x0, yAt(x0), g0, yAt(g0)]); x0 = Math.max(x0, g1); });
+            if (x0 < xs[1]) out.push([x0, yAt(x0), xs[1], yAt(xs[1])]);
+            return out;
+          })()
         : [[x1, y1, x2, y2]];
       if (wallLvl === 0) {
         // inscribed horoi pacing the line, no wall yet; a faint trace joins them
@@ -7057,11 +7366,16 @@
       });
     }
     // flora: cleared automatically by buildings, features, the way, the walls
-    const floraBlocked = (x, y) => {
+    const floraBlocked = (x, y, m = 7) => { // m: the margin round a drawing, wider for a tree's crown
       for (const b of S.built) {
         if (b.id === "peribolos" || BID[b.id].constraint === "in-temple") continue;
         const br = drawnRectOfB(b); // no tree grows inside a drawing
-        if (x > br.x - 7 && x < br.x + br.w + 7 && y > br.y - 7 && y < br.y + br.h + 7) return true;
+        if (x > br.x - m && x < br.x + br.w + m && y > br.y - m && y < br.y + br.h + m) return true;
+      }
+      for (const pr of S.projects) { // nor on the ground a work under way has taken
+        if (pr.kind !== "place") continue;
+        const br = drawnRectOf(pr.id, pr.toLvl, pr.x, pr.y);
+        if (x > br.x - m && x < br.x + br.w + m && y > br.y - m && y < br.y + br.h + m) return true;
       }
       for (const sp of SPRINGS) if (Math.abs(x - sp.x) < 20 && Math.abs(y - sp.y) < 16) return true;
       if (Math.abs(x - OAK.x) < 22 && Math.abs(y - OAK.y) < 22) return true;
@@ -7084,7 +7398,7 @@
       return false;
     };
     FLORA.forEach(f => {
-      if (floraBlocked(f.x, f.y)) return;
+      if (floraBlocked(f.x, f.y, f.kind === "tuft" || f.kind === "shrub" ? 7 : 13)) return;
       if (f.kind === "tuft") {
         const [tx, ty] = isoT(f.x, f.y, 0);
         const t1 = ["#A9AF7E", "#9BA274", "#B0B183"][Math.floor(f.v * 3)];
@@ -7156,14 +7470,15 @@
       const d = b.x + b.y + (fp[0] + fp[1]) / 2;
       const rr = { x0: b.x + F.rect.x0, x1: b.x + F.rect.x1, y0: b.y + F.rect.y0, y1: b.y + F.rect.y1 };
       drawn[idx] = { bx, by, kEff, d, sy: F.sy, kz: F.kz, r: rr };
+      if (b.id === "waytrees") { waytreeItems(items, b, idx); return; } // each tree in its own depth
       items.push({ d, r: rr, draw: parent => {
         // the temple stays highlighted while the file of something inside it is open
         const insp = S.inspected === idx || (b.id === "temple" && S.built[S.inspected] &&
           BID[S.built[S.inspected].id].constraint === "in-temple");
         const wrap = el("g", { class: "built-g" + (insp ? " inspected" : "") + (blockHint && blockHint.includes(idx) ? " blocking" : ""), "data-bid": b.id }, parent);
         if (b.id === "temple") { const st = S.built.find(o => o.id === "statue"); templeImage = st ? st.lvl : -1; }
-        ISO_SY = F.sy; ISO_KZ = F.kz; CAVEA_CTX = b.id === "theater" ? b : null;
-        try { fn(wrap, bx, by, kEff, false); } finally { templeImage = -1; ISO_SY = 1; ISO_KZ = 1; CAVEA_CTX = null; }
+        ISO_SY = F.sy; ISO_KZ = F.kz; CAVEA_CTX = b.id === "theater" ? b : null; PLANT_CTX = b;
+        try { fn(wrap, bx, by, kEff, false); } finally { templeImage = -1; ISO_SY = 1; ISO_KZ = 1; CAVEA_CTX = null; PLANT_CTX = null; }
         // a basin, a hearth or a secondary altar is a couple of metres across and
         // so a few pixels wide: the target for finger or pointer is held wider
         if (fp[0] + fp[1] < 26) el("circle", { cx: bx, cy: by - 4, r: 9, fill: "transparent" }, wrap);
@@ -7185,6 +7500,7 @@
         const [ox, oy] = isoT(OAK.x, OAK.y, 0);
         return { x0: ox - 17, x1: ox + 19, y0: oy - 29, y1: oy + 9 };
       })();
+      const wayTreesNow = S.built.some(o => o.id === "waytrees") ? waytreePoints() : [];
       const blockedBy = (x, y) => {
         for (const b of S.built) {
           const r = BID[b.id].constraint === "in-temple" ? rectOf(b) : drawnRectOfB(b);
@@ -7193,6 +7509,8 @@
         for (const f of [...SPRINGS, OAK]) {
           if (x > f.x - f.w / 2 - 4 && x < f.x + f.w / 2 + 4 && y > f.y - f.h / 2 - 4 && y < f.y + f.h / 2 + 4) return true;
         }
+        for (const f of FLORA) if (f.kind !== "tuft" && f.kind !== "shrub" && !floraBlocked(f.x, f.y, 13) && Math.hypot(x - f.x, y - f.y) < 9) return true; // no monument under a wild tree
+        for (const p of wayTreesNow) if (Math.hypot(x - p[0], y - p[1]) < 8) return true; // nor under the trees along the way
         const [px, py] = isoT(x, y, 0);
         if (px > oakCrown.x0 && px < oakCrown.x1 && py > oakCrown.y0 && py < oakCrown.y1) return true;
         for (const [wx, wy] of wayPoints()) if (Math.hypot(x - wx, y - wy) < 8) return true;
@@ -7672,7 +7990,10 @@
     if (!heraldOpen && !heraldHold) heraldNext();
   }
   // a siting that a card opened (the money settled, a gift's ground, the city's temple): the next card waits for it
-  function sitingHeld() { return !!(S.pendingBegin || S.placingDonor || (S.placingUp && (S.placingUp.onSite || S.placingUp.city))); }
+  function sitingHeld() {
+    if (S.pendingBegin && !S.placingId) setTimeout(() => resumePending(), 0); // a settled work whose siting was lost: opened again
+    return !!(S.pendingBegin || S.placingDonor || (S.placingUp && (S.placingUp.onSite || S.placingUp.city)));
+  }
   function heraldNext() {
     if (heraldOpen || heraldHold || sitingHeld()) return; // held cards wait for the years to pass, or for the ground to be chosen
     // cards that will open a siting come after the rest of the decade's stack, so no card covers the map while a work waits to be sited
@@ -7710,9 +8031,13 @@
       if (r) { S.pendingBegin = null; S.placingId = null; S.placingUp = null; clearGhost(); renderAll(); }
       return r;
     }
-    if (S.placingUp) return attemptUpgradeAt(S.placingUp.idx, S.placingUp.lvl, x, y);
+    if (S.placingUp) { const r0 = attemptUpgradeAt(S.placingUp.idx, S.placingUp.lvl, x, y); if (r0 && S.pendingBegin) setTimeout(() => resumePending(), 0); return r0; }
     const bld = BID[id];
     const donor = id === "treasury" ? S.placingDonor : null;
+    if (S.pendingBegin) { const r1 = attemptPlaceOther(id, x, y, bld, donor); if (r1 && S.pendingBegin) setTimeout(() => resumePending(), 0); return r1; } // the waiting work gets the map back
+    return attemptPlaceOther(id, x, y, bld, donor);
+  }
+  function attemptPlaceOther(id, x, y, bld, donor) {
     if (bld.deities && !bld.deities.includes(S.deity)) {
       notify("That building belongs to another cult.", "bad");
       return false;
@@ -7774,7 +8099,7 @@
           " of building, at a grateful city's expense", "good");
       }
     } else {
-      startProject({ kind: "place", id, x, y, toLvl: 0, left: yrs, name: workName(id, 0) }, cost0, sponsored0);
+      startProject(Object.assign({ kind: "place", id, x, y, toLvl: 0, left: yrs, name: workName(id, 0) }, bld.planting ? { species: pickSpecies(id) } : {}), cost0, sponsored0);
       const pr = S.projects[S.projects.length - 1];
       S.placingId = null; clearGhost(); renderAll();
       if (pr && pr.id === id) showProjectFile(id, pr);
@@ -7839,7 +8164,7 @@
   // with city officials on the board, only the work they have named may begin
   function boardLocked(key) {
     if (!S.terms.epistatai || !S.cityPriority) return false;
-    const open = S.cityPriority.keys.filter(k => !S.projects.some(p => p.id + ":" + p.toLvl === k)); // a named work under way frees the others at once
+    const open = S.cityPriority.keys.filter(k => !S.projects.some(p => p.id + ":" + p.toLvl === k) && !workBlockedWhy(k)); // a named work under way, or one that cannot be begun, frees the others at once
     return open.length > 0 && !open.includes(key);
   }
   function priorityNames() { return S.cityPriority ? S.cityPriority.names.map(n => n.toLowerCase()).join(" and the ") : ""; }
@@ -7943,10 +8268,11 @@
     const wind = windOf(S.year);
     const out = [];
     // the demos cannot be won by a feast or an embassy: it looks at piety and the festival
-    const lowPiety = S.piety < demosPiety(), shortFest = festivalRep() < demosFest();
+    const woodBan = (S.laws.wood || "none") === "ban"; // the demos, denied the god's firewood, asks more piety before it votes money
+    const lowPiety = S.piety < demosPiety() + (woodBan ? 5 : 0), shortFest = festivalRep() < demosFest();
     const resent = S.honoursAt != null && S.year - S.honoursAt < 10 && S.honoursKey !== key; // honours offered to a citizen for the last work
     const demosOk = !lowPiety && !shortFest && !demosSlighted() && !resent;
-    const pietyWord = "piety " + demosPiety() + " or more", festWord = "a festival above the standard (splendor " + demosFest() + ")";
+    const pietyWord = "piety " + (demosPiety() + (woodBan ? 5 : 0)) + " or more" + (woodBan ? " (five more, under the Koan ban on the god\u2019s wood)" : ""), festWord = "a festival above the standard (splendor " + demosFest() + ")";
     out.push({ id: "demos", name: "The demos", lever: false, ok: demosOk,
       brief: demosOk ? "piety high, the festival above the standard" : resent ? "resents the honors given a citizen for the last work" : demosSlighted() ? "would rather have voted the last building\u2019s money"
          : lowPiety && shortFest ? "wants " + pietyWord + " and " + festWord : lowPiety ? "wants " + pietyWord : "wants " + festWord,
@@ -8084,6 +8410,7 @@
       if (idx < 0) return "The " + bld.name.toLowerCase() + " to be enlarged no longer stands.";
       if (S.projects.some(pp => pp.kind === "upgrade" && pp.idx === idx)) return "Works are already under way there.";
       if (S.built[idx].lvl + 1 !== lvl) return "The " + bld.name.toLowerCase() + " is no longer at that stage.";
+      if (bld.levels[lvl].single && singleTaken(id, lvl, idx)) return "Only one " + bld.levels[lvl].name.toLowerCase() + " can stand in the sanctuary.";
       return null;
     }
     const blocked = newBuildBlock(bld) || pacedOut(bld);
@@ -8182,7 +8509,21 @@
     }
   }
   // the door from the file: the money card without a siting
-  function openWorkCard(key) { openFundingCard(specFor(key)); }
+  // a work whose money is settled but whose ground is not yet chosen: its siting is opened again, and every
+  // road to it (the palette card, the site file, the funding card) leads here rather than to a new card
+  function resumePending(key) {
+    const pb = S.pendingBegin;
+    if (!pb || (key && pb.key !== key)) return false;
+    const { id, lvl } = keyParts(pb.key);
+    if (lvl > 0 && workIdx(pb.key) < 0) { S.pendingBegin = null; return false; } // the building to be enlarged is gone
+    S.placingId = id; S.placingDonor = null; S.placingUp = lvl > 0 ? { idx: workIdx(pb.key), lvl } : null;
+    renderAll();
+    drawGhost(null);
+    notify("The money for the " + workName(id, lvl).toLowerCase() + " is settled. Site it: " + clickWord().toLowerCase() + " where it is to stand.", "");
+    focusMap();
+    return true;
+  }
+  function openWorkCard(key) { if (resumePending(key)) return; openFundingCard(specFor(key)); }
   // the file's row for a capital work: the door to the money; the ground comes after
   function payRow(key) {
     return '<div class="upg-row">' +
@@ -8653,7 +8994,8 @@
   }
   // the basin stood outside the entrance; when the gateway rises over its ground it is set out again before the gate
   function nudgeBasin(chron) {
-    const gi = S.built.findIndex(b => b.id === "propylon"), bi = S.built.findIndex(b => b.id === "perirrhanterion");
+    const e0 = entrance(); // the gateway at the entrance, not a second gate elsewhere in the wall
+    const gi = S.built.findIndex(b => b.id === "propylon" && Math.hypot(b.x - e0.x, b.y - e0.y) <= 16), bi = S.built.findIndex(b => b.id === "perirrhanterion");
     if (gi < 0 || bi < 0) return;
     const gate = S.built[gi], basin = S.built[bi];
     if (!overlaps(drawnRectOfB(gate), drawnRectOfB(basin), 4)) return;
@@ -8742,12 +9084,14 @@
       const cost = costOf(bld.id, lvl0);
       if (cost < MAJOR_COST) return;
       const standing = S.built.filter(b => b.id === bld.id).length + S.projects.filter(p => p.kind === "place" && p.id === bld.id).length;
-      if (bld.max && standing >= bld.max) return;
+      if (standing >= maxOf(bld)) return;
+      if (newBuildBlock(bld)) return; // what it needs first is not there: the board cannot name it
       out.push({ key: bld.id + ":0", name: workName(bld.id, 0), cost });
     });
     S.built.forEach((b, idx) => {
       const next = BID[b.id].levels[b.lvl + 1];
       if (!next) return;
+      if (next.single && singleTaken(b.id, b.lvl + 1, idx)) return;
       if (tierOf(b.id, b.lvl + 1, next) > S.tier) return;
       const cost = costOf(b.id, next);
       if (cost < MAJOR_COST) return;
@@ -8768,6 +9112,7 @@
     const nCost = costOf(b.id, next);
     if (nTier > S.tier) { notify("The " + TIERS[nTier].label + " tier must be reached before such a work.", "bad"); return false; }
     if (S.projects.some(pp => pp.kind === "upgrade" && pp.idx === idx)) { notify("Works are already under way there.", "bad"); return false; }
+    if (next.single && singleTaken(b.id, b.lvl + 1, idx)) { notify("Only one " + next.name.toLowerCase() + " can stand in the sanctuary.", "bad"); return false; }
     if (nCost >= MAJOR_COST && boardLocked(b.id + ":" + (b.lvl + 1))) {
       notify("The city's officials have named the " + priorityNames() + " as the next capital work. No other may begin until it is under way.", "bad");
       return false;
@@ -9213,9 +9558,9 @@
     return S.built.reduce((a, b) => a + BID[b.id].levels[b.lvl].upkeep, 0);
   }
   function totalDraw() {
-    return S.built.reduce((a, b) => a + drawOf(b.id, BID[b.id].levels[b.lvl]), 0) + guestDraw();
+    return S.built.reduce((a, b) => a + drawOf(b.id, BID[b.id].levels[b.lvl], b), 0) + guestDraw();
   }
-  function landRents() { return Math.round([48, 60, 150][S.tier] * (S.rentMult || 1)); } // the village's rents raised (BR, 13 Sep 2026): a modest calendar and one work at a time
+  function landRents() { return Math.round([48, 60, 150][S.tier] * (S.rentMult || 1) * leaseMult()); } // the village's rents raised (BR, 13 Sep 2026): a modest calendar and one work at a time
   function subsidy() { return (S.tier >= 1 ? 85 : 0) * (dmods().subsidyMult || 1); }
 
   function estimatePilgrims(y) {
@@ -9442,12 +9787,14 @@
   ];
 
   /* — donor treasuries: at panhellenic rank, cities ask for ground — */
-  const DONOR_CITIES = ["Sikyon", "Megara", "Gela", "Kyrene", "Byzantion", "Naxos"];
-  const TREASURY_SLOTS = [[300,252],[340,250],[380,249],[470,250],[510,252],[550,256]];
+  const DONOR_CITIES = ["Sikyon", "Megara", "Gela", "Kyrene", "Byzantion", "Naxos", // the row at Olympia, then more of its builders and Delphi's Knidians (Mallwitz 164-166)
+    "Syracuse", "Selinous", "Metapontion", "Epidamnos", "Sybaris", "Knidos"];
+  const TREASURY_SLOTS = [[300,252],[340,250],[380,249],[470,250],[510,252],[550,256], // the terrace, then a second row below it
+    [260,256],[590,260],[300,278],[340,278],[470,278],[510,278]];
   function maybeTreasuryOffer() {
     if (S.tier < 2 || Math.random() > 0.4) return;
     const used = S.built.filter(b => b.id === "treasury").length;
-    if (used >= 6) return;
+    if (used >= maxOf(BID.treasury)) return;
     const city = DONOR_CITIES.find(c => !S.built.some(b => b.who === "Treasury of the " + c + "ians" || (b._donor === c)) && !S.projects.some(p => p._donor === c));
     if (!city) return;
     const slot = TREASURY_SLOTS.find(([x, y]) => validate("treasury", 0, x, y, -1).ok);
@@ -9818,6 +10165,8 @@
           if (pr.left <= 0) {
             if (pr.kind === "place") {
               const nb = { id: pr.id, lvl: pr.toLvl, x: pr.x, y: pr.y, funded: pr.funded || null };
+              if (pr.species) nb.species = pr.species;
+              if (BID[pr.id].planting) { nb.planted = S.year; nb._stage = 0; }
               if (pr.who) { nb.who = pr.who; nb._donor = pr._donor; nb.whoCite = pr.whoCite; }
               if (pr.id === "shrine") { nb.who = "Shrine (unassigned)"; nb._askGuest = true; }
               S.built.push(nb);
@@ -10194,6 +10543,8 @@
     // the access law tells on the decade's piety
     if (S.laws.access === "strict") gainPiety(1);
     else if (S.laws.access === "open") losePiety(1);
+    // the plantings grow, or are lopped; the god's own trees, grown, tell on piety
+    plantingsDecade(chron);
 
     // the subscription: pledges come in decade by decade
     if (S.campaign) {
@@ -11083,13 +11434,18 @@
   function cityTempleOffer() {
     const ti = S.built.findIndex(b => b.id === "temple");
     if (ti < 0) return;
+    if (!S.periGrown) { // the city's surveyors mark out the larger precinct first: room for a temple of stone, taken or not
+      S.periGrown = true;
+      log("The city's surveyors mark out a larger precinct with new horoi, room for a temple of stone.", "good");
+      camRest();
+    }
     const cost = costOf("temple", BID.temple.levels[1]);
     const city = Math.round(cost * 0.9), share = cost - city, down = Math.round(share * 0.2);
     const short = S.treasury < down;
     S.cityTemple = Object.assign(S.cityTemple || {}, { state: "offered", year: S.year });
     heraldQueue({
       sites: true, cls: "wide", vig: { med: "elder", badge: "kerykeion" }, title: "The city offers to upgrade the temple",
-      body: '<div class="hline">The assembly offers to rebuild the shrine as ' + (S.templeIIForm === "samos" ? "a peripteral temple of timber, with a colonnade all round" : "a peripteral temple of poros stone, with a colonnade all round") + '. The city pays most of the cost. In return the board must accept one of two conditions, and the condition is permanent.</div>' +
+      body: '<div class="hline">The assembly offers to rebuild the shrine as ' + (S.templeIIForm === "samos" ? "a peripteral temple of timber, with a colonnade all round" : "a peripteral temple of poros stone, with a colonnade all round") + '. Its surveyors have marked out a larger precinct for it. The city pays most of the cost. In return the board must accept one of two conditions, and the condition is permanent.</div>' +
         hstrip([["Cost", fmt(cost) + " <small>dr.</small>"], ["The city pays", fmt(city) + " <small>dr.</small>"], ["The sanctuary pays", fmt(share) + " <small>dr.</small>"], ["Due now", fmt(down) + " <small>dr.</small>", short ? "warn" : ""]]) +
         '<div class="hline"><b>The accounts on stone.</b> The sanctuary publishes its accounts every decade, and the city borrows part of the surplus and repays it over time. ' +
         '<b>The city\u2019s right to borrow.</b> The city takes the whole surplus as a loan it never repays, and nothing goes into the building fund while the debt stands. ' +
@@ -11598,6 +11954,19 @@
     regrowFills(pj, fills);
   }
 
+  // the cap on a kind of building at this rank: a second stoa from polis rank and a fourth at panhellenic,
+  // after the pairs of stoas at the Archaic Heraia and the four or five at Kalauria and Olympia (multiples-research.md)
+  function maxOf(b) { return b.maxBy ? b.maxBy[Math.min(2, S.tier || 0)] : b.max; }
+  function capLine(b) {
+    const cap = maxOf(b), top = b.maxBy[2];
+    return "Up to " + cap + " can stand at " + TIERS[Math.min(2, S.tier || 0)].label + " rank" + (top > cap ? ", " + top + " at panhellenic" : "") + ".";
+  }
+  // a stage only one building of its kind may reach (the courtyard hestiatorion): taken when another stands
+  // at it or rises to it
+  function singleTaken(id, lvl, idx) {
+    return S.built.some((o, i) => i !== idx && o.id === id && o.lvl >= lvl) ||
+      S.projects.some(pp => pp.kind === "upgrade" && pp.id === id && pp.toLvl >= lvl && pp.idx !== idx);
+  }
   function countBuilt(id) {
     return S.built.filter(b => b.id === id).length +
       S.projects.filter(pr => pr.kind === "place" && pr.id === id).length;
@@ -11608,11 +11977,19 @@
   // place button and attemptPlace, so that no route can go past a cap
   function newBuildBlock(b) {
     if (b.preplaced) return "That has stood here since the founding. It is upgraded, not built new.";
-    if (countBuilt(b.id) >= b.max)
-      return b.max === 1 ? "Only one can be built, and the sanctuary already has it."
-                         : "No more of these can be built. The limit is " + b.max + ".";
-    if (b.requires && !S.built.some(x => x.id === b.requires))
-      return "It needs the " + BID[b.requires].name.toLowerCase() + " first.";
+    if (b.id === "grove" && countBuilt("grove") >= GROVE_MAX[S.tier])
+      return S.tier >= 2 ? "No more groves can be planted. The limit is three."
+        : "At " + ["village", "polis", "panhellenic"][S.tier] + " rank the sanctuary keeps " + (GROVE_MAX[S.tier] === 1 ? "one grove" : "two groves") + "; the next rank allows another.";
+    const cap = maxOf(b), have = countBuilt(b.id);
+    if (have >= cap) {
+      const later = b.maxBy ? b.maxBy.findIndex((n, t) => t > S.tier && n > cap) : -1; // a rank that allows more
+      if (cap === 1) return later >= 0 ? "One stands already; a second may be raised at " + TIERS[later].label + " rank."
+                                       : "Only one can be built, and the sanctuary already has it.";
+      return later >= 0 ? "No more at this rank: " + cap + " stand, and " + b.maxBy[later] + " may stand at " + TIERS[later].label + " rank."
+                        : "No more of these can be built. The limit is " + cap + ".";
+    }
+    if (b.requires && !hasBld(b.requires, b.requiresLvl || 0))
+      return "It needs the " + (b.requiresLvl ? workName(b.requires, b.requiresLvl) : BID[b.requires].name).toLowerCase() + " first.";
     if (b.needsGames && !gamesInCalendar())
       return "It needs games: set athletic games in a festival's calendar first.";
     return "";
@@ -11649,6 +12026,7 @@
     return S.built.findIndex((b, i) => {
       const nx = BID[b.id].levels[b.lvl + 1];
       return b.id === id && nx && tierOf(id, b.lvl + 1, nx) <= S.tier &&
+        !(nx.single && singleTaken(id, b.lvl + 1, i)) &&
         !S.projects.some(pr => pr.kind === "upgrade" && pr.idx === i);
     });
   }
@@ -11666,7 +12044,7 @@
       // preplaced structures only ever appear here when a stage is available
       if (b.preplaced && upgIdx < 0) return;
       const locked = !canBuild && upgIdx < 0 &&
-        (t0 > S.tier || (b.requires && !S.built.some(x => x.id === b.requires)) || (b.needsGames && !gamesInCalendar()));
+        (t0 > S.tier || (b.requires && !hasBld(b.requires, b.requiresLvl || 0)) || (b.needsGames && !gamesInCalendar()));
       const maxed = !canBuild && upgIdx < 0 && !locked;
       const underWay = S.projects.some(p => p.kind === "place" && p.id === b.id); // begun, not yet standing
       const isUpg = !canBuild && upgIdx >= 0;
@@ -11681,7 +12059,8 @@
       card.tabIndex = locked || maxed ? -1 : 0;
       card.setAttribute("role", "button");
       const paced = !isUpg && !maxed && !locked ? pacedOut(b) : "";
-      const tag = isUpg ? "upgrade" : underWay ? "under way" : maxed ? "built" : paced ? "next decade" : TIERS[t0].label;
+      const tag = isUpg ? "upgrade" : underWay ? "under way" : maxed ? "built" : paced ? "next decade"
+        : built > 0 && maxOf(b) > 1 ? built + " of " + maxOf(b) : TIERS[t0].label; // a kind that may stand in several: how many do
       card.innerHTML =
         '<div class="btier lapidary">' + tag + (fresh ? '<span class="newdot" title="Newly available"></span>' : "") + "</div>" +
         '<div class="bname">' + b.name + "</div>" +
@@ -11705,6 +12084,8 @@
         card.addEventListener("click", () => {
           const bi = S.built.find(x => x.id === b.id), nx = bi && b.levels[bi.lvl + 1];
           const why = locked ? (t0 > S.tier ? "Unlocks at " + TIERS[t0].label + " rank." : newBuildBlock(b) || "Not to be built now.")
+            : b.id === "grove" && newBuildBlock(b) ? newBuildBlock(b)
+            : b.maxBy && newBuildBlock(b) ? newBuildBlock(b) // the cap at this rank, and the rank that lifts it
             : boardLocked(b.id + ":0") ? "The city\u2019s officials have named the " + priorityNames() + " as the next capital work; this waits."
             : nx ? "Built. Its next stage, the " + nx.name.toLowerCase() + ", " + (tierOf(b.id, bi.lvl + 1, nx) > S.tier ? "opens at " + TIERS[tierOf(b.id, bi.lvl + 1, nx)].label + " rank." : "is in its file.")
             : "Built, in its final form.";
@@ -11713,6 +12094,7 @@
       }
       if (isUpg) {
         const act = () => { // a minor enlargement's siting opens at once with the file beside it; a capital one opens its card; fixed works keep the file's button
+          if (S.pendingBegin && S.pendingBegin.key === b.id + ":" + (S.built[upgIdx].lvl + 1)) { inspect(upgIdx); resumePending(); return; } // its own siting, taken up again
           cancelPlacing(); inspect(upgIdx);
           if (!b.preplaced) attemptUpgrade(upgIdx, true);
           focusSiteFile(true);
@@ -11726,8 +12108,14 @@
             showCatalogFile(b); renderAll(); focusSiteFile(true); return;
           }
           if (costOf(b.id, lvl0) >= MAJOR_COST) { // a capital work: the purse first, the ground once it is settled
+            if (S.pendingBegin && S.pendingBegin.key === b.id + ":0") { showCatalogFile(b); resumePending(); return; } // its own siting is taken up again, not cancelled
             cancelPlacing(); showCatalogFile(b); renderAll(); focusSiteFile(true);
             openWorkCard(b.id + ":0");
+            return;
+          }
+          if (b.constraint === "fixed") { // laid out where it belongs: the file opens, then the work begins at once
+            cancelPlacing(); showCatalogFile(b); renderAll(); focusSiteFile(true);
+            const sp = fixedSpot(b.id); attemptPlace(b.id, sp.x, sp.y);
             return;
           }
           S.placingUp = null; S.placingDonor = null;
@@ -11772,7 +12160,9 @@
         (gkOf(b) ? '<div class="gk">' + gkOf(b) + "</div>" : "") +
         "<p>" + b.blurb + "</p>" +
         '<div class="fx num">' + fxLine(b.id, l) + "</div>" +
-        (b.perDecade ? '<div class="fx">Up to ' + b.max + " can stand. One new one can be begun per decade" +
+        (b.planting ? speciesRow(b) : "") +
+        (b.maxBy ? '<div class="fx">' + capLine(b) + "</div>" : "") +
+        (b.perDecade ? '<div class="fx">Up to ' + maxOf(b) + " can stand. One new one can be begun per decade" +
           (pacedOut(b) ? "; the next in year " + (S.year + 10) : "") + ".</div>" : "") +
         (costOf(b.id, l) >= MAJOR_COST && canPlaceNew ? payRow(b.id + ":0") : "") +
         (costOf(b.id, l) >= MAJOR_COST
@@ -11782,7 +12172,7 @@
             (boardLocked(b.id + ":0") ? '<div class="fx">The city\u2019s officials have named the ' + priorityNames() + " as the next capital work. This waits until it is under way.</div>" : "")
           : "") +
         ev("more info", '<div class="cite">' + l.cite + (l.real ? '<span class="real">' + l.real + "</span>" : "") + "</div>") +
-        (canPlaceNew && costOf(b.id, l) < MAJOR_COST ? '<button type="button" class="act place-btn" id="placeBtn">Place it on the map &uarr;</button>' : "") +
+        (canPlaceNew && costOf(b.id, l) < MAJOR_COST ? '<button type="button" class="act place-btn" id="placeBtn">' + (b.constraint === "fixed" ? "Begin the work" : "Place it on the map &uarr;") + "</button>" : "") +
       "</div>";
     // one-column layout only (see the phone block): scroll up to the map, and
     // take up the placement again if it was cancelled meanwhile. Shown only
@@ -11790,10 +12180,12 @@
     const pb = document.getElementById("placeBtn");
     if (pb) pb.addEventListener("click", () => {
       if (newBuildBlock(b)) { renderAll(); return; }
+      if (b.constraint === "fixed") { const sp = fixedSpot(b.id); attemptPlace(b.id, sp.x, sp.y); return; } // no siting: it is laid out where it belongs
       if (S.placingId !== b.id) { S.placingUp = null; S.placingDonor = null; S.placingId = b.id; renderAll(); }
       focusMap();
     });
     wirePayRow();
+    wireSpeciesPick(b);
   }
 
   /* — demolition: anything the player raised can come down again; the altar
@@ -11868,9 +12260,11 @@
       const minNeed = major ? 0 : Math.round(nCost * 0.2);
       const canPay = major || S.treasury >= minNeed;
       const boardNo = major && boardLocked(b.id + ":" + (b.lvl + 1));
-      const disabled = tierLocked || !canPay || boardNo;
+      const singleNo = !!(next.single && singleTaken(b.id, b.lvl + 1, idx)); // one courtyard hall in the sanctuary: the other rows stay rows
+      const disabled = tierLocked || !canPay || boardNo || singleNo;
       let note = "";
       if (tierLocked) note += "Requires " + TIERS[nTier].label + " standing.";
+      else if (singleNo) note += "Only one " + next.name.toLowerCase() + " can stand in the sanctuary; this one keeps its form.";
       else if (boardNo) note += "The city\u2019s officials have named the " + priorityNames() + " as the next capital work. This waits until it is under way.";
       else if (!roomV.ok) note += "Nothing fits within 75 m: " + roomV.reason.toLowerCase() + ". It may be sited on any permitted ground elsewhere.";
       else if (!canPay) note += "The down payment needs " + fmt(minNeed) + " dr.; the treasury holds " + fmt(S.treasury) + " dr.";
@@ -11896,6 +12290,7 @@
         (bld.levels.length > 1 ? '<div class="lvl lapidary">Stage ' + roman(b.lvl + 1) + " of " + roman(bld.levels.length) + (l.name.toLowerCase() !== bld.name.toLowerCase() ? " \u00b7 " + l.name : "") + "</div>" : "") +
         "<p>" + bld.blurb + "</p>" +
         '<div class="fx num">' + fxLine(bld.id, l) + (b.funded ? "<br>" + fundedLine(b.funded) : "") + "</div>" +
+        (bld.planting ? plantLine(b) : "") +
         ev("more info", '<div class="cite">' + (b.whoCite || l.cite) + (l.real ? '<span class="real">' + l.real + "</span>" : "") + "</div>") +
         (function () { // the way in to what stands inside the temple, and back out
           if (b.id === "temple") {
@@ -12673,7 +13068,8 @@
   function openLawModal() {
     const body = Object.entries(LAWS).map(([k, L]) => {
       const opts = Object.entries(L.options).map(([ok, o]) => {
-        const locked = (o.minTier || 0) > S.tier && !(k === "surplus" && ok === "fund" && fundAllowed());
+        const locked = ((o.minTier || 0) > S.tier && !(k === "surplus" && ok === "fund" && fundAllowed())) ||
+          (k === "land" && leaseRuns() && ok !== S.laws.land); // a lease of twenty years runs its course
         const mkey = "law:" + k + ":" + ok, fresh = !locked && !seenMarks[mkey];
         return '<button class="' + (S.laws[k] === ok ? "cur" : "ghost") + (fresh ? " fresh" : "") + '" data-law="' + k +
           '" data-opt="' + ok + '"' + (fresh ? ' data-mark="' + mkey + '"' : "") + (locked ? " disabled" : "") + ">" + o.label +
@@ -12682,10 +13078,11 @@
       return '<div class="law-row"><div class="law-name"><b>' + L.name + '</b> <span class="gk">\u00b7 ' +
         L.gk + "</span></div>" +
         '<div class="law-opts">' + opts + "</div>" +
-        '<div class="law-note">' + L.options[S.laws[k]].note +
+        '<div class="law-note">' + L.options[S.laws[k] || Object.keys(L.options)[0]].note +
           (k === "surplus" && (S.terms.lendable || S.cityBooks) ? " The city takes the whole surplus first, up to its ceiling, by the assembly's condition; while it owes, nothing goes to the fund, and the debt may stand in for the sanctuary's share of a capital work." :
            k === "surplus" && S.terms.accounts ? " The accounts on stone show the city the surplus, and it borrows first, by the assembly's condition." : "") +
-          (k === "hides" && S.terms.epistatai ? (/[.!?]$/.test(L.options[S.laws[k]].note) ? "" : ".") + " With city officials on the board the dermatikon goes to the city." : "") + "</div>" +
+          (k === "hides" && S.terms.epistatai ? (/[.!?]$/.test(L.options[S.laws[k]].note) ? "" : ".") + " With city officials on the board the dermatikon goes to the city." : "") +
+          (k === "land" && S.laws.land === "olives" && S.landLease != null ? " The lease runs from year " + S.landLease + " to year " + (S.landLease + 20) + (S.year - S.landLease >= 20 ? "; the olives bear, and the rent stands a third higher." : "; the rent stands a third lower while the shoots grow.") : "") + "</div>" +
         '<div class="law-cite">' + L.cite + "</div></div>";
     }).join("");
     openModal("The Sacred Law", "standing rules \u00b7 ancestral custom is not lightly changed",
@@ -12702,7 +13099,8 @@
         const k = btn.dataset.law, ok = btn.dataset.opt;
         if (S.laws[k] === ok) return;
         S.laws[k] = ok;
-        if (k !== "surplus") losePiety(2); // the treasurers' business, not sacred law
+        if (k === "land") S.landLease = ok === "olives" ? S.year : null;
+        if (k !== "surplus" && k !== "land") losePiety(2); // the treasurers' business, not sacred law
         log("The sacred law is amended: " + LAWS[k].name.toLowerCase() + " \u2014 now \u201c" +
           LAWS[k].options[ok].label.toLowerCase() + "\u201d.", "good");
         renderAll();
@@ -12739,7 +13137,11 @@
         : ", and within it an image of the god well worth seeing.")
       : ", though the image within is of the old wooden sort."));
     else if (temple) parts.push("The god's house is a modest shrine of a single chamber, which to my mind has its own dignity.");
-    if (get("grove")) parts.push("There is also a grove sacred to the god, which it is not lawful to cut.");
+    const gv = get("grove");
+    if (gv) parts.push("There is also a grove of " + TREES[speciesOf(gv)].plural + " sacred to the god, which it is not lawful to cut.");
+    const wt = get("waytrees");
+    if (wt) parts.push("Along the way to the altar " + TREES[speciesOf(wt)].plural + " stand in a row.");
+    if (get("temple2")) parts.push("Beside the god's house stands a second temple, also of stone; the image is in the first.");
     if (get("springhouse")) parts.push("A spring rises within the temenos, and those who have drunk of it tell remarkable things.");
     if (get("abaton")) parts.push("Those seeking cures sleep in the portico set aside for the purpose, and slabs stand nearby recording the names of men and women healed, and the manner of it.");
     if (get("adyton")) parts.push("In the inmost part of the temple is a chamber which none may enter but those who serve the oracle.");
@@ -12909,8 +13311,9 @@
     BID.temple.levels[0].real = TEMPLE_L0[S.naiskosForm].real;
     BID.temple.levels[1].real = TEMPLE_L1[S.templeIIForm].real;
     if (id === "herakles") {
-      // the hero's double: a high altar for the god, a low hearth for the hero
-      S.built.push({ id: "eschara", lvl: 0, x: ALTAR_POS.x - 26, y: ALTAR_POS.y + 14 });
+      // the hero's double: a high altar for the god, a low hearth for the hero, beside the altar on its
+      // east side so that the ground before the altar, where the temple must face it, stays open (BR, 14 Sep 2026)
+      S.built.push({ id: "eschara", lvl: 0, x: ALTAR_POS.x + 18, y: ALTAR_POS.y + 6 });
       S.cal.heortai[0].heroRite = true;
       heraldQueue({
         vig: { med: "sphagia", badge: "kanoun" },
@@ -13110,7 +13513,7 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (S.placingId) { cancelPlacing(); renderAll(); }
+      if (S.placingId || S.pendingBegin) { cancelPlacing(); renderAll(); }
       document.getElementById("modalBack").classList.remove("open");
     }
   });
