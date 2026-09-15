@@ -1117,7 +1117,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXXII</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXXIV</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -3655,9 +3655,9 @@
   // the entrance the way runs to the altar. At panhellenic rank the south wall and the
   // entrance stand 25 m further out, so the way inside the boundary is twice as long
   const WAY_TIERS = [
-    [[396,612],[408,570],[420,528],[428,488],[430,470],[434,452],[438,434],[442,420]],
-    [[396,612],[408,570],[420,528],[428,488],[430,470],[434,452],[438,434],[442,420]],
-    [[396,612],[412,576],[424,540],[430,520],[433,500],[436,480],[439,460],[441,440],[442,420]],
+    [[291,980],[408,570],[420,528],[428,488],[430,470],[434,452],[438,434],[442,420]], // from the plate's edge (BR, 15 Sep 2026)
+    [[291,980],[408,570],[420,528],[428,488],[430,470],[434,452],[438,434],[442,420]], // from the plate's edge (BR, 15 Sep 2026)
+    [[232,980],[412,576],[424,540],[430,520],[433,500],[436,480],[439,460],[441,440],[442,420]], // from the plate's edge
   ];
   const WAY_ENTRY_T = [4, 4, 3]; // the entrance's index in each line: from there the way is inside the boundary
   const wayTier = () => Math.min(2, S.tier || 0);
@@ -7160,6 +7160,9 @@
       return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
     };
   })();
+  // the ground plate: the widest resting view and a little more; beyond it the frame's black stands (BR, 14 Sep 2026).
+  // The scrub and the washes run to its edge, so the plain does not go bare before the void (BR, 15 Sep 2026)
+  const PLATE = { x0: -100, x1: 1060, y0: -90, y1: 980 };
   const WASHES = (() => {
     const out = [];
     for (let i = 0; i < 11; i++) {
@@ -7167,12 +7170,27 @@
         rx: 55 + terraRand() * 95, ry: 22 + terraRand() * 38,
         tone: ["#DFD4AE", "#D8D0A6", "#E2D5B4"][i % 3], op: 0.35 + terraRand() * 0.25 });
     }
+    for (let i = 0; out.length < 25; i++) { // the band beyond the old plate, at the same density
+      const x = PLATE.x0 + terraRand() * (PLATE.x1 - PLATE.x0), y = PLATE.y0 + terraRand() * (PLATE.y1 - PLATE.y0);
+      if (x >= -30 && x <= 800 && y >= -30 && y <= 590) continue;
+      out.push({ x, y, rx: 55 + terraRand() * 95, ry: 22 + terraRand() * 38,
+        tone: ["#DFD4AE", "#D8D0A6", "#E2D5B4"][out.length % 3], op: 0.35 + terraRand() * 0.25 });
+    }
     return out;
   })();
   const FLORA = (() => {
     const out = [];
     for (let i = 0; i < 300; i++) {
       const x = -40 + terraRand() * 850, y = -40 + terraRand() * 640;
+      const r = terraRand();
+      out.push({ x, y, kind: r < 0.66 ? "tuft" : (r < 0.92 ? "shrub" : "tree"), v: terraRand() });
+    }
+    // the band beyond the buildable ground, out to the plate's edge, at the same density (the same seeded
+    // sequence continues, so the three hundred above keep their places); nothing is ever built there
+    while (out.length < 680) {
+      const m = 14; // a canopy's width inside the edge, so no tree overhangs the void
+      const x = PLATE.x0 + m + terraRand() * (PLATE.x1 - PLATE.x0 - 2 * m), y = PLATE.y0 + m + terraRand() * (PLATE.y1 - PLATE.y0 - 2 * m);
+      if (x >= -40 && x <= 810 && y >= -40 && y <= 600) continue;
       const r = terraRand();
       out.push({ x, y, kind: r < 0.66 ? "tuft" : (r < 0.92 ? "shrub" : "tree"), v: terraRand() });
     }
@@ -7269,7 +7287,7 @@
     // the slope so hill and plain meet without a seam
     // the plate covers the widest resting view (the panhellenic one, at the zoom floor) and a little more;
     // beyond it the frame's black stands, as it did before rev. XVI (BR, 14 Sep 2026)
-    const PLATE = { x0: -100, x1: 1060, y0: -90, y1: 980 }; // the sides run wider than the view, since the hill's lift at the plate's top corners pulls its side edges inward
+    // PLATE (above the scenery tables): the sides run wider than the view, since the hill's lift at the plate's top corners pulls its side edges inward
     for (let ya = PLATE.y0; ya < 240; ya += 8) {
       poly(g0, [isoT(PLATE.x0, ya, 0), isoT(PLATE.x1, ya, 0), isoT(PLATE.x1, ya + 9, 0), isoT(PLATE.x0, ya + 9, 0)], C.sand);
       g0.lastChild.setAttribute("stroke", C.sand);
@@ -7277,6 +7295,14 @@
     }
     poly(g0, [isoT(PLATE.x0, 240, 0), isoT(PLATE.x1, 240, 0), isoT(PLATE.x1, PLATE.y1, 0), isoT(PLATE.x0, PLATE.y1, 0)], C.sand);
     const hillDefs = el("defs", {}, g0);
+    { // the plate as drawn, for clipping the washes: the side edges follow the strips' lifted corners
+      const pts = [];
+      for (let ya = PLATE.y0; ya <= 240; ya += 8) pts.push(isoT(PLATE.x0, ya, 0));
+      pts.push(isoT(PLATE.x0, PLATE.y1, 0), isoT(PLATE.x1, PLATE.y1, 0));
+      for (let ya = 240; ya >= PLATE.y0; ya -= 8) pts.push(isoT(PLATE.x1, ya, 0));
+      const cp = el("clipPath", { id: "plateClip" }, hillDefs);
+      el("polygon", { points: pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ") }, cp);
+    }
     // gradient phase must run perpendicular to the projected x-axis (0.9, 0.45)
     // so iso-phase lines coincide with the terrain's y-contours
     const p0 = isoT(380, 240, 0), pc = isoT(380, -50, 0);
@@ -7292,11 +7318,12 @@
     el("stop", { offset: "100%", "stop-color": "#8F8468", "stop-opacity": "0.14" }, hillGrad);
     poly(g0, [isoT(PLATE.x0, 240, 0), isoT(PLATE.x1, 240, 0), isoT(PLATE.x1, PLATE.y0, 0), isoT(PLATE.x0, PLATE.y0, 0)], "url(#hillShade)");
     // dry-grass washes relieve the bare ground
+    const gw = el("g", { "clip-path": "url(#plateClip)" }, g0); // no wash runs past the plate into the void
     WASHES.forEach(w => {
       const [wx, wy] = isoT(w.x, w.y, 0);
       el("ellipse", { cx: wx.toFixed(1), cy: wy.toFixed(1),
         rx: (w.rx * 0.9 * ISO_K).toFixed(1), ry: (w.ry * 0.45 * ISO_K).toFixed(1),
-        fill: w.tone, opacity: w.op.toFixed(2) }, g0);
+        fill: w.tone, opacity: w.op.toFixed(2) }, gw);
     });
     [[80, -10], [230, -28], [500, -20], [660, 6], [330, 20]].forEach(([rx, ry], i) => {
       const [ox2, oy2] = isoT(rx, ry, 0);
