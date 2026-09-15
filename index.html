@@ -100,7 +100,7 @@
   .tier-badge b { color: var(--terra); font-weight: 600; }
 
   /* transient notice for refusals and blocked actions */
-  #toast { position: fixed; left: 1rem; bottom: 2.6rem; z-index: 90; max-width: 24rem;
+  #toast { position: fixed; left: 1rem; bottom: 2.6rem; z-index: 30; max-width: 24rem; /* above the map and its cards, beneath a modal */
     background: var(--panel); color: var(--ink); border: 1px solid var(--danger);
     border-left-width: 4px; padding: .55rem .9rem; font-size: .8rem; border-radius: 2px;
     box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .25s; }
@@ -258,7 +258,7 @@
   /* last, so a pan in progress wins over the placement crosshair */
   .plan-wrap svg.panning, .plan-wrap svg.panning * { cursor: grabbing; }
   .plan-caption {
-    position: absolute; left: 1rem; bottom: .7rem;
+    position: absolute; left: 1rem; bottom: .7rem; z-index: 3; /* above the sprites, which may reach the corner */
     font-size: .65rem; color: var(--ink-soft); letter-spacing: .1em;
     pointer-events: none;
   }
@@ -472,6 +472,7 @@
   .sitefile .inside-row .lvl { flex-basis: 100%; }
   .sitefile .real { display: block; margin-top: .35rem; }
   .sitefile .place-btn { display: none; margin-top: .6rem; }
+  .sitefile .place-btn.fixed { display: inline-block; } /* a work laid out where it belongs begins from its file on every layout */
   .sitefile .cite {
     margin-top: .35rem; padding-top: .4rem; border-top: 1px dashed var(--line);
     font-size: .75rem; color: var(--ink-soft);
@@ -913,7 +914,7 @@
     .plan-caption { right: 3.4rem; }
     .placing-banner { top: .5rem; font-size: .62rem; padding: .3rem .6rem; max-width: 90%; }
     #ghost polygon.hint-target, #ghost polyline.hint-edge { stroke-width: 2; }
-    .plan-wrap { height: 46vh; min-height: 260px; border-right: none; border-bottom: 1px solid var(--line); }
+    .plan-wrap { height: 44vh; min-height: 250px; border-right: none; border-bottom: 1px solid var(--line); } /* the sticky bar fits the first screen below it */
     .rail { overflow: visible; min-width: 0; }
     .railbar { top: 0; padding: .5rem .8rem; flex-wrap: wrap; }
     .railbar button.act, .railbar button.endyear { flex: 1 1 100%; white-space: normal; padding: .55rem .7rem; }
@@ -927,9 +928,13 @@
     .hstrip { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .herald .hchoices { flex-direction: column; }
     .herald .hchoices button, .herald.wide .hchoices button { flex: none; width: 100%; font-size: .8rem; padding: .55rem .7rem; }
+    .herald { padding-bottom: 0; } /* the choices carry the card's foot */
+    .herald .hchoices { position: sticky; bottom: 0; margin: .7rem 0 0; padding: .5rem 1.1rem .7rem; background: var(--panel); border-top: 1px solid var(--line); } /* a tall card scrolls behind its buttons */
     .meter .label { white-space: normal; width: auto; }
     .meters.five .meter:last-child { grid-column: span 2; }
     #toast { left: .6rem; right: .6rem; bottom: .6rem; max-width: none; font-size: .74rem; padding: .45rem .7rem; }
+    html, body { overflow-x: hidden; } /* a chip beside the last meter must not widen the page and scale the cards to it */
+    .meter { overflow: hidden; }
     .modal-head { position: sticky; top: 0; z-index: 3; background: var(--panel); padding-bottom: .2rem; }
     .modal .cal-totals.sticky { top: 2.9rem; } /* the composer's totals stick below the head, not over it */
     .rail section { padding-left: .8rem; padding-right: .8rem; }
@@ -982,7 +987,7 @@
 <header>
   <h1>Temenos</h1>
   <img class="port" id="deityPort" alt="" style="display:none">
-  <span class="deity" id="deityLine">Sanctuary of Asklepios, in the hills above a village</span>
+  <span class="deity" id="deityLine">A sanctuary in the hills above a village</span>
   <div class="tier-box">
     <span class="tier-badge lapidary" id="tierBadge">Tier · <b>Kome</b> (village shrine)</span>
     <div class="standing-strip" id="standingStrip" role="button" tabindex="0" title="What the next rank needs. Click for the details."></div>
@@ -1112,7 +1117,7 @@
 </div>
 
 <footer class="lapidary">
-  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXVII</span>
+  Pedagogical sanctuary simulator <span id="revTag">rev. metron XXXII</span>
   <span class="sep">&middot;</span> &copy; 2026 <span class="name">Ben Radcliffe</span>
   <span class="sep">&middot;</span> <a href="mailto:ben.radcliffe@lmu.edu">ben.radcliffe@lmu.edu</a>
 </footer>
@@ -1870,8 +1875,8 @@
       ],
     },
     {
-      id: "grove", tip: "Trees of one species planted for the god and protected by sacred law.", name: "Sacred grove", gk: "alsos", shape: "grove", max: 3, planting: true,
-      blurb: "Groves were planted as well as found. Pits were cut for trees at Kourion in the seventh or sixth century, two dozen cypress pits were cut around the temple of Nemean Zeus, and Herakles was said to have planted the bare Altis with the olive. The species is chosen at planting. The trees take a decade to take root and two decades to grow. Sacred laws regulated groves closely, and felling protected timber carried penalties.",
+      id: "grove", tip: "Trees of one species planted for the god and protected by sacred law.", name: "Sacred grove", gk: "alsos", shape: "grove", maxBy: [1, 2, 3], planting: true, // one stand at village rank, two at polis, three at panhellenic
+      blurb: "Groves were planted as well as found. Pits were cut for trees at Kourion in the seventh or sixth century, two dozen cypress pits were cut around the temple of Nemean Zeus, and Herakles was said to have planted the bare Altis with the olive. The species is chosen at planting. The trees take a decade to take root and two decades to grow. Sacred laws regulated groves closely, and felling protected timber carried penalties. A grove may be planted inside the wall or on the god's land outside it, never across the wall.",
       outside: true,   // stood outside the sacred boundary at Olympia and Epidauros
       levels: [
         { name: "Stand of trees", cost: 80, upkeep: 3, draw: 6, renown: 5, tier: 0, fp: [70, 60], real: "Real size: not recorded in our sources. At Olympia no wall round the grove can be traced before the late 4th century BCE, and the wall built then was low, about 1.5 m, and could be stepped over (Mallwitz, Olympia und seine Bauten, 121–2).",
@@ -2720,10 +2725,10 @@
             S.familyPriesthood = S.year + 30;
             let seated = false;
             if (S.priests.length < priestCap()) { const pr = newPriest(); pr.family = name; S.priests.push(pr); seated = true; }
-            notify(name.charAt(0).toUpperCase() + name.slice(1) + " give " + fmt(amt) + " dr. toward a front of marble.", "good");
+            notify(name.charAt(0).toUpperCase() + name.slice(1) + " give " + fmt(amt) + " dr. to the building fund, toward a front of marble.", "good");
             log((seated ? "One of the family takes the priesthood." : "One of the family will take the priesthood at the next vacancy.") +
               (tierOf("temple", toLvl, BID.temple.levels[toLvl]) > S.tier ? " The next stage of the temple itself waits for " + TIERS[tierOf("temple", toLvl, BID.temple.levels[toLvl])].label.toLowerCase() + " standing; the money waits in the fund." : ""), "");
-          }, log: "The family takes the contract for the next stage of the temple and pays toward a front of marble. The money goes into the building fund." },
+          }, log: "The family pays toward a front of marble for the temple's next stage. The money goes into the building fund, which is one purse: the board may spend it on whatever capital work comes first." },
         { label: "Decline", then: () => { S.familySlighted = S.year; }, log: "The family is refused and holds it against the board." },
       ],
     },
@@ -2779,7 +2784,7 @@
       body: "The league of cities offers to levy its members for the sanctuary's building. The levy pays a fixed sum each decade for three decades. In return the league's representatives decide where dedications may stand in the sanctuary, and the sanctuary is drawn into the league's disputes.",
       cite: "After the collapse of 373 the Delphic Amphictyony taxed its member peoples for the rebuilding, the \u201cfirst and second obols\u201d; the Phocians' refusal of a fine began the Third Sacred War (Davies 2001, 216\u201318; Diod. 16.23\u201324).",
       choices: [
-        { label: "Accept the levy", then: () => { S.league = { since: S.year, left: 3, suspended: 0, indemnity: 0 }; },
+        { label: "Accept the levy (900 dr. per decade, three times)", then: () => { S.league = { since: S.year, left: 3, suspended: 0, indemnity: 0 }; },
           log: "The league votes the levy. Its representatives take their seats, and their say over where dedications may stand." },
         { label: "Decline", fx: { deeds: 2 }, log: "The league's offer is declined. The sanctuary keeps its independence." },
       ],
@@ -3040,7 +3045,7 @@
     { id: "b3-city-loan", kind: "event", minTier: 1,
       title: "A city asks to borrow",
       body: "A neighboring polis, short of cash in an ordinary year, asks for a loan from the god's reserve at the usual interest.",
-      cite: "(Reger, 38)",
+      cite: "Apollo on Delos lent to the island cities as well as to individuals, and the Delians once appealed to a king to compel the islands to repay what they owed the god (Reger, 38).",
       choices: [
         { label: "Lend at the usual interest", fx: { lend: 600, deeds: 3, pilgrimBonus: 15 }, log: "The contract is cut in stone with the interest reckoned to the day." },
         { label: "The god's silver stays here", fx: { piety: 2 }, log: "The envoys are refused politely. That city sends a smaller delegation to the next festival." },
@@ -3153,7 +3158,7 @@
       cite: "In the drought of 329/8 BC sheep and goats cost 30 drachmas and cattle 400, against the 10–17 and 40–90 of the sacrificial calendars (IG II² 1672.289–90; van Straten, 176, 177 n. 59).",
       choices: [
         { label: "Pay what they ask", fx: { priceShock: 0.6, piety: 3, deeds: 3 }, log: "The calendar is kept whole at the new prices. The treasury pays more every year." },
-        { label: "Buy smaller animals this decade", fx: { priceShock: 0.25, piety: -3 }, log: "Sheep replace oxen and piglets replace sheep until the herds recover." },
+        { label: "Buy smaller animals for the coming decade", fx: { priceShock: 0.25, piety: -3 }, log: "The hieropoioi buy smaller victims where they can, so the bill rises by a quarter rather than doubling; the god's portion is the poorer for it, and the town notices." },
       ] },
 
     { id: "c10-purify", kind: "event", minTier: 0, med: "kopen",
@@ -3176,7 +3181,7 @@
 
     /* --- D · the priesthood --- */
     { id: "d1-auction", noHereditary: true, kind: "event", minTier: 1, era: "theoria", med: "ck4996",
-      when: () => !S.terms.civic, // under the civic condition the city sells the office itself
+      when: () => !S.terms.civic && !S._lotChosen, // under the civic condition the city sells the office itself; a board that chose the lot does not then sell
       title: "The priesthood at auction",
       body: "The office is to be sold, and the board must decide what to offer with it. The more the buyer is excused from paying for elsewhere, the higher the bidding will go.",
       cite: "At Priene the priesthood of Dionysos Phleos sold for 12,002 drachmas — two drachmas past the threshold at which the heaviest civic liturgies were waived. Prices elsewhere ran from 10 drachmas up to 19,800 (Connelly, 51–2).",
@@ -3195,12 +3200,13 @@
       ] },
 
     { id: "d3-tenure", noHereditary: true, kind: "agenda", minTier: 0,
+      when: () => !S.priestTerm && !S._tenureAsked, // asked once, here or at a vacancy
       title: "How long should the office run?",
-      body: "The custom here has been service for life. The local demes propose annual tenure instead, so that more families may hold it.",
+      body: "The custom here has been service for life. The local demes propose a fixed term instead, so that more families may hold it.",
       cite: "Tenure varied. Many women's priesthoods ran for a year or a single festival cycle, while family offices like the Eteoboutadai's and most purchased priesthoods were held for life; the Salaminioi filled theirs by lot on the holder's death (Connelly, 17; CGRN, Salaminioi).",
       choices: [
-        { label: "Annual tenure", fx: { piety: 2, deeds: 3 }, log: "The office will change hands each year. Four families put names forward at once." },
-        { label: "Keep it for life", fx: { piety: 2 }, log: "The custom stands. The present holder will die in office, as the last one did." },
+        { label: "A term of ten years", fx: { piety: 2, deeds: 3 }, then: () => { S.priestTerm = 10; S._tenureAsked = true; }, log: "The office will change hands every ten years. Four families put names forward at once." },
+        { label: "Keep it for life", fx: { piety: 2 }, then: () => { S._tenureAsked = true; }, log: "The custom stands. The present holder will die in office, as the last one did." },
       ] },
 
     { id: "d4-key", kind: "agenda", minTier: 0,
@@ -3311,7 +3317,7 @@
       body: "Pilgrims are washing their hands in standing green water at the entrance.",
       cite: "Worshippers had to purify themselves on entering a sanctuary; water basins (perirrhanteria) stood near the entrances for the purpose (Pedley, 98).",
       choices: [
-        { label: "Set an attendant to keep them clean", fx: { treasury: -30, piety: 4, capacity: 10, deeds: 3 }, log: "The basins are emptied and refilled daily. Visitors notice, and say so." },
+        { label: "Set an attendant to keep them clean (30 dr.)", fx: { treasury: -30, piety: 4, capacity: 10, deeds: 3 }, log: "The basins are emptied and refilled daily. Visitors notice, and say so." },
         { label: "Refill them at festivals only", fx: { piety: -4 }, log: "For most of the year people wash in whatever is in the bowl." },
       ] },
 
@@ -3382,12 +3388,12 @@
 
     /* --- H · strangers, crowds, and other gods --- */
     { id: "h1-pan", kind: "event", minTier: 0, med: "aulete",
-      when: () => !!S.cal && S.cal.heortai.length < heortaiCap(), // the rite needs a place in the calendar
+      when: () => !!S.cal && S.cal.heortai.length < heortaiCap() && !(S.guests || []).some(g => g.key === "pan"), // the rite needs a place in the calendar, and Pan no shrine here already
       title: "A stranger met the god on the road",
       body: "A runner arrives saying the god spoke to him on the mountain and asked why he receives no worship here.",
       cite: "Pheidippides said Pan met him in the mountains and asked why the Athenians did not worship him. They believed him, gave Pan a yearly festival with sacrifices and a torch race, and built him a shrine below the Acropolis (Hdt. 6.105; Pedley, 22).",
       choices: [
-        { label: "Institute the rite he describes (40 dr.)", fx: { foundFest: 80, piety: 5, deeds: 3 }, log: "A day is set aside and a small altar built. Nobody can say afterwards whether the runner was believed or simply not contradicted." },
+        { label: "Institute the rite he describes (40 dr.)", fx: { foundFest: 80, foundName: "Day of Pan", piety: 5, deeds: 3 }, log: "A day is set aside and a small altar built. Nobody can say afterwards whether the runner was believed or simply not contradicted." },
         { label: "Thank him and do nothing", fx: { piety: -3 }, log: "He is given a meal and sent on. The story is still told locally forty years later." },
       ] },
 
@@ -3463,7 +3469,7 @@
       cite: "The Messenians and Naupaktians dedicated Paionios' Nike at Olympia as a tithe of spoils, and said so on the base. Mantiklos' small bronze does the same thing on a smaller scale: from his tithe — grant, Apollo, something good in return (Pedley, 104, 130).",
       choices: [
         { label: "Accept, and raise the monument", fx: { dedication: { name: "Victory monument, tithe of spoils", val: 600, ren: 5 }, pilgrimBonus: 20 }, log: "The monument goes up on the highest ground in the precinct, with the inscription facing the road." },
-        { label: "Accept the tithe, decline the inscription", fx: { treasury: 400, piety: 3, deeds: 3 }, log: "The metal is taken and worked into plate. The victory is not advertised here." },
+        { label: "Accept the tithe, decline the inscription", fx: { dedication: { name: "Tithe of the spoils, worked into plate", val: 400, ren: 2 }, piety: 3, deeds: 3 }, log: "The metal is taken and worked into plate for the god. The victory is not advertised here." },
       ] },
 
     { id: "i3-donor", kind: "event", minTier: 0,
@@ -3951,16 +3957,18 @@
     if (S.tier === 1 && S.tierAt != null) return Math.min(f, 12 + 2 * Math.floor((S.year - S.tierAt) / 10));
     return f;
   }
+  // the standard in words, for every text that names a rank's: the polis floor eases in
+  function standardWords(t) { return t === 1 ? "12 in the decade of the promotion, rising by two a decade to " + FEST_EXPECT[1] : FEST_EXPECT[t] + " at least"; }
   function festExpect() {
     const floor = rankFloor();
     if (S._incomeRate === undefined) return floor;
     return Math.max(floor, Math.round(FEST_EFF * frontierRep(S.tier, FEST_SHARE * S._incomeRate)));
   }
   // what the demos looks for before it votes money: piety at three quarters of the rank's cap, and
-  // the festival a quarter above the standard
-  const DEMOS_PIETY = [30, 38, 45];
+  // the festival a tenth above the standard (a quarter until 14 Sep 2026)
+  const DEMOS_PIETY = [30, 34, 42]; // about seven tenths of the rank's cap, so the demos comes round two or three decades into the rank
   function demosPiety() { return DEMOS_PIETY[S.tier]; }
-  function demosFest() { return Math.ceil(festExpect() * 1.25); }
+  function demosFest() { return Math.ceil(festExpect() * 1.1); }
   const MONUMENT_MAX = 25;           // buildings alone cannot make a sanctuary famous
   function festivalRenown() { return Math.round(festivalRep() * 2.5); }
   function monumentRenown() { return Math.min(MONUMENT_MAX, Math.round(monuments() * 0.5)); }
@@ -4154,7 +4162,13 @@
   }
   function speciesLabel(k, own) {
     const T = TREES[k];
-    return T.name + (own ? " \u00b7 the god\u2019s own" : T.kind === "fruit" ? " \u00b7 bears fruit" : T.kind === "shade" ? " \u00b7 shade" : "");
+    return T.name + (own ? " \u00b7 the god\u2019s own" : T.kind === "fruit" ? " \u00b7 bears fruit" : T.kind === "shade" ? " \u00b7 shade" : T.kind === "crown" ? " \u00b7 the victor\u2019s crown" : "");
+  }
+  // the head noun of a work's name decides its verb: "the dining rooms stand", "the trees along the way stand", "the stoa stands"
+  function isPluralName(n) {
+    if (/\band\b/.test(n)) return true;
+    const h = n.replace(/^the\s+/i, "").replace(/\s*\(.*\)\s*$/, "").toLowerCase().split(/\s+(?:of|along|for|to|in|at|by)\s+/)[0].split(/\s+/).pop();
+    return /s$/.test(h) && !/[ou]s$|is$/.test(h);
   }
   function speciesNote(id, k) {
     const T = TREES[k], G = GOD_TREES[S.deity], own = !!(G && G.own.includes(k));
@@ -4180,6 +4194,16 @@
     });
   }
   // the ground a fixed planting is laid out on: beside the way
+  // a work that lives inside the temple (the cult image, the oracle's chamber) is set up there without a siting
+  function inTempleSpot(id) {
+    const t = S.built.find(b => b.id === "temple"); if (!t) return null;
+    const tr = rectOf(t);
+    for (let dy = 0; dy <= tr.h; dy += 2) for (let dx = 0; dx <= tr.w; dx += 2) for (const sx of [1, -1]) for (const sy of [1, -1]) {
+      const x = t.x + sx * dx, y = t.y + sy * dy;
+      if (validate(id, 0, x, y).ok) return { x, y };
+    }
+    return null;
+  }
   function fixedSpot(id) {
     if (id === "waytrees") { const A = wayAnchors(), e = wayEntry(), p = A[Math.min(A.length - 2, e + 1)]; return { x: p[0], y: p[1] }; }
     return { x: 420, y: 470 };
@@ -4304,7 +4328,7 @@
       options: {
         plate: { label: "Worked into plate", note: "surplus silver is weighed into phialai and entered in the inventories (IG I\u00b3 78). This adds renown and no income." },
         loans: { label: "Lent at interest", note: "polis rank and above: surplus goes out at 10% per year, as Apollo's money did on Delos. This adds income and no renown.", minTier: 1 },
-        fund: { label: "Set aside for building", note: "from polis rank, or from the day the city offers its temple: a tenth of each decade's income is kept in coin toward the next large building, up to half the working float per decade; the surplus above the float is worked into plate. A village saving for its own temple sets aside everything above the float instead, up to the same cap. The fund earns no renown, and a city at war may borrow it.", minTier: 1 },
+        fund: { label: "Set aside for building", get note() { return "from polis rank, or from the day the city offers its temple, coin is kept toward the next large building. " + fundRuleText() + "; what still stands above the float at the audit is worked into plate. The fund earns no renown, and a city at war may borrow it."; }, minTier: 1 }, // the rule is stated by the one helper the audit follows
       },
     },
     wood: {
@@ -4416,6 +4440,13 @@
         if (rd.x < -40 || rd.y < -40 || rd.x + rd.w > 800 || rd.y + rd.h > 600) {
           return { ok: false, reason: "Beyond the god's land" };
         }
+        if (S.tier < 2) { // the south wall may one day be carried out to the panhellenic line: the ground its gates will need stays clear
+          for (const g of [ENTRANCE_PAN, GATE2_PAN]) {
+            const gz = { x: g.x - 26, y: g.y - 28, w: 52, h: 64 };
+            if (rd.x < gz.x + gz.w && rd.x + rd.w > gz.x && rd.y < gz.y + gz.h && rd.y + rd.h > gz.y)
+              return { ok: false, reason: "The ground below the entrance is kept clear for the way out of the sanctuary" };
+          }
+        }
       } else if (nIn !== 4) {
         return { ok: false, reason: "Outside the temenos boundary" };
       }
@@ -4453,6 +4484,12 @@
       for (const s of SPRINGS) if (overlaps(rd, featRect(s), 2)) return { ok: false, reason: "A natural spring rises there" };
     }
     if (overlaps(rd, featRect(OAK), 2)) return { ok: false, reason: "The ancient oak stands there and may not be removed" };
+
+    // the altar keeps open ground about it for the sacrifice: six metres before its largest stage, as the temple's own rule reserves
+    if (!["altar", "temple", "sidealtar", "eschara", "waytrees", "peribolos", "perirrhanterion", "propylon"].includes(id) && bld.constraint !== "in-temple") {
+      const az = drawnRectOf("altar", BID.altar.levels.length - 1, ALTAR_POS.x, ALTAR_POS.y);
+      if (overlaps(rd, az, 12)) return { ok: false, reason: "The ground about the altar stays open for the sacrifice" };
+    }
 
     // collisions with what is built
     for (let i = 0; i < S.built.length; i++) {
@@ -5479,14 +5516,14 @@
         stone(x, y, 0, 1, i % 2 ? C.stepC : C.stepB, i % 2 ? C.porosR : C.porosL));
       backToFront([[-.5, -1.2], [.6, 0], [-.4, 1.1]]).forEach(([x, y]) => stone(x, y, 1.3, .9, C.stepB, C.porosL));
       poly(g, [[-1, -1.4], [1, -1.5], [1.1, 1.3], [-.9, 1.5]].map(([x, y]) => iso(x, y, 2.5)), C3.soot);
-      altarFire(g, iso, k, 2.6, .3);
+      altarFire(g, iso, k, 2.6, .5); // a plume the resting view can find
     } else {
       const base = [[-2, .2], [-1.6, -1.6], [-.6, -2.9], [.7, -2.8], [1.7, -1.4], [2, .4], [1.5, 2], [.3, 2.9], [-1, 2.5], [-1.8, 1.5]];
       poly(g, base.map(([x, y]) => iso(x, y, 0)), C3.ashD);
       poly(g, base.map(([x, y]) => iso(x * .72, y * .72, 1.1)), C3.ash);
       poly(g, base.map(([x, y]) => iso(x * .4, y * .4, 2)), C3.ash);
       poly(g, base.map(([x, y]) => iso(x * .22, y * .22, 2.5)), C3.soot);
-      altarFire(g, iso, k, 2.6, .3);
+      altarFire(g, iso, k, 2.6, .5); // a plume the resting view can find
     }
   }
 
@@ -6578,17 +6615,18 @@
     S.built.forEach(b => {
       const lv = BID[b.id] && BID[b.id].levels[b.lvl];
       if (!lv || !lv.fp || b.id === "peribolos") return;
-      const r = rectOf(b);
+      const r = drawnRectOfB(b); // as drawn, which for the stadium runs well beyond its footprint
       pts.push([r.x, r.y], [r.x + r.w, r.y], [r.x + r.w, r.y + r.h], [r.x, r.y + r.h]);
     });
     const fit = camFitOf(pts, 1.2);
     return { z: Math.min(CAM_ZMAX, Math.max(CAM_ZMIN, fit.z)), cx: fit.cx, cy: fit.cy };
   }
-  function camPlan() { const v = camPlanView(); cam.z = v.z; cam.cx = v.cx; cam.cy = v.cy; camApply(); }
+  let camPlanAt = null; // the camera as it stood after the last plan view, the pan's clamp included
+  function camPlan() { const v = camPlanView(); cam.z = v.z; cam.cx = v.cx; cam.cy = v.cy; camApply(); camPlanAt = { z: cam.z, cx: cam.cx, cy: cam.cy }; }
   // the fit button shows the whole plan; pressed again on that view, it returns to the resting view
   function camPlanToggle() {
-    const v = camPlanView();
-    if (Math.abs(cam.z - v.z) < 1e-3 && Math.abs(cam.cx - v.cx) < 2 && Math.abs(cam.cy - v.cy) < 2) camRest(); else camPlan();
+    const p = camPlanAt;
+    if (p && Math.abs(cam.z - p.z) < 1e-3 && Math.abs(cam.cx - p.cx) < 2 && Math.abs(cam.cy - p.cy) < 2) camRest(); else camPlan();
   }
 
   // preserveAspectRatio="meet" letterboxes the viewBox, so what the frame
@@ -7229,12 +7267,15 @@
     // ground: displacement strips in plain sand carry the geometry; a single
     // gradient overlay carries the shading, fully transparent at the foot of
     // the slope so hill and plain meet without a seam
-    for (let ya = -700; ya < 240; ya += 8) { // the ground runs far past the plate, so no zoom shows the frame's black
-      poly(g0, [isoT(-700, ya, 0), isoT(1500, ya, 0), isoT(1500, ya + 9, 0), isoT(-700, ya + 9, 0)], C.sand);
+    // the plate covers the widest resting view (the panhellenic one, at the zoom floor) and a little more;
+    // beyond it the frame's black stands, as it did before rev. XVI (BR, 14 Sep 2026)
+    const PLATE = { x0: -100, x1: 1060, y0: -90, y1: 980 }; // the sides run wider than the view, since the hill's lift at the plate's top corners pulls its side edges inward
+    for (let ya = PLATE.y0; ya < 240; ya += 8) {
+      poly(g0, [isoT(PLATE.x0, ya, 0), isoT(PLATE.x1, ya, 0), isoT(PLATE.x1, ya + 9, 0), isoT(PLATE.x0, ya + 9, 0)], C.sand);
       g0.lastChild.setAttribute("stroke", C.sand);
       g0.lastChild.setAttribute("stroke-width", "0.6");
     }
-    poly(g0, [isoT(-700, 240, 0), isoT(1500, 240, 0), isoT(1500, 1300, 0), isoT(-700, 1300, 0)], C.sand);
+    poly(g0, [isoT(PLATE.x0, 240, 0), isoT(PLATE.x1, 240, 0), isoT(PLATE.x1, PLATE.y1, 0), isoT(PLATE.x0, PLATE.y1, 0)], C.sand);
     const hillDefs = el("defs", {}, g0);
     // gradient phase must run perpendicular to the projected x-axis (0.9, 0.45)
     // so iso-phase lines coincide with the terrain's y-contours
@@ -7249,7 +7290,7 @@
     el("stop", { offset: "40%", "stop-color": "#F6ECCB", "stop-opacity": "0.34" }, hillGrad);
     el("stop", { offset: "78%", "stop-color": "#F6ECCB", "stop-opacity": "0.1" }, hillGrad);
     el("stop", { offset: "100%", "stop-color": "#8F8468", "stop-opacity": "0.14" }, hillGrad);
-    poly(g0, [isoT(-700, 240, 0), isoT(1500, 240, 0), isoT(1500, -700, 0), isoT(-700, -700, 0)], "url(#hillShade)");
+    poly(g0, [isoT(PLATE.x0, 240, 0), isoT(PLATE.x1, 240, 0), isoT(PLATE.x1, PLATE.y0, 0), isoT(PLATE.x0, PLATE.y0, 0)], "url(#hillShade)");
     // dry-grass washes relieve the bare ground
     WASHES.forEach(w => {
       const [wx, wy] = isoT(w.x, w.y, 0);
@@ -7918,6 +7959,7 @@
   }
   // the one label of the advance button, short enough for a narrow rail
   function advanceLabel() {
+    if (heraldQ.length && !heraldOpen && !heraldHold) return "A card waits: read it first"; // the press shows it, so the label says so
     const n = S.pendingEvents.length;
     return n > 1 ? "Decide " + n + " events" : n ? "Decide the event" : "Advance the decade";
   }
@@ -7960,7 +8002,8 @@
         heraldOpen = false;
         S._heraldBlocking = false;
         document.getElementById("heraldBack").classList.remove("open");
-        try { if (c.fn) c.fn(); } finally { heraldNext(); updateAdvance(); refreshEventButtons(); }
+        const before = { piety: pietyR(), renown: renown(), treasure: treasureVal() }; // what the choice moves is said after it, as an event's receipt does
+        try { if (c.fn) c.fn(); } finally { heraldEffects(before); heraldNext(); updateAdvance(); refreshEventButtons(); }
       });
       row.appendChild(btn);
     });
@@ -7988,6 +8031,7 @@
     if (card.key && heraldOpen && heraldCur && heraldCur.key === card.key) { heraldShow(card); return; } // the same work's card, already on show: redrawn, not queued
     heraldQ.push(card);
     if (!heraldOpen && !heraldHold) heraldNext();
+    updateAdvance(); // a card that waits changes the button's word
   }
   // a siting that a card opened (the money settled, a gift's ground, the city's temple): the next card waits for it
   function sitingHeld() {
@@ -8037,7 +8081,7 @@
     if (S.pendingBegin) { const r1 = attemptPlaceOther(id, x, y, bld, donor); if (r1 && S.pendingBegin) setTimeout(() => resumePending(), 0); return r1; } // the waiting work gets the map back
     return attemptPlaceOther(id, x, y, bld, donor);
   }
-  function attemptPlaceOther(id, x, y, bld, donor) {
+  function attemptPlaceOther(id, x, y, bld, donor, sure) {
     if (bld.deities && !bld.deities.includes(S.deity)) {
       notify("That building belongs to another cult.", "bad");
       return false;
@@ -8077,6 +8121,7 @@
       return true;
     }
     const sponsored0 = 0;
+    if (!sure && !donor && treasurerObjects(id, 0, cost0, sponsored0, () => { attemptPlaceOther(id, x, y, bld, donor, true); })) return false; // the siting stays open behind the card
     if (S.treasury < Math.round((cost0 - sponsored0) * 0.2)) {
       notify("The treasurers refuse: even the down payment needs " + fmt(Math.round((cost0 - sponsored0) * 0.2)) + " dr.", "bad");
       return false;
@@ -8155,8 +8200,8 @@
   // 352/1 when the Athenians drew the answer on the sacred orgas from sealed
   // water-jugs before sending to Delphi (IG II3 1 292)
   const EMBASSY_COST = [60, 100, 150];
-  // the city's share of a capital work: three tenths, and a fifth more for each condition, up to nine tenths
-  function cityFrac(n) { return Math.min(0.9, 0.3 + 0.2 * n); }
+  // the city's share of a capital work: three tenths, and a fifth more for each condition, up to four fifths
+  function cityFrac(n) { return Math.min(0.8, 0.3 + 0.2 * n); } // four fifths at most: the sanctuary always finds a fifth (BR, 14 Sep 2026)
   // the works the city's officials want first: what the crowds see
   const CITY_WANTS = ["temple", "propylon", "stoa", "theater", "statue", "stadium", "peribolos", "gymnasion", "katagogion", "hestiatorion", "altar", "telesterion", "abaton", "adyton", "ergasteria"];
   const CITY_WORKS = ["fountain house", "council house", "walls", "harbor mole", "temple in the agora", "theater", "ship-sheds"];
@@ -8171,10 +8216,21 @@
   // the sanctuary's own money toward a share: the fund, and under the borrowing condition what the
   // city owes, which the sanctuary may set against its share except in war
   function debtUsable() { return S.terms.lendable && windOf(S.year) !== "war" ? (S.cityDebt || 0) : 0; }
-  function ownMoney() { return S.fund + debtUsable(); }
+  // the city's debt stands in for half of a share at most, and never for a whole work (BR, 14 Sep 2026)
+  function debtFor(share) { return Math.min(debtUsable(), Math.round((share || 0) / 2)); }
+  // the sanctuary's own money toward a share (the fund and half the share from the debt), or toward a whole work (the fund alone)
+  function ownMoney(share) { return S.fund + (share === undefined ? 0 : debtFor(share)); }
+  // where a held grant's share is about to come from, in words, before it is drawn
+  function shareSources(g) {
+    let rest = g ? g.share : 0;
+    const parts = [];
+    if (g && S.campaign && S.campaign.key === g.key && campaignTotal() > 0) { parts.push("the cities' pledges"); rest -= Math.min(campaignTotal(), rest); }
+    if (rest > 0) { const ff = Math.min(S.fund, rest); if (ff > 0) parts.push("the building fund"); if (rest - ff > 0 && debtFor(g.share) > 0) parts.push("the city's debt"); }
+    return parts.length ? parts.join(" and ") : "the building fund";
+  }
   // pay a share from the fund first and the city's debt after; returns the words for the log
-  function drawOwn(amt) {
-    const fromFund = Math.min(S.fund, amt), fromDebt = Math.min(debtUsable(), amt - fromFund);
+  function drawOwn(amt, debtMax) {
+    const fromFund = Math.min(S.fund, amt), fromDebt = Math.min(debtMax === undefined ? debtUsable() : debtMax, amt - fromFund);
     S.fund -= fromFund;
     if (fromDebt > 0) S.cityDebt -= fromDebt;
     return fromDebt > 0 ? fmt(fromFund) + " dr. from the building fund and " + fmt(fromDebt) + " dr. set against the city's debt" : fmt(fromFund) + " dr. from the building fund";
@@ -8184,13 +8240,13 @@
   // flag on S.terms and is never removed once accepted
   const TERMS = {
     epistatai: { label: "City officials on the board", short: "city officials sit on the board",
-      play: "Each decade the officials name the next capital work, one or two of them. No other may begin until it is under way. A grant for it passes without a lot. The hide money goes to the city.",
-      text: "City officials sit on your board. Each decade they name the next capital work, one or two of them, and no other capital work may begin until the named work is under way. A grant for it passes without a lot. The money from the victims\u2019 hides, the dermatikon, goes to the city." },
+      play: "Each decade the officials name the next capital work, one or two of them. No other may begin until it is under way. A grant for it passes without a lot, and the officials direct the audit's surplus to its share. The hide money goes to the city.",
+      text: "City officials sit on your board. Each decade they name the next capital work, one or two of them, and no other capital work may begin until the named work is under way. A grant for it passes without a lot, and at the audit the officials direct what stands above the float to the sanctuary\u2019s share of the named work before anything else. The money from the victims\u2019 hides, the dermatikon, goes to the city." },
     accounts: { label: "The accounts on stone", short: "the accounts are published on stone",
-      play: "The stele counts as a monument and the magistrates never object again. Of what the audit finds above the float the city borrows half first, at 1.2%, repaying a tenth per decade. In war the city takes the plate it asks for. A decade that closes in deficit is fined a tenth of it.",
-      text: "The accounts are cut on a stone stele each decade for anyone to read. The stele counts as a monument, and the magistrates, who read the accounts, support every later request. The audit shows the city what stands above the float, and the city borrows half of it first, at the state\u2019s rate of 1.2% per year, repaying a tenth per decade. A city at war takes the plate it asks for, and the loan is recorded. A decade whose accounts close in deficit is found by the audit and fined a tenth of the deficit." },
+      play: "The stele counts as a monument and the magistrates never object again. Of what the audit finds above the float the city borrows half first, at 1.2%, repaying a tenth per decade. In war the city takes the plate it asks for. A decade that closes in deficit is fined a tenth of it. Where the city also has the right to borrow, that condition rules the surplus: it takes the whole and repays no principal.",
+      text: "The accounts are cut on a stone stele each decade for anyone to read. The stele counts as a monument, and the magistrates, who read the accounts, support every later request. The audit shows the city what stands above the float, and the city borrows half of it first, at the state\u2019s rate of 1.2% per year, repaying a tenth per decade. A city at war takes the plate it asks for, and the loan is recorded. A decade whose accounts close in deficit is found by the audit and fined a tenth of the deficit. Where the city also holds the right to borrow, that condition rules the surplus: the city takes the whole of it and repays no principal." },
     lendable: { label: "The city may borrow", short: "the city may borrow from the surplus",
-      play: "The city takes the whole surplus each decade, up to a ceiling, at 1.2%. While it owes, nothing goes to the fund. It pays the interest and never repays the principal. The debt may stand in for the sanctuary\u2019s share of a capital work, except in war.",
+      play: "The city takes the whole surplus each decade, up to a ceiling, at 1.2%. While it owes, nothing goes to the fund. It pays the interest and never repays the principal. The debt may stand in for half of the sanctuary\u2019s share of a capital work, never a whole work, except in war.",
       text: "Each decade the city takes the whole surplus above the float, up to a ceiling, at the state\u2019s rate of 1.2% per year. While it owes, nothing is set aside for building. It pays the interest and never repays the principal, but the sanctuary may set its share of a capital work against the debt, except in war, when the city also takes the whole building fund." },
     civic: { label: "The city\u2019s name and the front row", short: "the festival carries the city\u2019s name",
       play: "More visitors come, and the magistrates sit in the front row. Every second decade the assembly revises the calendar: it adds a festival in the city\u2019s name, half paid by the sanctuary, or strikes one of the sanctuary\u2019s own. The city sells the priesthood. Piety falls a little.",
@@ -8259,7 +8315,7 @@
     return pt;
   }
   function benefactorHonored() {
-    return (S.honoredAt != null && S.year - S.honoredAt <= 10) || (S.familyPriesthood != null && S.year < S.familyPriesthood);
+    return (S.honoredAt != null && S.year - S.honoredAt <= 20) || (S.familyPriesthood != null && S.year < S.familyPriesthood); // the wealthy remember an honoured benefactor for twenty years (BR, 14 Sep 2026)
   }
   function familySlighted() { return S.familySlighted != null && S.year - S.familySlighted < 20; }
   function demosSlighted() { return S.demosSlighted != null && S.year - S.demosSlighted < 10; }
@@ -8272,7 +8328,7 @@
     const lowPiety = S.piety < demosPiety() + (woodBan ? 5 : 0), shortFest = festivalRep() < demosFest();
     const resent = S.honoursAt != null && S.year - S.honoursAt < 10 && S.honoursKey !== key; // honours offered to a citizen for the last work
     const demosOk = !lowPiety && !shortFest && !demosSlighted() && !resent;
-    const pietyWord = "piety " + (demosPiety() + (woodBan ? 5 : 0)) + " or more" + (woodBan ? " (five more, under the Koan ban on the god\u2019s wood)" : ""), festWord = "a festival above the standard (splendor " + demosFest() + ")";
+    const pietyWord = "piety " + (demosPiety() + (woodBan ? 5 : 0)) + " or more" + (woodBan ? " (five more, under the Koan ban on the god\u2019s wood)" : ""), festWord = "a festival above the standard (splendor " + demosFest() + "; last decade averaged " + festivalRep() + ")";
     out.push({ id: "demos", name: "The demos", lever: false, ok: demosOk,
       brief: demosOk ? "piety high, the festival above the standard" : resent ? "resents the honors given a citizen for the last work" : demosSlighted() ? "would rather have voted the last building\u2019s money"
          : lowPiety && shortFest ? "wants " + pietyWord + " and " + festWord : lowPiety ? "wants " + pietyWord : "wants " + festWord,
@@ -8281,18 +8337,18 @@
          : demosSlighted() ? "The city would rather have voted the money for the last building itself. The demos will not support the request."
          : lowPiety && shortFest ? "The demos looks for " + pietyWord + " and " + festWord + ", and sees neither. It will not support the request, and a public feast will not win it over."
          : lowPiety ? "The demos looks for " + pietyWord + " before it votes money, and a public feast will not win it over. It will not support the request."
-         : "The demos looks for " + festWord + " before it votes money; the last decade averaged " + festivalRep() + ". It will not support the request.",
+         : "The demos looks for " + festWord + " before it votes money, and judges the decade just closed, not the calendar as it is now set. It will not support the request.",
       short: resent ? "the demos resents the honors given a citizen for the last work" : demosSlighted() ? "the city would rather have voted the last building's money itself"
-           : lowPiety && shortFest ? "piety is below " + demosPiety() + " and the festival is not above the standard"
-           : lowPiety ? "piety is below " + demosPiety() : "the festival is not above the standard" });
+           : lowPiety && shortFest ? "piety is below " + demosPiety() + " and last decade's festivals did not rise above the standard"
+           : lowPiety ? "piety is below " + demosPiety() : "last decade's festivals did not rise above the standard" });
     const honored = benefactorHonored() && !familySlighted();
     out.push({ id: "wealthy", name: "The wealthy", lever: true, ok: honored || !!pt.swung.wealthy,
-      brief: pt.swung.wealthy === "benefactor" ? "a citizen is offered the honors" : pt.swung.wealthy === "embassy" ? "won over by the embassy"
-         : familySlighted() ? "the leading family was refused" : honored ? "a benefactor was honored within ten years" : pt.embassyFailed === S.year ? "unmoved by this decade\u2019s embassy; no benefactor honored within ten years" : "no benefactor honored within ten years",
-      why: pt.swung.wealthy === "benefactor" ? "A wealthy citizen has been offered the honors for the work. He supports the request."
+      brief: pt.swung.wealthy === "benefactor" ? (pt.benefactorName || "a citizen") + " is offered the honors and pays half the share" : pt.swung.wealthy === "embassy" ? "won over by the embassy"
+         : familySlighted() ? "the leading family was refused" : honored ? "a benefactor was honored within twenty years" : pt.embassyFailed === S.year ? "unmoved by this decade\u2019s embassy; no benefactor honored within twenty years" : "no benefactor honored within twenty years",
+      why: pt.swung.wealthy === "benefactor" ? (pt.benefactorName || "A wealthy citizen") + " has been offered his name on the work and the front row at the festival, and will pay half of the sanctuary's share. He supports the request; the demos will resent a private name on the next work for a decade."
          : pt.swung.wealthy === "embassy" ? "The embassy won over the wealthy."
          : familySlighted() ? "The leading family was refused when it offered to build, and holds it against the board. The wealthy will not support the request."
-         : honored ? "A benefactor was honored here within the last ten years. The wealthy support the request."
+         : honored ? "A benefactor was honored here within the last twenty years. The wealthy support the request."
          : "No wealthy citizen has been honored here within ten years, and none expects to be. They will not support the request.",
       short: familySlighted() ? "the leading family was refused and holds it against the board" : "no wealthy citizen has been honored here within ten years" });
     const halted = S.projects.find(pr => pr._halted);
@@ -8376,7 +8432,7 @@
                 S.columnsGift[spec.key] = { name, amt, year: S.year };
                 S.benefactorPaidAt = S.year; S.honoredAt = S.year; // the wait before the next such gift; his name on the columns is an honour paid
                 log(name + " gives " + fmt(amt) + " dr. for " + (most ? "most of the columns" : "the columns of the front") + " of the " + lower + ". The money goes into the building fund, and his name will be cut on the columns.", "good");
-                openFundingCard(spec);
+                renderAll(); openFundingCard(spec); // the header shows the gift at once
               } },
             { label: "Decline", ghost: true, fn: () => openFundingCard(spec) },
           ],
@@ -8432,7 +8488,7 @@
   // why the purse no longer answers, or null
   function settleShort(d, key) {
     if (!d) return null;
-    if (d.how === "fund" && ownMoney() < d.amount) return (debtUsable() ? "The fund and the city's debt no longer cover" : "The fund no longer covers") + " the cost: " + fmt(ownMoney()) + " of " + fmt(d.amount) + " dr.";
+    if (d.how === "fund" && ownMoney() < d.amount) return "The fund no longer covers the cost: " + fmt(ownMoney()) + " of " + fmt(d.amount) + " dr.";
     if (d.how === "pledges" && !(S.campaign && S.campaign.key === key && campaignTotal() + S.fund >= specFor(key).cost)) return "The pledges and the fund no longer cover the cost.";
     if (d.how === "held" && !(S.heldGrant && S.heldGrant.key === key && heldCover(S.heldGrant) >= S.heldGrant.share)) return "The sanctuary's share of the grant is not covered.";
     return null;
@@ -8456,7 +8512,20 @@
     focusMap();
     return "siting";
   }
-  function beginAt(key, x, y, sponsored, funded, settle) {
+  // a work paid by the year that would join a queue the chest cannot carry: the treasurer says so first, and the board may go on
+  function treasurerObjects(id, lvl, cost, sponsored, proceed) {
+    if (cost >= MAJOR_COST || !S.projects.length) return false;
+    const shareC = cost - (sponsored || 0), dn = Math.round(shareC * 0.2), rt = Math.round(shareC * 0.1), yrs = yearsOf(id, lvl), nm = workName(id, lvl);
+    S.projects.push({ installment: Math.round((shareC - dn - rt) / Math.max(1, yrs)), left: yrs, retention: rt, name: nm });
+    let B; try { B = treasurerBudget(); } finally { S.projects.pop(); }
+    if (!(B.idle || !B.finish || B.finish > 10)) return false;
+    heraldQueue({ front: true, vig: { med: "elder", badge: "kerykeion" }, title: "The treasurer objects to another work",
+      body: "With the " + nm.toLowerCase() + " added to the queue, one crew paid by the year " + (B.idle ? "would stand idle from the " + ORD[B.idle] + " year" : "would be paid") + ", and the works would " + (B.finish ? "take about " + B.finish + " years to finish" : "not finish within forty years") + ". The chest holds " + fmt(S.treasury) + " dr. The board may begin it now and let it wait its turn, or hold it back.",
+      cite: "Athens set officials over the sacred money and audited what had been spent (IG I\u00b3 32); the treasurers of the Other Gods kept accounts of their own (IG I\u00b3 52).",
+      choices: [{ label: "Begin it anyway", fn: proceed }, { label: "Not now", ghost: true, fn: () => { cancelPlacing(); renderAll(); } }] });
+    return true;
+  }
+  function beginAt(key, x, y, sponsored, funded, settle, sure) {
     const { id, lvl } = keyParts(key), bld = BID[id], level = bld.levels[lvl], cost = costOf(id, level), idx = workIdx(key);
     const why = workBlockedWhy(key) || settleShort(settle, key);
     if (why) { notify(why, "bad"); return false; }
@@ -8464,6 +8533,7 @@
     if (!v.ok) { notify(v.reason + ".", "bad"); return false; }
     const down = Math.round((cost - (sponsored || 0)) * 0.2);
     if (S.treasury < down) { notify("The treasurers refuse: the down payment needs " + fmt(down) + " dr.", "bad"); return false; }
+    if (!sure && !settle && treasurerObjects(id, lvl, cost, sponsored, () => { beginAt(key, x, y, sponsored, funded, settle, true); })) return false;
     if (bld.perDecade) S.begun[id] = S.year;
     if (lvl > 0) {
       const b = S.built[idx];
@@ -8483,7 +8553,7 @@
     const spec = specFor(key), lower = spec.name.toLowerCase();
     const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
     if (d.how === "fund") {
-      log(cap(drawOwn(d.amount)) + " pay for the " + lower + ".", "good");
+      log(cap(drawOwn(d.amount, 0)) + " pay for the " + lower + ".", "good"); // a whole work is the fund's alone
     } else if (d.how === "pledges") {
       const mine = S.campaign && S.campaign.key === key;
       const pledged = mine ? campaignTotal() : 0;
@@ -8503,7 +8573,7 @@
         S.campaign = null;
         log(fmt(use) + " dr. of the cities' pledges go to the sanctuary's share of the " + lower + (pledged > use ? "; the rest, " + fmt(pledged - use) + " dr., goes to the building fund" : "") + ".", "good");
       }
-      const words = rest ? drawOwn(rest) : "";
+      const words = rest ? drawOwn(rest, debtFor(g.share)) : "";
       S.heldGrant = null;
       log((rest ? cap(words) + " go to the sanctuary's share of the " + lower + ". " : "") + "The work on the " + lower + " begins.", "good");
     }
@@ -8589,7 +8659,7 @@
       const lapsing = held.until - S.year <= 10;
       body =
         hstrip([["The city\u2019s grant", fmt(held.sponsored) + " <small>dr.</small>"], ["Sanctuary\u2019s share", fmt(held.share) + " <small>dr.</small>"],
-          [mine ? "Fund and pledges" : debtUsable() ? "Fund and city\u2019s debt" : "Building fund", fmt(have) + " <small>dr.</small>", ready ? "good" : ""], ["Vote stands to", "year " + held.until, lapsing ? "warn" : ""]]) +
+          [mine ? "Fund and pledges" : debtUsable() ? "Fund and half from the debt" : "Building fund", fmt(have) + " <small>dr.</small>", ready ? "good" : ""], ["Vote stands to", "year " + held.until, lapsing ? "warn" : ""]]) +
         fundBar("Toward the sanctuary\u2019s share" + (mine ? " (pledges and fund)" : ""), Math.min(have, held.share), held.share) +
         '<div class="hline">' + (ready ? "The share is covered. The work can begin." : "Short by " + fmt(held.share - have) + " dr." + (lapsing ? " <b>The vote lapses next decade.</b>" : "") +
           (S.terms.lendable && windOf(S.year) === "war" && (S.cityDebt || 0) > 0 ? " The city\u2019s debt cannot stand in for the share while the war lasts." : "")) +
@@ -8598,7 +8668,7 @@
         ev("how the share is found", '<div class="hline">The sanctuary\u2019s share comes from the building fund' + (panhellenic ? " and the pledges the envoys collect" : "") +
           ". " + fundRuleText() + ", while its switch is on" + (panhellenic ? ", and envoys can be sent to collect pledges" : "") +
           ". The vote stands for five decades from the day it was taken.</div>");
-      choices.push({ label: "Begin the work", disabled: !ready, fn: () => { tryBeginHeld(); } });
+      choices.push({ label: "Begin the work", disabled: !ready, fn: () => { tryBeginHeld(); } }); // the "Move N dr. from the chest to the fund" lever below already offers what stands above the float
       const shortBy = Math.max(0, held.share - have), spare = Math.max(0, S.treasury - Math.round(WORK_FLOAT[S.tier] / 2));
       if (!ready && shortBy > 0 && spare >= shortBy) choices.push({ label: "Move " + fmt(shortBy) + " dr. from the chest to the fund", ghost: true,
         fn: () => {
@@ -8628,7 +8698,7 @@
     }
 
     const cityPct = Math.round(cityFrac(termsCount()) * 100);
-    const cells = [["Cost", fmt(spec.cost) + " <small>dr.</small>"], [debtUsable() ? "Fund and city\u2019s debt" : "Building fund", fmt(ownMoney()) + " <small>dr.</small>", fundCovers ? "good" : ""]];
+    const cells = [["Cost", fmt(spec.cost) + " <small>dr.</small>"], ["Building fund", fmt(ownMoney()) + " <small>dr.</small>", fundCovers ? "good" : ""]]; // a whole work is paid by the fund alone
     if (mine) cells.push(["Pledged", fmt(campaignTotal()) + " <small>dr.</small>"]);
     if (assemblyView) cells.push(["City would pay", cityPct + "%"], ["The assembly", nFor + " of 4 for", nFor >= 3 ? "good" : "warn"]);
     else {
@@ -8637,8 +8707,8 @@
     }
     const howFold = ev("how a capital work is paid for",
       '<div class="hline">' + (panhellenic
-        ? "A capital work needs a grant from the assembly, pledges collected from the cities by envoys, or the building fund. With a grant the city pays three tenths of the cost, and a fifth more for each condition the sanctuary accepts, up to nine tenths; the sanctuary\u2019s share comes from the fund and the pledges, not from the treasury. Sending envoys costs " + fmt(EMBASSY_COST[S.tier]) + " dr.; pledges come in each decade while the collection runs, more when the truce is kept and crowned games are held. The board pursues one such initiative at a time; the other route can be added later for the same work."
-        : "A capital work needs a grant from the assembly or the building fund. With a grant the city pays three tenths of the cost, and a fifth more for each condition the sanctuary accepts, up to nine tenths. The sanctuary\u2019s share comes from the building fund, not from the treasury.") +
+        ? "A capital work needs a grant from the assembly, pledges collected from the cities by envoys, or the building fund. With a grant the city pays three tenths of the cost, and a fifth more for each condition the sanctuary accepts, up to four fifths; the sanctuary\u2019s share comes from the fund and the pledges, not from the treasury. Sending envoys costs " + fmt(EMBASSY_COST[S.tier]) + " dr.; pledges come in each decade while the collection runs, more when the truce is kept and crowned games are held. The board pursues one such initiative at a time; the other route can be added later for the same work."
+        : "A capital work needs a grant from the assembly or the building fund. With a grant the city pays three tenths of the cost, and a fifth more for each condition the sanctuary accepts, up to four fifths. The sanctuary\u2019s share comes from the building fund, not from the treasury." + (S.tier === 0 && spec.key === "temple:1" ? " A citizen may offer to pay for the columns once the sanctuary has the renown for polis standing" + (bareGrant(spec) ? ", and since the city's own offer was refused the assembly will pay three tenths with no condition." : ".") : "")) +
       " " + fundRuleText() + ", while its switch is on. It can be filled before the vote as well as after; a vote stands for five decades. The ground is chosen once the money is settled, and only then." +
       (S.terms.epistatai ? " City officials sit on the board: each decade they name the next capital work, and only that work may begin; a grant for it passes without a lot." : "") +
       (S.terms.lendable ? " The city may borrow: what it owes the god may be set against the sanctuary\u2019s share, except in war." : "") + "</div>");
@@ -8715,15 +8785,16 @@
           openFundingCard(spec, opts);
         } });
       const honoursRecent = S.honoursAt != null && S.year - S.honoursAt < 20; // the honours are offered once in two decades
-      if (!tally[1].ok && !pt.columns) choices.push({ label: "Offer a citizen the honors" + (honoursRecent ? " (offered within twenty years)" : ""), ghost: true, disabled: honoursRecent,
+      if (!tally[1].ok && !pt.columns) choices.push({ label: "Offer a citizen the honors" + (honoursRecent ? " (offered within twenty years)" : ": his name on the work, and he pays half the share"), ghost: true, disabled: honoursRecent,
         fn: () => {
           pt.swung.wealthy = "benefactor"; pt.commits.benefactor = true; pt.leverYear = S.year;
+          pt.benefactorName = pt.benefactorName || BENEFACTOR_NAMES[Math.floor(Math.random() * BENEFACTOR_NAMES.length)]; // the citizen is named from the offer on
           S.honoursAt = S.year; S.honoursKey = spec.key; // the demos resents a private name on the next work
-          log("A wealthy citizen is offered his name on the " + lower + " and the front row at the festival. He will pay half of the sanctuary's share.", "good");
+          log(pt.benefactorName + " is offered his name on the " + lower + " and the front row at the festival. He will pay half of the sanctuary's share, and the demos will resent a private name on the next work for a decade.", "good");
           openFundingCard(spec, opts);
         } });
     }
-    if (fundCovers && !covered) choices.push({ label: (S.fund >= spec.cost ? "Pay from the building fund (" : "Pay from the fund and the city\u2019s debt (") + fmt(spec.cost) + " dr.)",
+    if (fundCovers && !covered) choices.push({ label: "Pay from the building fund (" + fmt(spec.cost) + " dr.)",
       disabled: !approved,
       fn: () => {
         spec.start(spec.cost, { how: "fund", year: S.year, debt: S.fund < spec.cost }, { how: "fund", amount: spec.cost }); // drawn once the work has begun
@@ -8768,6 +8839,8 @@
   // raises the city's share by a fifth, and none is ever lifted. The city
   // pays three tenths at the least; the sanctuary's share comes from the building fund
   // the arithmetic of the conditions card, from what is ticked at this moment
+  // the pure refuser's temple: the assembly pays three tenths with no condition (BR, 14 Sep 2026)
+  function bareGrant(spec) { return S.tier === 0 && spec.key === "temple:1" && !!(S.cityTemple && S.cityTemple.state === "refused"); }
   function termsQuote(spec, pt) {
     const ids = Object.keys(TERMS);
     const held = ids.filter(id => S.terms[id]);
@@ -8784,7 +8857,7 @@
   function termsFigs(q) {
     // what the fund can be expected to bring in a decade, against what is owed
     const perDecade = S.laws.surplus === "fund" ? fundTake((S._incomeRate || 0) * 10, S.treasury, obligationsNow()) : 0; // as the audit would take it from the chest as it stands
-    const shortBy = Math.max(0, q.share - ownMoney());
+    const shortBy = Math.max(0, q.share - ownMoney(q.share));
     const reach = perDecade > 0 ? Math.ceil(shortBy / perDecade) : Infinity;
     const reachLine = shortBy <= 0 ? ""
       : perDecade === 0 && S.laws.surplus !== "fund" ? " <b>Nothing is being set aside for building at present; the law on the surplus can send it to the fund. More conditions, a benefactor, or the cities' pledges would be needed.</b>"
@@ -8792,12 +8865,13 @@
       : reach > 5 ? " <b>At about " + fmt(perDecade) + " dr. per decade the fund would not meet this share within the five decades the vote stands. More conditions, a benefactor, or the cities' pledges would be needed.</b>"
       : " At about " + fmt(perDecade) + " dr. per decade the fund would meet it in about " + reach + " decade" + (reach === 1 ? "" : "s") + ".";
     return hstrip([["Conditions", String(q.n)], ["The city pays", fmt(q.sponsored) + " <small>dr. · " + Math.round(q.frac * 100) + "%</small>"],
-        ["The sanctuary", fmt(q.share) + " <small>dr.</small>"], [debtUsable() ? "Fund and city\u2019s debt" : "Building fund", fmt(ownMoney()) + " <small>dr.</small>", ownMoney() >= q.share ? "good" : "warn"]]) +
+        ["The sanctuary", fmt(q.share) + " <small>dr.</small>"], [debtUsable() ? "Fund and half from the debt" : "Building fund", fmt(ownMoney(q.share)) + " <small>dr.</small>", ownMoney(q.share) >= q.share ? "good" : "warn"]]) +
       '<div class="tally-sum">' + (q.bShare ? "The benefactor pays " + fmt(q.bShare) + " dr. more. " : "") +
-        (ownMoney() >= q.share ? "The work can begin at once." : "The vote will stand for five decades while " + (S.tier >= 2 ? "the fund and the pledges are" : "the fund is") + " filled." + reachLine) + "</div>";
+        (ownMoney(q.share) >= q.share ? "The work can begin at once." : "The vote will stand for five decades while " + (S.tier >= 2 ? "the fund and the pledges are" : "the fund is") + " filled." + reachLine) + "</div>";
   }
 
   function openTermsCard(spec, pt) {
+    const bare = bareGrant(spec); // the pure refuser's temple needs no condition
     const lower = spec.name.toLowerCase();
     pt.sel = pt.sel || {};
     if (pt.commits.epistatai && !S.terms.epistatai) pt.sel.epistatai = true;
@@ -8818,14 +8892,14 @@
     }).join("");
     const body =
       '<div class="hline">' + (S.terms.epistatai ? "With city officials on the board no lot was drawn; the proposal carried." : "The lot was drawn and the proposal carried.") +
-        " At least one condition must be in force. The city pays three tenths, and each condition adds a fifth to its share. Conditions are permanent, and each gives the city a lasting say in the sanctuary's affairs. Read them before accepting.</div>" +
+        (bare ? " Because the sanctuary refused the city's temple, the assembly will pay three tenths of the cost with no condition; each condition accepted adds a fifth to its share." : " At least one condition must be in force. The city pays three tenths, and each condition adds a fifth to its share.") + " Conditions are permanent, and each gives the city a lasting say in the sanctuary's affairs. Read them before accepting.</div>" +
       '<div class="tally terms">' + rows + "</div>" +
       '<div class="terms-figs">' + termsFigs(termsQuote(spec, pt)) + "</div>";
     const choices = [];
-    choices.push({ label: "Accept the grant on these conditions", disabled: termsQuote(spec, pt).n < 1,
+    choices.push({ label: bare ? "Accept the grant" + (termsQuote(spec, pt).n ? " on these conditions" : " with no condition") : "Accept the grant on these conditions", disabled: !bare && termsQuote(spec, pt).n < 1,
       fn: () => {
         const q = termsQuote(spec, pt); // as ticked at the moment of acceptance
-        if (q.n < 1) return;
+        if (q.n < 1 && !bareGrant(spec)) return;
         const { chosen, sponsored, share, bShare } = q;
         chosen.forEach(applyTerm);
         // the officials, newly seated, name this work as their first: nothing else begins before it
@@ -8833,7 +8907,7 @@
         delete S.petitions[spec.key];
         const funded = { how: "grant", year: S.year, terms: chosen.slice() };
         if (pt.commits.benefactor) {
-          funded.benefactor = BENEFACTOR_NAMES[Math.floor(Math.random() * BENEFACTOR_NAMES.length)];
+          funded.benefactor = pt.benefactorName || BENEFACTOR_NAMES[Math.floor(Math.random() * BENEFACTOR_NAMES.length)]; // the citizen the lever named
           S.honoredAt = S.year;
         }
         S.heldGrant = { key: spec.key, name: spec.name, cost: spec.cost, sponsored, share, bShare, funded, voted: S.year, until: S.year + 50 };
@@ -8868,7 +8942,7 @@
 
   // what stands toward a held grant's share: the fund, and the pledges if the envoys are out for the same work
   function heldCover(g) {
-    return ownMoney() + (S.campaign && S.campaign.key === g.key ? campaignTotal() : 0);
+    return ownMoney(g.share) + (S.campaign && S.campaign.key === g.key ? campaignTotal() : 0);
   }
   // a voted grant begins when the fund and the pledges cover the sanctuary's share
   function tryBeginHeld(quiet) {
@@ -8941,7 +9015,7 @@
       if (i >= 0) {
         S.cityPriority.keys.splice(i, 1); S.cityPriority.names.splice(i, 1);
         if (!S.cityPriority.keys.length) { S.cityPriority = null; log("The work the city's officials named is under way. The board may propose what it likes until they name the next.", ""); }
-        else log("One of the works the city's officials named is under way; the " + priorityNames() + " remains.", "");
+        else log("One of the works the city's officials named is under way; the " + priorityNames() + (isPluralName(priorityNames()) ? " remain." : " remains."), "");
       }
     }
     const share = cost - civic;
@@ -8951,15 +9025,18 @@
     pr.installment = pr.left > 0 ? Math.round((share - down - retention) / pr.left) : 0;
     pr.retention = share - down - pr.installment * Math.max(1, pr.left); // the remainder, so the parts sum to the price
     S.treasury -= down;
+    const ahead = S.projects.length ? S.projects[0] : null; // one crew: a second work waits its turn
     S.projects.push(pr);
     const how = funded && funded.how;
     const payLine = how === "fund" ? (funded.debt ? "paid in full from the building fund and the city's debt" : "paid in full from the building fund")
-      : how === "grant" ? "paid by the city's grant and the building fund"
+      : how === "grant" ? (funded.city ? "paid by the city's grant, the sanctuary's share by the year from the chest"
+          : (function () { const g = S.heldGrant && S.heldGrant.funded === funded ? S.heldGrant : null;
+              return "paid by the city's grant" + (g && funded.benefactor && g.bShare ? ", " + fmt(g.bShare) + " dr. of it by " + funded.benefactor : "") + " and the sanctuary's share from " + shareSources(g); })())
       : how === "subscription" ? "paid by the cities' pledges and the building fund"
       : how === "benefactor" ? "paid in full by " + (funded.benefactor || "a benefactor")
       : share <= 0 ? "paid in full by the sponsor"
-      : fmt(down) + " dr. down, " + (pr.installment ? fmt(pr.installment) + " dr. per year, " : "") + fmt(retention) + " dr. held to approval";
-    notify("Work begins: " + pr.name + " — " + pr.left + " year" + (pr.left > 1 ? "s" : "") + " of building · " + payLine, "good");
+      : fmt(down) + " dr. down, " + (pr.installment ? fmt(pr.installment) + " dr. per year, " : "") + fmt(pr.retention) + " dr. held to approval";
+    notify("Work begins: " + pr.name + " — " + pr.left + " year" + (pr.left > 1 ? "s" : "") + " of building · " + payLine + (ahead ? " · the masons take it up after the " + ahead.name.toLowerCase() : ""), "good");
   }
 
   // the site file follows a work just begun
@@ -8990,7 +9067,23 @@
       const r = drawnRectOfB(b);
       if (r.y < wallY + 4 && r.y + r.h > wallY - 4) { const need = wallY + 6 - r.y; if (r.y + r.h + need <= 606) b.y += need; }
     });
-    if (chron) chron.push("Yr " + S.year + " \u2014 the south wall is carried 25 m further out, and the entrance, the basin and the gateway move with it.");
+    // anything outside that the moved gate or basin now lands on is set back from them
+    const moved = [];
+    const zones = S.built.filter(b => (b.id === "propylon" && Math.abs(b.x - ENTRANCE_PAN.x) <= 16) || b.id === "perirrhanterion").map(b => drawnRectOfB(b));
+    S.built.forEach(b => {
+      if (!BID[b.id].outside) return;
+      zones.forEach(z => {
+        const r = drawnRectOfB(b);
+        if (r.x < z.x + z.w + 4 && r.x + r.w > z.x - 4 && r.y < z.y + z.h + 4 && r.y + r.h > z.y - 4) {
+          const need = z.y + z.h + 6 - r.y;
+          if (need > 0 && r.y + r.h + need <= 606) b.y += need;
+          else if (need > 0) b.x += (r.x + r.w / 2 >= z.x + z.w / 2 ? 1 : -1) * (z.w + 8 + r.w / 2 - Math.abs(r.x + r.w / 2 - (z.x + z.w / 2))); // no room south: along the wall
+          if (!moved.includes(BID[b.id].name.toLowerCase())) moved.push(BID[b.id].name.toLowerCase()); // once, though both the gate and the basin may land on it
+        }
+      });
+    });
+    if (chron) chron.push("Yr " + S.year + " \u2014 the south wall is carried 25 m further out, and the entrance, the basin and the gateway move with it." +
+      (moved.length ? " The " + moved.join(" and the ") + " " + (moved.length > 1 ? "are" : "is") + " set back from the gate." : ""));
   }
   // the basin stood outside the entrance; when the gateway rises over its ground it is set out again before the gate
   function nudgeBasin(chron) {
@@ -9606,6 +9699,12 @@
     }
     return raised;
   }
+  // the same reckoning without taking anything: what the whole objects would come to
+  function meltWould(need) {
+    let raised = 0;
+    for (let i = S.dedications.length - 1; i >= 0 && raised < need; i--) raised += S.dedications[i].val;
+    return raised;
+  }
 
   /* — the decade agenda: small matters before the hieropoioi, repeatable — */
   const AGENDA = [
@@ -9749,7 +9848,7 @@
       body: (pr, t) => pr.name + ", who served the god for " + t + " years, is dead. A wealthy man of the district offers to buy the office outright.",
       cite: "Priesthoods were bought and sold: some fifty-seven were auctioned at Erythrai, from ten drachmas upward, and at Priene the priesthood of Dionysos Phleos went for 12,002 drachmas (Connelly, Portrait of a Priestess, 51–2).",
       choices: [
-        { label: "Fill it by lot", fx: { piety: 3, deeds: 3 }, log: "The lot is drawn and the god chooses. The buyer withdraws his offer without comment." },
+        { label: "Fill it by lot", fx: { piety: 3, deeds: 3 }, then: () => { S._lotChosen = S.year; }, log: "The lot is drawn and the god chooses. The buyer withdraws his offer without comment." },
         { label: "Sell it", fx: { treasury: 500 }, log: "The office is sold and the money enters the treasury. The new holder is at the altar within the month." },
       ] },
     { id: "succ-family",
@@ -9765,8 +9864,8 @@
       body: (pr, t) => pr.name + " held the office " + t + " years and died in it. Some now argue the next holder should serve a fixed term and hand it on.",
       cite: "Tenure varied: many women's priesthoods ran for a year or a single festival cycle, while family offices and most purchased priesthoods were held for life (Connelly, 17).",
       choices: [
-        { label: "A fixed term, and then hand it on", fx: { piety: 2, deeds: 3 }, then: () => { S.priestTerm = 10; }, log: "The term is set at ten years. More families will hold the office, and none will hold it long." },
-        { label: "For life, as before", fx: { piety: 2 }, log: "The custom stands. The new holder is thirty-one and will likely serve forty years." },
+        { label: "A fixed term, and then hand it on", fx: { piety: 2, deeds: 3 }, then: () => { S.priestTerm = 10; S._tenureAsked = true; }, log: "The term is set at ten years. More families will hold the office, and none will hold it long." },
+        { label: "For life, as before", fx: { piety: 2 }, then: () => { S._tenureAsked = true; }, log: "The custom stands. The new holder serves until death, as the last one did." },
       ] },
     { id: "succ-elect", noHereditary: true,
       title: pr => "Who is to succeed the " + pr.title + "?",
@@ -9825,7 +9924,7 @@
        engraved when the accounts are closed. — */
   const LAURELS = [
     { id: "truce", name: "The Truce Kept",
-      how: "Hold crowned games at four successive penteterides with the sacred truce never violated at your sanctuary.",
+      how: "Hold the games at four successive penteterides with the sacred truce never violated at your sanctuary.",
       test: () => S.gamesStreak >= 4 && !S.truceBroken,
       cite: "Spondophoroi carried the truce to every Greek state (Games at Athens, 14); when Aratos broke a rival truce, athletes were seized and sold (Nemea: The Museum, 57)." },
     { id: "hecatomb", name: "A Hundred Oxen",
@@ -9833,7 +9932,7 @@
       test: () => !!S._hundredOxen,
       cite: "In 410/9 BC the treasurers of Athena provided 5,114 dr. for the Panathenaic hecatomb \u2014 at 50 dr. a head, a literal hundred (van Straten, Hiera Kala, 178)." },
     { id: "circuit", name: "The Circuit",
-      how: "Appoint a host for the sacred delegations, then hold crowned games at three successive penteterides.",
+      how: "Appoint a host for the sacred delegations, then hold the games at three successive penteterides.",
       test: () => S.theorodokos && S.gamesStreak >= 3,
       cite: "The theorodokoi lists name, city by city, the men who received the god's envoys (Nemea: The Museum, 55; Reger, 20)." },
     { id: "meeting", name: "The Meeting Place", how: "Be chosen as the seat of an interstate assembly. The league only asks where the truce has been kept.",
@@ -9852,7 +9951,7 @@
       test: () => !!S.colonySent,
       cite: "Delphi sanctioned the foundations: Battos was sent to found Cyrene at the Pythia's command (Hdt. 4.150\u20137)." },
     { id: "reckoning", name: "The Reckoning of Years",
-      how: "Hold crowned games at every penteteris for a hundred years, until people date events by them.",
+      how: "Hold the games at every penteteris for a hundred years, until people date events by them.",
       test: () => S.gamesStreak >= 10,
       cite: "Hippias of Elis worked through the victor lists and fixed the first Olympiad at 776 BC, which is the basis of Greek chronology (Pedley, 130)." },
     { id: "ledger", name: "The Open Accounts",
@@ -10004,20 +10103,25 @@
     const worksYears = works.reduce((a, w) => a + w.left, 0);
     // the coming decade, year by year, in the order the loop pays: the masons, then the rites
     // out of the chest as it stands, then the year's income less upkeep and the priests' share
-    let chest = S.treasury, cut = 0, idle = 0, idleName = "";
-    for (let y = 1; y <= 10; y++) {
+    // the same reckoning runs on past the decade until the masons are paid off (forty years at most),
+    // so the finish it names is the one the chest allows, not the sum of the installments
+    let chest = S.treasury, cut = 0, idle = 0, idleName = "", end = null, finish = null;
+    for (let y = 1; y <= 40; y++) {
+      if (y > 10 && !works.length) break;
       const w = works[0];
       if (w) {
         const due = w.inst + (w.left <= 1 ? w.ret : 0);
-        if (chest >= due) { chest -= due; w.left -= 1; if (w.left <= 0) works.shift(); }
+        if (chest >= due) { chest -= due; w.left -= 1; if (w.left <= 0) { works.shift(); if (!works.length) finish = y; } }
         else if (!idle) { idle = y; idleName = w.name; }
       }
       const fc = S.cal ? calForYear(S.year + y).cost : 0;
-      if (chest < fc && !cut) cut = y;
+      if (y <= 10 && chest < fc && !cut) cut = y;
       chest -= Math.min(chest, fc);
       chest += income - upkeep - gera;
+      if (y === 10) end = Math.round(chest);
     }
-    return { income, rents, offerings, est, extras, sub, rites, upkeep, gera, steady, owed, masonsNow, worksYears, cut, idle, idleName, end: Math.round(chest) };
+    if (end === null) end = Math.round(chest);
+    return { income, rents, offerings, est, extras, sub, rites, upkeep, gera, steady, owed, masonsNow, worksYears, finish, cut, idle, idleName, end };
   }
   function treasurerNote() {
     if (!S.deity || !S.cal) return null;
@@ -10036,7 +10140,9 @@
     }
     // a squeeze while the masons are paid, from which the chest recovers
     if (first && S.projects.length)
-      return { cls: "soft", key: "squeeze", text: "The chest runs low while the masons are paid: " + first.what + " " + yearWord(first.y) + (B.worksYears ? ". The works finish in " + B.worksYears + " year" + (B.worksYears === 1 ? "" : "s") + ", and the chest recovers to about " : ". The chest recovers to about ") + fmt(B.end) + " by the audit.", hover };
+      return { cls: "soft", key: "squeeze", text: "The chest runs low while the masons are paid: " + first.what + " " + yearWord(first.y) + (B.finish && B.finish <= 10 ? ". The works finish in " + B.finish + " year" + (B.finish === 1 ? "" : "s") + ", and the chest recovers to about "
+        : B.finish ? ". At this rate the works take " + B.finish + " years to finish, and by the audit the chest stands at about "
+        : B.worksYears ? ". At this rate the works do not finish within forty years, and by the audit the chest stands at about " : ". The chest recovers to about ") + fmt(B.end) + " by the audit.", hover };
     // silver about to leave the chest at the audit
     if (S.laws.surplus === "plate" && B.end - WORK_FLOAT[S.tier] - B.owed > 300)
       return { cls: "soft", key: "plate", text: "At the audit the chest will hold about " + fmt(B.end) + " dr. Silver above the float of " + fmt(WORK_FLOAT[S.tier]) + " is worked into plate for the god.", hover: hover + " The surplus law is set in the Sacred law." };
@@ -10177,8 +10283,7 @@
               if (pr.x !== S.built[pr.idx].x || pr.y !== S.built[pr.idx].y) moveBuilt(S.built[pr.idx], pr.x, pr.y); // the old came down when the new was dedicated
               if (pr.funded && pr.funded.city && S.cityTemple) { S.cityTemple.state = "done"; chron.push("Yr " + S.year + " \u2014 the city's temple is dedicated; the city adopts the cult as its own."); }
             }
-            const headWord = pr.name.replace(/\s*\(.*\)\s*$/, "").toLowerCase();
-            chron.push("Yr " + S.year + " — the " + pr.name.toLowerCase() + (/s$/.test(headWord) && !/[ou]s$|is$/.test(headWord) ? " stand" : " stands") + " finished and approved.");
+            chron.push("Yr " + S.year + " — the " + pr.name.toLowerCase() + (isPluralName(pr.name) ? " stand" : " stands") + " finished and approved.");
             if (pr.id === "propylon") nudgeBasin(chron); // the basin stood outside the entrance; it is set out again before the gate
             S.projects.shift();
           }
@@ -10192,6 +10297,8 @@
         // what cannot be paid for is cut back: fewer victims, plainer rites
         const frac = fest.cost > 0 ? Math.max(0, S.treasury) / fest.cost : 1;
         if (frac >= 0.25) {
+          const wasPeak = !!fest.peakOn; // a greater year cut back loses its games: said at the close
+          if (wasPeak) (sums.peakCut = sums.peakCut || []).push(S.year);
           fest = { key: fest.key, peakOn: false, saleIncome: 0,
             cost: Math.round(fest.cost * frac),
             rep: Math.max(1, Math.round(fest.rep * Math.sqrt(frac))),
@@ -10304,7 +10411,7 @@
         }
         if (S.tier === 1 && S.laws.surplus === "plate") { S.laws.surplus = "fund"; S._fundDefaulted = true; } // the fund is kept by default from polis rank
         chron.push("Yr " + S.year + " — " + (S.tier === 1
-          ? "the city adopts the cult as its own and the boundary is enlarged. Festivals of splendor " +
+          ? "the city adopts the cult as its own" + (S.periGrown ? "" : " and the boundary is enlarged") + ". Festivals of splendor " +
             "12 at least are now expected, rising by two per decade to " + FEST_EXPECT[1] + ", and more as income grows."
           : "the sanctuary is now known across Greece. Festivals of splendor " +
             FEST_EXPECT[2] + " at least are now expected, and more as income grows."));
@@ -10329,13 +10436,13 @@
           if (S.fund > 0) {
             const took = S.terms.lendable ? S.fund : Math.round(S.fund / 3);
             S.fund -= took;
-            S.warLoan = (S.warLoan || 0) + took;
-            S.warLoanLeft = (S.warLoanLeft || 0) + Math.round(took * 1.2);
+            S.warLoan = (S.warLoan || 0) + took; S._warLoanAt = S.year;
+            S.warLoanLeft = (S.warLoanLeft || 0) + took; // the principal; interest is added by the decade at the state's rate
             heraldQueue({
               vig: { med: "elder", badge: "kerykeion" },
               title: "The city borrows from the building fund",
               body: "The city is at war and has taken " + (S.terms.lendable ? "all of the money set aside for building (<b>" + fmt(took) + " dr.</b>)" : "<b>" + fmt(took) + " dr.</b> from the money set aside for building") +
-                ". It is recorded as a loan to the city at interest, to be repaid when the war is over." +
+                ". It is recorded as a loan to the city at the state's rate of interest, to be repaid in four installments once the war is over." +
                 (S.fund ? " " + fmt(S.fund) + " dr. remains in the fund." : ""),
               cite: "Athens borrowed from its gods' treasuries at interest throughout the Archidamian war (IG I\u00b3 369), and Pericles counted the sacred treasure as a war reserve (Thuc. 2.13).",
             });
@@ -10343,17 +10450,17 @@
         }
         if (w === "war" && !seen.demand && S.year >= S.winds.warFrom + 8 && treasureVal() > 400) {
           seen.demand = 1;
-          const ask = Math.round(treasureVal() * 0.6);
+          const ask = meltWould(Math.round(treasureVal() * 0.6)); // what the whole objects come to
           heraldQueue({
             vig: { med: "elder", badge: "kerykeion" },
             title: "The polis asks for the god's treasure",
-            body: "Envoys stand before the treasurers. The war goes badly, and the city asks to borrow the god's plate, about <b>" + fmt(ask) + " dr.</b> by weight. Whole objects go to the mint, so the sum may run a little over. It is to be repaid with interest when the danger has passed. Renown falls while the plate is away, because the treasure counts toward it." +
+            body: "Envoys stand before the treasurers. The war goes badly, and the city asks to borrow the god's plate, about <b>" + fmt(ask) + " dr.</b> by weight: the phialai and statues that make up the sum go whole to the mint. It is to be repaid with interest at the state's rate when the danger has passed. Renown falls while the plate is away, because the treasure counts toward it." +
               ((S.terms.accounts || S.cityBooks) ? " <b>The accounts are on stone: the city knows the weight of every object, and the treasurers cannot refuse.</b>" : ""),
             cite: "Athens borrowed from Athena throughout the Archidamian war; the logistai's accounts survive with the interest computed to the day. Perikles counted even the Parthenos' gold a removable reserve (Thuc. 2.13).",
             choices: (S.terms.accounts || S.cityBooks) ? [
               { label: "The plate goes to the mint: the accounts on stone show the city its weight", fn: () => {
                   const got = meltTreasure(ask);
-                  S.warLoan = (S.warLoan || 0) + got; S.warLoanLeft = (S.warLoanLeft || 0) + Math.round(got * 1.2);
+                  S.warLoan = (S.warLoan || 0) + got; S.warLoanLeft = (S.warLoanLeft || 0) + got; S._warLoanAt = S.year;
                   losePiety(2);
                   log("The city knows the weight of every phiale from the stele, and takes what it asks for: " + fmt(got) + " dr. of plate go to the mint under seal, recorded as a loan at interest.", "bad");
                   renderAll();
@@ -10361,7 +10468,7 @@
             ] : [
               { label: "Lend the god's plate", fn: () => {
                   const got = meltTreasure(ask);
-                  S.warLoan = (S.warLoan || 0) + got; S.warLoanLeft = (S.warLoanLeft || 0) + Math.round(got * 1.2);
+                  S.warLoan = (S.warLoan || 0) + got; S.warLoanLeft = (S.warLoanLeft || 0) + got; S._warLoanAt = S.year;
                   losePiety(3); S.deeds = Math.min(0, S.deeds + 2);
                   log("The phialai go to the mint under seal: " + fmt(got) + " dr. lent to the polis at interest.", "good");
                   renderAll();
@@ -10427,17 +10534,24 @@
             ],
           });
         }
-        // the war loan comes home, when it can
-        if (S.warLoanLeft > 0 && w !== "war" && S.year % 10 === 1) {
-          if (Math.random() < 0.75) {
-            const pay = Math.min(S.warLoanLeft, Math.round((S.warLoan * 1.2) / 4));
+        // the war loan: interest at the state's rate, 1.2% a year, is added by the decade; it comes home
+        // in four installments once the war is over, when the city pays (it does not always)
+        if (S.warLoanLeft > 0 && S.year % 10 === 1 && S._warLoanAt !== S.year) {
+          const intr = Math.round(S.warLoanLeft * 0.12);
+          S.warLoanLeft += intr; sums.warInterest = (sums.warInterest || 0) + intr;
+          if (w === "war") {
+            chron.push("Yr " + S.year + " \u2014 the war loan runs on at interest while the fighting lasts; the city owes " + fmt(S.warLoanLeft) + " dr. on it.");
+          } else if (Math.random() < 0.75) {
+            let pay = Math.min(S.warLoanLeft, Math.round((S.warLoan || S.warLoanLeft) / 4) + intr);
+            if (S.warLoanLeft - pay < 20) pay = S.warLoanLeft; // no drachma left dangling
             S.warLoanLeft -= pay;
             S.treasury += pay;
             sums.warRepay = (sums.warRepay || 0) + pay;
-            chron.push("Yr " + S.year + " \u2014 the polis repays " + fmt(pay) +
-              " dr. of the war loan" + (S.warLoanLeft <= 0 ? "; the debt to the god is discharged, with interest." : "."));
+            chron.push("Yr " + S.year + " \u2014 the polis repays " + fmt(pay) + " dr. of the war loan, " + fmt(intr) + " dr. of it the decade's interest" +
+              (S.warLoanLeft <= 0 ? "; the debt to the god is discharged, with interest." : "; it still owes " + fmt(S.warLoanLeft) + " dr. on it."));
+            if (S.warLoanLeft <= 0) { S.warLoanLeft = 0; S.warLoan = 0; }
           } else {
-            chron.push("Yr " + S.year + " \u2014 the war loan's installment does not come; the logistai note the arrears.");
+            chron.push("Yr " + S.year + " \u2014 the war loan's installment does not come; the logistai note the arrears, and the interest runs on: the city owes " + fmt(S.warLoanLeft) + " dr. on it.");
           }
         }
       }
@@ -10457,8 +10571,17 @@
       const pr = S.priests[pi];
       const tenure = S.year - pr.since;
       const term = !!(S.priestTerm && tenure >= S.priestTerm); // a fixed term, once the board has set one
-      const dies = term || tenure >= 30 || (tenure >= 20 && Math.random() < 0.6) || (tenure >= 10 && Math.random() < 0.3);
-      if (!dies) continue;
+      // death is rolled by the year of tenure, so tenures read 13 or 24 and the line is dated inside the decade:
+      // about one and a half in a hundred each year under twenty years, six in a hundred from twenty, certain at thirty
+      let deathYear = term ? S.year : 0;
+      for (let y = 1; y <= 10 && !deathYear; y++) {
+        const t = tenure - 10 + y;
+        if (t < 1) continue;
+        const p = t >= 30 ? 1 : t >= 20 ? 0.06 : 0.015;
+        if (Math.random() < p) deathYear = S.year - 10 + y;
+      }
+      if (!deathYear) continue;
+      const tenureAt = term ? tenure : deathYear - pr.since;
       S._namesRetired.push(pr.name);
       // a vacancy can recur — priests die — so the question put to the board
       // rotates, and each version is asked at most once in a run
@@ -10466,27 +10589,27 @@
       const eventful = !term && succ.length && Math.random() < 0.35 && !S.pendingEvents.some(e => e._succName);
       if (S.terms.civic && !dRule().hereditary) {
         // under the civic condition the city sells the office and keeps the price
-        const heir = newPriest();
+        const heir = newPriest(); heir.since = deathYear;
         S.priests.splice(pi, 1);
         S.priests.push(heir);
-        chron.push("Yr " + S.year + " \u2014 " + pr.name + " the " + pr.title + " dies after " + tenure +
-          " years. The city puts the office up for sale, as its condition allows; " + heir.name + " buys it, and the price goes to the city's treasury, not the god's.");
+        chron.push("Yr " + deathYear + " \u2014 " + pr.name + " the " + pr.title + " dies after " + tenureAt + " years.");
+        chron.push("Yr " + deathYear + " \u2014 the city puts the office of " + pr.title + " up for sale, as its condition allows; " + heir.name + " buys it, and the price goes to the city's treasury, not the god's.");
       } else if (eventful) {
         const v = succ[Math.floor(Math.random() * succ.length)];
         S.usedEvents.add(v.id);
         S.pendingEvents.push({
-          id: v.id, _year: S.year, _succName: pr.name,
+          id: v.id, _year: deathYear, _succName: pr.name,
           med: PRIESTESS_DEITIES.includes(S.deity) ? "adorn" : "ck4996",
           title: v.title(pr),
-          body: v.body(pr, tenure),
+          body: v.body(pr, tenureAt),
           cite: v.cite,
           choices: v.choices,
         });
       } else {
-        const heir = newPriest(); // drawn before the vacancy, so the dead priest's name is not reused at once
+        const heir = newPriest(); heir.since = deathYear; // drawn before the vacancy, so the dead priest's name is not reused at once
         S.priests.splice(pi, 1);
         S.priests.push(heir);
-        chron.push("Yr " + S.year + " — " + pr.name + " the " + pr.title + (term ? " hands on the office after " : " dies after ") + tenure +
+        chron.push("Yr " + deathYear + " — " + pr.name + " the " + pr.title + (term ? " hands on the office after " : " dies after ") + tenureAt +
           " years; " + heir.name + (dRule().hereditary ? " succeeds from the same family." : " succeeds by lot."));
       }
     }
@@ -10508,12 +10631,12 @@
     }
     dedsThisDecade.forEach(d => {
       S.dedications.push(d);
-      chron.push("Entered the god's inventories: " + d.name.toLowerCase() + " (" + fmt(d.val) + " dr. by weight).");
+      chron.push("Entered the god's inventories: " + d.name.toLowerCase() + " (" + fmt(d.val) + " dr." + (/marble|stone|wood|ivory|terracotta|kore|kouros/i.test(d.name) ? ", as valued" : " by weight") + ").");
     });
     if (S.dedications.length && !S.dedExplained) {
       S.dedExplained = true;
       heraldQueue({
-        quiet: true, vig: "treasure", title: "The god's treasure: objects, not money",
+        quiet: true, vig: "treasure", title: "The new dedications are entered in the god's inventories: objects, not money",
         body: "The treasurers enter the new dedications in the inventories, weighing each object of gold and silver. This wealth belongs to the god: it raises the sanctuary's renown and may stand as a reserve in extremity, but it is not coin for the chest. <b>The god's treasure and the sacred treasury are two different things.</b>" +
           (sums.plate ? " The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest; only what stood above it at the audit was worked into plate." : ""),
         cite: "Temple inventories at Athens and Delos list vessels by weight, checked annually by magistrates; Perikles counted the gold on the Parthenos itself as a removable reserve (Thuc. 2.13; A Companion to Greek Architecture, ch. 15: temple interiors 'served as banks, as museums').",
@@ -10534,6 +10657,15 @@
         "-rank sanctuary is expected to hold (splendor " + festivalRep() + " against " +
         festExpect() + "): " + lost + " renown lost, and the pious complain.");
     }
+    // a fall in renown that no line explains: the part that fell furthest is named
+    if (lost === 0 && renown() <= renownBefore - 1) {
+      const P = S._renownParts || {}, now = { festivals: festivalRenown(), piety: pietyR(), buildings: monumentRenown(), dedications: treasure() };
+      const why = Object.keys(now).filter(k => P[k] !== undefined && now[k] < P[k]).sort((a, b) => (now[a] - P[a]) - (now[b] - P[b]))[0];
+      chron.push("Renown slips from " + renownBefore + " to " + renown() +
+        (why === "festivals" ? ": the festivals of the last decades were less splendid than before" : why === "piety" ? ": piety has fallen"
+          : why === "dedications" ? ": the god's treasure is smaller" : why === "buildings" ? ": the buildings count for less" : "") + ".");
+    }
+    S._renownParts = { festivals: festivalRenown(), piety: pietyR(), buildings: monumentRenown(), dedications: treasure() };
     // reputation for sharp practice fades with the generation that remembers it
     if (S.deeds < 0) {
       S.deeds = Math.min(0, S.deeds + 1);
@@ -10585,9 +10717,9 @@
       const planned = calSplendorNow();
       heraldQueue({
         vig: { med: "elder", badge: "kerykeion" }, title: "Polis standing is near",
-        body: "The sanctuary is " + fmt(Math.max(0, TIERS[1].renownAt - renown())) + " renown short of polis standing. A polis sanctuary is expected to hold festivals of splendor " + FEST_EXPECT[1] +
-          " at least, more as its income grows; the calendar as it stands holds splendor " + planned + ". Polis standing also needs a peripteral temple, a colonnade round the shrine; the city may offer to build it, and once it has, a building fund may be kept toward a temple of the sanctuary's own. " +
-          (planned >= FEST_EXPECT[1] ? "It already meets that standard." : "Set the calendar before the rank rises, or the sanctuary will lose renown each decade until it is set. For the decade of the promotion and the decade after, the loss is halved."),
+        body: (renown() >= TIERS[1].renownAt ? "The sanctuary has the renown for polis standing." : "The sanctuary is " + fmt(TIERS[1].renownAt - renown()) + " renown short of polis standing.") + " A polis sanctuary is expected to hold festivals of splendor " + standardWords(1) +
+          ", and more as its income grows; the calendar as it stands holds splendor " + planned + ". Polis standing also needs a peripteral temple, a colonnade round the shrine; the city may offer to build it, and from the day it offers, a building fund may be kept toward a temple of the sanctuary's own. " +
+          (planned >= FEST_EXPECT[1] ? "It already meets that standard in full." : planned >= 12 ? "It meets the first decade's standard; raise it as the decades pass." : "Set the calendar before the rank rises, or the sanctuary will lose renown each decade until it is set. For the decade of the promotion and the decade after, the loss is halved."),
         cite: "The bond of cult and city: civic magistrates presided at the great festivals, and polis money paid for hecatombs (IG I\u00b3 375).",
       });
     }
@@ -10614,7 +10746,7 @@
       S._panGuideShown = true;
       heraldQueue({
         vig: { med: "elder", badge: "kerykeion" }, title: "The means for panhellenic standing",
-        body: "The sanctuary now takes in about <b>" + fmt(S._incomeRate) + " dr. per year</b>: enough to hold festivals of the splendor a panhellenic sanctuary is expected to show, " + FEST_EXPECT[2] +
+        body: "The sanctuary took in about <b>" + fmt(S._incomeRate) + " dr. per year</b> over the last decade: enough to hold festivals of the splendor a panhellenic sanctuary is expected to show, " + FEST_EXPECT[2] +
           " at least, and to carry renown toward " + TIERS[2].renownAt + ". Two settings in the calendar decide it: <b>athletic games</b> in one festival, and that festival <b>marked greater every fourth year</b>. Games held in a greater year count toward the cities\u2019 recognition; the theoroi can then be sent.",
         cite: "Magnesia sent envoys to every Greek city and king to have the Leukophryena recognized as crowned games and the city as inviolable (I.Magnesia 16ff.; CGRN 200).",
         choices: [
@@ -10667,7 +10799,113 @@
         ],
       });
     }
-    // a voted grant: the fund may now cover the share, or the vote may lapse
+    // the league's levy, and the indemnity after a Sacred War
+    if (S.league) {
+      const L = S.league;
+      if (L.suspended > 0) {
+        L.suspended -= 1;
+        chron.push("The league's levy does not come this decade; the war over the sanctuary goes on.");
+        if (L.suspended === 0 && L.indemnity) chron.push("The league fines the people who seized the sanctuary; the indemnity will repay the god over the coming decades.");
+      } else if (L.left > 0) {
+        S.fund += 900; L.left -= 1; sums.levy = 900;
+        chron.push("The league's levy brings 900 dr. toward building; the fund stands at " + fmt(S.fund) + " dr." + (L.left ? "" : " The levy is complete."));
+        if (!L.left && !L.indemnity) { S.league = null; S.leagueDone = S.year; }
+      }
+      if (S.league && L.indemnity > 0 && L.suspended === 0) {
+        S.treasury += 300; L.indemnity -= 1; sums.indemnity = 300;
+        chron.push("The indemnity brings 300 dr. to the god.");
+        if (!L.indemnity && !L.left) { S.league = null; S.leagueDone = S.year; }
+      }
+    }
+    // the treasurers leave no surplus: silver above the working float — and
+    // beyond what the masons are owed — is worked into plate (IG I3 78)
+    const obligations = S.projects.reduce((a, pr) =>
+      a + (pr.installment || 0) * Math.max(0, pr.left - 1) + (pr.installment || 0) + (pr.retention || 0), 0);
+    // the building fund comes first, from income: a tenth of the decade's income, or a
+    // third of the surplus above the float if that is more, never above half the float,
+    // and never what the masons are owed. The city, the loan book and the plate share
+    // what is left above the float
+    let toFund = 0;
+    if (S.laws.surplus === "fund" && fundAllowed() && S.terms.lendable && (S.cityDebt || 0) > 0) {
+      chron.push("Nothing is set aside for building while the city owes the god " + fmt(S.cityDebt) + " dr.: under the assembly's condition the surplus is the city's first. The debt may stand in for half of the sanctuary's share of a capital work, never a whole work.");
+    } else if (S.laws.surplus === "fund" && fundAllowed()) {
+      const decIncome = sums.offerings + sums.hides + sums.rents + sums.sub + sums.extras + (sums.interest || 0) + (sums.cityInterest || 0);
+      // nothing is set aside out of a deficit, and the chest is never drawn below half its float
+      const opResult = decIncome + (sums.cityRepay || 0) + (sums.meatSale || 0) -
+        (sums.festCost + sums.upkeep + (sums.works || 0) + (sums.gera || 0));
+      const saving = fundSaving();
+      toFund = opResult > 0 ? fundTake(decIncome, S.treasury, obligations) : 0; // the one rule, fundRuleText() in words
+      if (toFund > 0) {
+        S.treasury -= toFund; S.fund += toFund; sums.fund = toFund;
+        chron.push("The treasurers set aside " + fmt(toFund) + " dr. toward " + (saving ? "the temple, everything the chest can spare above the float" : "building") +
+          (toFund >= fundCap() ? ", the most the law allows in a decade" : "") + "; the fund stands at " + fmt(S.fund) + " dr.");
+      } else {
+        let why = opResult <= 0 ? "Nothing was set aside for building this decade: the accounts closed in deficit."
+          : "Nothing could be set aside for building this decade: the chest could not spare it.";
+        if (!S._floatExplained) { S._floatExplained = true; why += " The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest before anything is set aside."; }
+        chron.push(why);
+      }
+    }
+    // with city officials on the board, the surplus above the float goes to the named work's share before any loan or plate
+    if (S.terms.epistatai && S.heldGrant) {
+      const g = S.heldGrant, need = Math.max(0, g.share - heldCover(g)), spare = S.treasury - WORK_FLOAT[S.tier] - obligations;
+      const take = Math.min(need, Math.max(0, spare));
+      if (take > 0) {
+        S.treasury -= take; S.fund += take; sums.fund = (sums.fund || 0) + take;
+        chron.push("The city's officials direct " + fmt(take) + " dr. of the surplus to the sanctuary's share of the " + g.name.toLowerCase() + ", as their condition allows; the fund stands at " + fmt(S.fund) + " dr.");
+      }
+    }
+    const convertible = S.treasury - WORK_FLOAT[S.tier] - obligations;
+    if (convertible > 300) {
+      S.treasury -= convertible;
+      // under the assembly's conditions the city helps itself first, up to its
+      // ceiling and at the state's rate: the published accounts show it the silver,
+      // and the borrowing condition gives it the whole surplus. What it leaves
+      // follows the sanctuary's law
+      let toCity = 0;
+      if ((S.terms.lendable || S.terms.accounts || S.cityBooks) && S.tier >= 1) {
+        // the accounts alone let the city borrow half of the surplus, repaid a tenth a decade, so the debt settles and the chest keeps half for plate; the right to borrow takes the whole and never repays
+        toCity = Math.max(0, Math.min(S.terms.lendable || S.cityBooks ? convertible : Math.round(convertible / 2), CITY_CAP[S.tier] - (S.cityDebt || 0)));
+        if (toCity > 0) {
+          S.cityDebt = (S.cityDebt || 0) + toCity;
+          sums.city = toCity;
+          chron.push("The city borrows " + fmt(toCity) + " dr. from the surplus at the state's rate" +
+            (S.terms.lendable ? " (the accounts on stone show it the silver, and by its condition it takes the whole surplus first)" : S.terms.accounts ? " (the accounts on stone show it the silver)" : "") +
+            "; it owes the god " + fmt(S.cityDebt) + " dr." + (S.warLoanLeft ? " The war loan of " + fmt(S.warLoanLeft) + " dr. stands besides." : "") + (S.terms.lendable ? " The principal is not repaid, but it may stand in for half of the sanctuary's share of a capital work, never a whole work." : ""));
+        }
+      }
+      const left = convertible - toCity;
+      let toLoan = 0;
+      if (S.laws.surplus === "loans" && S.tier >= 1) {
+        toLoan = Math.max(0, Math.min(left, LOAN_CAP[S.tier] - S.loansOut));
+        if (toLoan > 0) {
+          S.loansOut += toLoan;
+          sums.lent = toLoan;
+          chron.push("The hieropoioi put " + fmt(toLoan) +
+            " dr. of the god's silver out at interest; the loan book stands at " + fmt(S.loansOut) + " dr.");
+        }
+      }
+      const toPlate = left - toLoan;
+      if (toPlate > 0) {
+        S.dedications.push({ name: "Silver phialai worked from surplus", val: toPlate,
+          ren: Math.min(5, Math.ceil(toPlate / 500)), year: S.year });
+        sums.plate = toPlate;
+        chron.push("The treasurers leave no surplus: " + fmt(toPlate) +
+          " dr. is worked into plate and entered in the inventories." +
+          (toLoan > 0 ? " (The polis will borrow no more.)" : ""));
+      }
+    }
+
+    // the city repays its debt slowly, and not at all in war; under the borrowing condition it
+    // serves the interest and never repays the principal, as Athens never repaid Athena
+    const owedBefore = (S.cityDebt || 0) - (sums.city || 0); // this audit's borrowing is not repaid in the same breath
+    if (owedBefore > 0 && windOf(S.year) !== "war" && !S.terms.lendable && !S.cityBooks) {
+      const pay = Math.min(S.cityDebt, Math.round(owedBefore * 0.1));
+      S.cityDebt -= pay; S.treasury += pay; sums.cityRepay = pay;
+      chron.push("The city repays " + fmt(pay) + " dr. of its debt to the god; it still owes " + fmt(S.cityDebt) + " dr.");
+    }
+    // a voted grant: the fund may now cover the share, or the vote may lapse. After the set-aside and the
+    // city's borrowing, so that the card comes at the audit that meets the share, not a decade later
     if (S.heldGrant) {
       const g = S.heldGrant;
       if (S.year >= g.until) {
@@ -10707,101 +10945,6 @@
         });
       }
     }
-    // the league's levy, and the indemnity after a Sacred War
-    if (S.league) {
-      const L = S.league;
-      if (L.suspended > 0) {
-        L.suspended -= 1;
-        chron.push("The league's levy does not come this decade; the war over the sanctuary goes on.");
-        if (L.suspended === 0 && L.indemnity) chron.push("The league fines the people who seized the sanctuary; the indemnity will repay the god over the coming decades.");
-      } else if (L.left > 0) {
-        S.fund += 900; L.left -= 1; sums.levy = 900;
-        chron.push("The league's levy brings 900 dr. toward building; the fund stands at " + fmt(S.fund) + " dr." + (L.left ? "" : " The levy is complete."));
-        if (!L.left && !L.indemnity) { S.league = null; S.leagueDone = S.year; }
-      }
-      if (S.league && L.indemnity > 0 && L.suspended === 0) {
-        S.treasury += 300; L.indemnity -= 1; sums.indemnity = 300;
-        chron.push("The indemnity brings 300 dr. to the god.");
-        if (!L.indemnity && !L.left) { S.league = null; S.leagueDone = S.year; }
-      }
-    }
-    // the treasurers leave no surplus: silver above the working float — and
-    // beyond what the masons are owed — is worked into plate (IG I3 78)
-    const obligations = S.projects.reduce((a, pr) =>
-      a + (pr.installment || 0) * Math.max(0, pr.left - 1) + (pr.installment || 0) + (pr.retention || 0), 0);
-    // the building fund comes first, from income: a tenth of the decade's income, or a
-    // third of the surplus above the float if that is more, never above half the float,
-    // and never what the masons are owed. The city, the loan book and the plate share
-    // what is left above the float
-    let toFund = 0;
-    if (S.laws.surplus === "fund" && fundAllowed() && S.terms.lendable && (S.cityDebt || 0) > 0) {
-      chron.push("Nothing is set aside for building while the city owes the god " + fmt(S.cityDebt) + " dr.: under the assembly's condition the surplus is the city's first. The debt may stand in for the sanctuary's share of a capital work.");
-    } else if (S.laws.surplus === "fund" && fundAllowed()) {
-      const decIncome = sums.offerings + sums.hides + sums.rents + sums.sub + sums.extras + (sums.interest || 0) + (sums.cityInterest || 0);
-      // nothing is set aside out of a deficit, and the chest is never drawn below half its float
-      const opResult = decIncome + (sums.cityRepay || 0) + (sums.meatSale || 0) -
-        (sums.festCost + sums.upkeep + (sums.works || 0) + (sums.gera || 0));
-      const saving = fundSaving();
-      toFund = opResult > 0 ? fundTake(decIncome, S.treasury, obligations) : 0; // the one rule, fundRuleText() in words
-      if (toFund > 0) {
-        S.treasury -= toFund; S.fund += toFund; sums.fund = toFund;
-        chron.push("The treasurers set aside " + fmt(toFund) + " dr. toward " + (saving ? "the temple, everything the chest can spare above the float" : "building") +
-          (toFund >= fundCap() ? ", the most the law allows in a decade" : "") + "; the fund stands at " + fmt(S.fund) + " dr.");
-      } else {
-        let why = opResult <= 0 ? "Nothing was set aside for building this decade: the accounts closed in deficit."
-          : "Nothing could be set aside for building this decade: the chest could not spare it.";
-        if (!S._floatExplained) { S._floatExplained = true; why += " The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest before anything is set aside."; }
-        chron.push(why);
-      }
-    }
-    const convertible = S.treasury - WORK_FLOAT[S.tier] - obligations;
-    if (convertible > 300) {
-      S.treasury -= convertible;
-      // under the assembly's conditions the city helps itself first, up to its
-      // ceiling and at the state's rate: the published accounts show it the silver,
-      // and the borrowing condition gives it the whole surplus. What it leaves
-      // follows the sanctuary's law
-      let toCity = 0;
-      if ((S.terms.lendable || S.terms.accounts || S.cityBooks) && S.tier >= 1) {
-        // the accounts alone let the city borrow half of the surplus, repaid a tenth a decade, so the debt settles and the chest keeps half for plate; the right to borrow takes the whole and never repays
-        toCity = Math.max(0, Math.min(S.terms.lendable || S.cityBooks ? convertible : Math.round(convertible / 2), CITY_CAP[S.tier] - (S.cityDebt || 0)));
-        if (toCity > 0) {
-          S.cityDebt = (S.cityDebt || 0) + toCity;
-          sums.city = toCity;
-          chron.push("The city borrows " + fmt(toCity) + " dr. from the surplus at the state's rate" +
-            (S.terms.lendable ? " (the accounts on stone show it the silver, and by its condition it takes the whole surplus first)" : S.terms.accounts ? " (the accounts on stone show it the silver)" : "") +
-            "; it owes the god " + fmt(S.cityDebt) + " dr." + (S.terms.lendable ? " The principal is not repaid, but it may stand in for the sanctuary's share of a capital work." : ""));
-        }
-      }
-      const left = convertible - toCity;
-      let toLoan = 0;
-      if (S.laws.surplus === "loans" && S.tier >= 1) {
-        toLoan = Math.max(0, Math.min(left, LOAN_CAP[S.tier] - S.loansOut));
-        if (toLoan > 0) {
-          S.loansOut += toLoan;
-          sums.lent = toLoan;
-          chron.push("The hieropoioi put " + fmt(toLoan) +
-            " dr. of the god's silver out at interest; the loan book stands at " + fmt(S.loansOut) + " dr.");
-        }
-      }
-      const toPlate = left - toLoan;
-      if (toPlate > 0) {
-        S.dedications.push({ name: "Silver phialai worked from surplus", val: toPlate,
-          ren: Math.min(5, Math.ceil(toPlate / 500)), year: S.year });
-        sums.plate = toPlate;
-        chron.push("The treasurers leave no surplus: " + fmt(toPlate) +
-          " dr. is worked into plate and entered in the inventories." +
-          (toLoan > 0 ? " (The polis will borrow no more.)" : ""));
-      }
-    }
-
-    // the city repays its debt slowly, and not at all in war; under the borrowing condition it
-    // serves the interest and never repays the principal, as Athens never repaid Athena
-    if ((S.cityDebt || 0) > 0 && windOf(S.year) !== "war" && !S.terms.lendable && !S.cityBooks) {
-      const pay = Math.min(S.cityDebt, Math.round(S.cityDebt * 0.1));
-      S.cityDebt -= pay; S.treasury += pay; sums.cityRepay = pay;
-      chron.push("The city repays " + fmt(pay) + " dr. of its debt to the god; it still owes " + fmt(S.cityDebt) + " dr.");
-    }
     // after the audit, so that the figures the officials and the fund alert quote are the audit's
     // the city's officials name the next work at the close of a decade in which none is outstanding:
     // the first affordable one in the order the city wants, or two when the money reaches both, or
@@ -10840,21 +10983,22 @@
     if (fundAllowed() && !S.heldGrant && !S.campaign) { // the fund has one claimant at a time
       const frac = cityFrac(termsCount());
       const named = S.cityPriority ? S.cityPriority.keys : [];
-      const ready = capitalWorksNow().filter(w => !boardLocked(w.key) && !named.includes(w.key) && hasGround(w.key)).map(w => ({ ...w, share: w.cost - Math.round(w.cost * frac) })).filter(w => ownMoney() >= w.share); // the named works have their own card
+      const ready = capitalWorksNow().filter(w => !boardLocked(w.key) && !named.includes(w.key) && hasGround(w.key)).map(w => ({ ...w, share: w.cost - Math.round(w.cost * frac) })).filter(w => ownMoney(w.share) >= w.share); // the named works have their own card
       S._fundAlerted = S._fundAlerted || {};
       Object.keys(S._fundAlerted).forEach(k => { if (!ready.some(w => w.key === k)) delete S._fundAlerted[k]; });
       const fresh = ready.filter(w => !S._fundAlerted[w.key]);
       if (fresh.length) {
         fresh.forEach(w => { S._fundAlerted[w.key] = true; });
         const pct = Math.round(frac * 100);
+        const named = fresh.slice(0, 4); // a button for every work the card names
         heraldQueue({
           sites: true, vig: { badge: "mallet" }, title: "The building fund can meet the sanctuary's share",
-          body: "The building fund" + (debtUsable() ? " and the city's debt" : "") + " hold" + (debtUsable() ? "" : "s") + " " + fmt(ownMoney()) + " dr. With the assembly paying " + pct + "% of the cost" +
+          body: "The building fund holds " + fmt(S.fund) + " dr." + (debtUsable() ? ", and the city's debt may stand in for half of a share." : ".") + " With the assembly paying " + pct + "% of the cost" +
             (termsCount() ? " under the conditions already in force" : "") + ", that is enough for the sanctuary's share of: " +
-            fresh.map(w => "<b>" + w.name.toLowerCase() + "</b> (" + fmt(w.cost) + " dr.; the sanctuary's share " + fmt(w.share) + " dr.)").join(", ") +
+            named.map(w => "<b>" + w.name.toLowerCase() + "</b> (" + fmt(w.cost) + " dr.; the sanctuary's share " + fmt(w.share) + " dr.)").join(", ") +
             ". Open its card to petition the assembly, or to pay from the fund if it covers the whole cost.",
           cite: FUND_CITE_SHORT,
-          choices: fresh.slice(0, 2).map(w => ({ label: "Open the card for the " + w.name.toLowerCase(), fn: () => openWorkCard(w.key) })).concat([{ label: "Noted", ghost: true }]),
+          choices: named.map(w => ({ label: "Open the card for the " + w.name.toLowerCase(), fn: () => openWorkCard(w.key) })).concat([{ label: "Noted", ghost: true }]),
         });
       }
     }
@@ -10877,7 +11021,7 @@
     S.pendingEvents = S.pendingEvents.filter(e => !e.when || e.when());
     // the city's own works: in some decades the Council has its hands full with a work of the city's,
     // oftener in the age of tyrants, who built
-    S.cityWork = Math.random() < (windOf(S.year) === "tyrants" ? 0.4 : 0.25) ? pick(CITY_WORKS) : null;
+    S.cityWork = Math.random() < (windOf(S.year) === "tyrants" ? 0.3 : 0.15) ? pick(CITY_WORKS) : null; // the city builds for itself less often (BR, 14 Sep 2026)
     if (S.cityWork && S.tier >= 1) chron.push("The city is building its own " + S.cityWork + "; the Council will bring forward no grant for the sanctuary while it does.");
     // under the civic condition the assembly revises the calendar every second decade
     if (S.terms.civic && S.cal && S.year - (S.civicRev || S.terms.civic) >= 20) { S.civicRev = S.year; civicRevision(chron); }
@@ -10890,6 +11034,12 @@
       const ys = sums.peakYears.length === 1 ? "year " + sums.peakYears[0] : "years " + sums.peakYears.slice(0, -1).join(", ") + " and " + sums.peakYears[sums.peakYears.length - 1];
       chron.push("The greater " + nm + " was held in " + ys + "; crowds came from afar.");
     }
+    if (sums.peakCut && sums.peakCut.length) { // a greater year the chest could not carry: no games were held in it
+      const nm = (S.cal.heortai[S.cal.peakIdx] || S.cal.heortai[0]).name.replace(/^The\s+/i, "");
+      const ys = sums.peakCut.length === 1 ? "year " + sums.peakCut[0] : "years " + sums.peakCut.join(" and ");
+      chron.push("The greater " + nm + " of " + ys + " was held on a reduced scale for want of money, without the games.");
+      S._peakCutLast = sums.peakCut.slice();
+    } else S._peakCutLast = null;
     chron.forEach(c => log(c));
     const opIncome = sums.offerings + sums.hides + sums.rents + sums.sub + sums.extras + (sums.interest || 0) +
       (sums.cityInterest || 0) + (sums.cityRepay || 0) + (sums.warRepay || 0) + (sums.indemnity || 0) + (sums.meatSale || 0);
@@ -10964,7 +11114,7 @@
       S.festSeen.games = 1;
       heraldQueue({
         vig: { med: "aulete", badge: "kerykeion" },
-        title: "Crowned games under sacred truce",
+        title: "Games under the sacred truce",
         body: "Heralds carry the truce from city to city and theoroi proclaim the panegyris. Music and athletics are now offered to the god beside the sacrifice.",
         cite: "Festival truces were proclaimed by spondophoroi; the pipes accompanied procession and sacrifice alike (cf. London E 504).",
       });
@@ -11013,7 +11163,10 @@
   // are ten-year totals, so the units are said once in the section headings
   function ledgerRows(d) {
     const ex = incomeExtras();
-    const exLabel = ex.length === 1 ? ex[0].label : "The cult’s own income";
+    const short = t => t.split(" (")[0]; // the row names what it holds, so a rent or a fee is never renamed away
+    const exLabel = ex.length === 0 ? "The cult’s own income"
+      : ex.length <= 3 ? ex.map((x, i) => i ? short(x.label).charAt(0).toLowerCase() + short(x.label).slice(1) : short(x.label)).join(", ")
+      : short(ex[0].label) + ", " + short(ex[1].label).charAt(0).toLowerCase() + short(ex[1].label).slice(1) + " and " + (ex.length - 2) + " more";
     const exTitle = ex.length > 1 ? ex.map(x => x.label + ", " + fmt(x.amt) + " dr. per year").join(" · ") : "";
     const inc = [
       ["Offerings & tariffs (~" + fmt(Math.round(d.pilgrimYears / 10)) + " pilgrims per year)", d.offerings],
@@ -11112,7 +11265,7 @@
         rentsNote +
         ev("where the money went", moneyPictureHTML(d), firstClose) +
         (S.consult
-          ? '<div class="renown-line">' + fmt(S.consult.served) + " heard at the hall" +
+          ? '<div class="renown-line">' + fmt(S.consult.served) + " heard at the " + (S.deity === "apollo" ? "chamber" : "hall") +
             (S.consult.turned ? ", <span class=\"bad\">" + fmt(S.consult.turned) + " turned away for want of room</span>" : "") +
             " · " + fmt(S.consult.income) + " dr. per year</div>"
           : "") +
@@ -11145,19 +11298,19 @@
       chest = box("Held at the start", fmt(S._chestBefore || 0) + " dr.") + box("At the audit", fmt(S.treasury) + " dr.", "end");
       when = "over the ten years just closed";
     } else {
-      const y = S.cal ? calForYear(1) : { cost: 0 };
-      const ec = dEcon();
-      const est = estimatePilgrims(y); // the offerings formula mirrors the decade loop's
-      inc = [box("Rents of sacred land", "+" + fmt(landRents())), box("Offerings of ~" + fmt(est) + " visitors", "+" + fmt(Math.round(3.4 * Math.pow(est, 0.8))))]
-        .concat(ec && ec.kind === "cash" ? [box(short(ec.label), "+" + fmt(ec.amt()))] : []);
-      out = [box("Festivals", "−" + fmt(y.cost)), box("Upkeep of the buildings", "−" + fmt(totalUpkeep()))];
+      const B = treasurerBudget(); // the treasurer's figures, so the money page, the composer and the rail agree
+      inc = [box("Rents of sacred land", "+" + fmt(B.rents)), box("Offerings of ~" + fmt(B.est) + " visitors", "+" + fmt(B.offerings))]
+        .concat(incomeExtras().map(x => box(short(x.label), "+" + fmt(Math.round(x.amt * serviceFactor())))))
+        .concat(B.sub ? [box("Polis subsidy", "+" + fmt(B.sub))] : []);
+      out = [box("Festivals", "−" + fmt(B.rites)), box("Upkeep of the buildings" + (attendantCost() ? " and attendants" : ""), "−" + fmt(B.upkeep))]
+        .concat(B.gera ? [box("The priests\u2019 share of the offerings", "−" + fmt(B.gera))] : []);
       chest = box("In the chest now", fmt(S.treasury) + " dr.");
       when = "per year, as the calendar stands";
     }
     const law = S.laws.surplus;
     const lawName = law === "fund" ? "set aside for building" : law === "loans" ? "lent out at interest" : "worked into plate for the god";
     const floatLine = "The treasurers keep a working float of " + fmt(WORK_FLOAT[S.tier]) + " dr. in the chest. " +
-      (law === "fund" ? "A tenth of the decade's income is <b>set aside for building</b> when the chest can spare it above half its float, and what still stands above the float at the audit is worked into plate" : "What stands above it at the audit is <b>" + lawName + "</b>") +
+      (law === "fund" ? "<b>Set aside for building</b>: " + fundRuleText().replace(/^The fund/, "the fund") + "; what still stands above the float at the audit, when it comes to more than 300 dr., is worked into plate" : "What stands above it at the audit, when it comes to more than 300 dr., is <b>" + lawName + "</b>") +
       (!fundAllowed() ? ". A building fund can be kept from polis rank, or from the day the city offers its temple." : ", as the Sacred law directs.") +
       ' <button type="button" class="ghost money-law">Sacred law</button>';
     return '<div class="money-note">Figures are ' + when + ".</div>" +
@@ -11199,7 +11352,7 @@
     if (fx.deeds) S.deeds = Math.max(DEEDS_FLOOR, Math.min(0, S.deeds + fx.deeds));
     if (fx.pilgrimBonus) S.pilgrimBonus += fx.pilgrimBonus;
     if (fx.projectDelay && S.projects.length) S.projects[0].left += fx.projectDelay;
-    if (fx.foundFest) foundFestival(fx.foundFest, true); // agreed in the event: founded at once, not asked again
+    if (fx.foundFest) foundFestival(fx.foundFest, true, fx.foundName); // agreed in the event: founded at once, not asked again
     if (fx.loans) S.loansOut = Math.max(0, Math.round(S.loansOut * (1 + fx.loans)));
     if (fx.lend) {
       const room = Math.max(0, LOAN_CAP[S.tier] - S.loansOut);
@@ -11227,10 +11380,7 @@
         (fx.rentPct > 0 ? "up " : "down ") + Math.abs(Math.round(fx.rentPct * 100)) + "%.",
         fx.rentPct > 0 ? "good" : "bad");
     }
-    if (fx.extendBoundary) {
-      S.periExtended = true;
-      log("The boundary is drawn anew; the temenos is enlarged.", "good");
-    }
+    if (fx.extendBoundary) S.periExtended = true; // the choice's own line says the temenos is enlarged
     if (fx.grantStructure) {
       const spots = [[466,404],[398,352],[468,346],[360,442],[344,332],[494,410]];
       const sp = spots.find(([x, y]) => validate(fx.grantStructure, 0, x, y, -1).ok);
@@ -11252,7 +11402,7 @@
         "% for the coming decade.", "bad");
     }
     S.pendingEvents.shift();
-    if (choice.log) log(choice.log, (fx.piety || 0) >= 0 ? "good" : "bad");
+    if (choice.log) log((ev._year && ev._year !== S.year ? "Yr " + ev._year + " \u2014 " : "") + choice.log, (fx.piety || 0) >= 0 ? "good" : "bad"); // dated to the year the event arose
     const fxBits = [];
     const bit = (v, label, flip) => { if (!v) return;
       const good = flip ? v < 0 : v > 0;
@@ -11266,7 +11416,7 @@
     if (moved.renown) bit(moved.renown, "renown " + sg(moved.renown));
     if (moved.treasure) bit(moved.treasure, "treasure " + sg(moved.treasure) + " dr.");
     if (fx.deeds < 0) bit(fx.deeds, "conduct \u2212" + Math.abs(fx.deeds));
-    else if (fx.deeds > 0 && before.deeds < 0) bit(fx.deeds, "conduct repaired"); // only when there was a blemish to repair
+    else if (fx.deeds > 0 && before.deeds < 0 && S.deeds > before.deeds) bit(fx.deeds, "conduct repaired"); // only when there was a blemish to repair, and it mended
     if (fx.pilgrimBonus) bit(fx.pilgrimBonus, "visitors " + (fx.pilgrimBonus > 0 ? "+" : "\u2212") + Math.abs(fx.pilgrimBonus) + " for a time");
     if (fx.capacity) bit(fx.capacity, "capacity " + (fx.capacity > 0 ? "+" : "\u2212") + Math.abs(fx.capacity));
     if (fx.grant) fxBits.push('<span class="pos">income +' + fmt(fx.grant.amt) + " dr. per year</span>");
@@ -11275,7 +11425,7 @@
     if (fx.projectDelay) fxBits.push('<span class="neg">works +' + fx.projectDelay + " yr</span>");
     if (fx.lend) fxBits.push("silver out at interest");
     if (fx.extendBoundary) fxBits.push('<span class="pos">the temenos is enlarged</span>');
-    const fxLineHtml = fxBits.length ? '<div class="fx-line"><b>Effects:</b> ' + fxBits.join(" \u00b7 ") + "</div>" : "";
+    const fxLineHtml = '<div class="fx-line"><b>Effects:</b> ' + (fxBits.length ? fxBits.join(" \u00b7 ") : "no change in the figures") + "</div>";
     // some choices are remembered by the laurels
     const first = choice === ev.choices[0];
     S.evChoice[ev.id] = ev.choices.indexOf(choice);
@@ -11314,13 +11464,7 @@
         rc.appendChild(nb);
       }
     }
-    if (S.pendingEvents.length) { // the next card waits until the receipt has been read
-      const next = S.pendingEvents[0];
-      clearTimeout(receiptT);
-      receiptT = setTimeout(() => {
-        if (S.pendingEvents[0] === next && document.querySelector("#infoBox .event-card.resolved")) showEvent(next);
-      }, reducedMotion() ? 0 : 2400);
-    }
+    clearTimeout(receiptT); // no card replaces a receipt on its own: the next comes from the Next button or the advance button
     renderAll();
   }
 
@@ -11341,7 +11485,7 @@
   // — the tap gloss: one sentence for one word, on click, tap, or keyboard —
   const GLOSS_EXTRA = {
     splendor: "how impressive a festival is. The average of recent years is multiplied into renown — the sanctuary’s main source of fame.",
-    standard: "the splendor a sanctuary is expected to show at its festivals: at least 3 at village rank, 18 at polis, 45 at panhellenic, and more as income grows, since three tenths of income are expected to go to the festivals. Below it, renown falls every decade. The first decade is not judged.",
+    standard: "the splendor a sanctuary is expected to show at its festivals: at least 3 at village rank, 12 rising by two a decade to 18 at polis, 45 at panhellenic, and more as income grows, since three tenths of income are expected to go to the festivals. Below it, renown falls every decade. The first decade is not judged.",
     renown: "how widely the sanctuary is known. It decides your rank, and Pausanias judges it at the end.",
     piety: "how well the god is served. It grows with rites and feasts, decays if neglected, and draws more visitors.",
     conduct: "the sanctuary’s good name. Expedient choices lower it, and it takes decades to recover.",
@@ -11436,7 +11580,7 @@
     if (ti < 0) return;
     if (!S.periGrown) { // the city's surveyors mark out the larger precinct first: room for a temple of stone, taken or not
       S.periGrown = true;
-      log("The city's surveyors mark out a larger precinct with new horoi, room for a temple of stone.", "good");
+      log("The city's surveyors mark out a larger precinct with new horoi, room for " + (S.templeIIForm === "samos" ? "a peripteral temple of timber" : "a temple of stone") + ".", "good");
       camRest();
     }
     const cost = costOf("temple", BID.temple.levels[1]);
@@ -11462,7 +11606,7 @@
         { label: "Refuse: the sanctuary will build its own temple", ghost: true, fn: () => {
             S.cityTemple.state = "refused";
             if (S.laws.surplus === "plate") { S.laws.surplus = "fund"; S._fundDefaulted = true; }
-            log("The board declines the city's temple. Polis standing must wait until the sanctuary has built a peripteral temple of its own. From now on the treasurers set aside everything the chest can spare above the float, up to " + fmt(fundCap()) + " dr. per decade, toward it.", "");
+            log("The board declines the city's temple. Polis standing must wait until the sanctuary has built a peripteral temple of its own. From now on the treasurers set aside everything the chest can spare above the float, up to " + fmt(fundCap()) + " dr. per decade, toward it. Once the sanctuary has the renown for polis standing a citizen may offer to pay for the columns, and the assembly, if it votes money, will pay three tenths with no condition.", "");
             renderAll();
           } },
       ],
@@ -11498,9 +11642,9 @@
       title: "The sanctuary rises: polis standing",
       body: "The assembly of the polis votes to adopt the cult as its own. Magistrates will sit in the front row at the festival, and the festival is announced in the city's name as well as the god's. The board now answers to the assembly." +
         "<br>\u2022 <b>Polis subsidy:</b> +" + fmt(subsidy()) + " dr. enters the ledger each year." +
-        "<br>\u2022 <b>The building fund:</b> " + (S.laws.surplus === "fund" ? "the treasurers now set a tenth of income aside each decade toward the next large building, when the chest can spare it above half its float. The switch is under the fund\u2019s figure in the header, and the rule is in the Sacred law." : "can now be kept. Switch it on under the fund\u2019s figure in the header.") +
+        "<br>\u2022 <b>The building fund:</b> " + (S.laws.surplus === "fund" ? fundRuleText().replace(/^The fund/, "the fund") + ". The switch is under the fund\u2019s figure in the header, and the rule is in the Sacred law." : "can now be kept. Switch it on under the fund\u2019s figure in the header.") +
         "<br>\u2022 <b>Higher expectations:</b> festivals are now expected to reach splendor 12 at least, rising by two per decade to " + FEST_EXPECT[1] + ", and more as income grows: three tenths of income are expected to go to the festivals. A calendar below the standard loses renown every decade. For this decade and the next the loss is halved." +
-        "<br>\u2022 <b>Unlocked:</b> the polis-stage buildings, hecatomb festivals, and a wider boundary." +
+        "<br>\u2022 <b>Unlocked:</b> the polis-stage buildings and hecatomb festivals" + (S.periGrown ? "" : ", and a wider boundary") + "." +
         "<br><i>Most Greek sanctuaries never rose past local standing; adoption by the city was itself an achievement.</i>",
       cite: "The bond of cult and city: civic magistrates presided at the great festivals, and polis money paid for hecatombs (IG I\u00b3 375).",
     } : {
@@ -11508,7 +11652,7 @@
       title: "The sanctuary rises: panhellenic standing",
       body: "The cities have recognized the sanctuary and its truce. Theoroi arrive from cities you have never seen, and every visitor may read the board's accounts. The sanctuary still answers to the assembly of the polis, and the assembly's grants are still the surest money." +
         "<br>\u2022 <b>Treasuries:</b> grateful cities now offer to build them at their own expense." +
-        "<br>\u2022 <b>Crowned games:</b> may be proclaimed under sacred truce (requires a stadium)." +
+        "<br>\u2022 <b>Crowned games:</b> the games of the greater year now rank with the crown games of Greece, proclaimed under the sacred truce; an embanked stadium is their proper ground." +
         "<br>\u2022 <b>Higher expectations:</b> the greatest sanctuaries held a hecatomb, a hundred cattle in a greater year at about " + fmt(100 * VIC_PRICE.oxen) + " dr., which a city whose name is on the festival pays; festivals are expected to reach splendor " + FEST_EXPECT[2] + " at least, and more as income grows; for this decade and the next a shortfall costs half. Land rents rise with the god's estate." +
         "<br>\u2022 <b>Unlocked:</b> the panhellenic building stages and the grandest works." +
         "<br><i>Only a handful of sanctuaries ever held this rank. Four festivals were recognized as crowned games by all of Greece. This is the rarest outcome, not the expected one.</i>",
@@ -11772,7 +11916,8 @@
     if (S._incomeRate !== undefined) {
       const net = S._incomeRate - (S._expenseRate || 0);
       ts.className = "status num " + (net >= 0 ? "good" : "warn");
-      ts.textContent = (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " per year";
+      ts.textContent = (net >= 0 ? "+" : "\u2212") + fmt(Math.abs(net)) + " per year last decade";
+      ts.title = "Last decade\u2019s income less its outgo, per year. The treasurer\u2019s line in the panel is the forecast for the coming years.";
     } else { ts.className = "status"; ts.textContent = "spendable silver"; }
     renderFundRow();
     // B: at village rank there is no fund to show; the header keeps five meters
@@ -11784,21 +11929,24 @@
     document.getElementById("mTreasureSub").textContent =
       (S.dedications.length ? S.dedications.length + (S.dedications.length === 1 ? " object" : " objects") : "no objects yet") +
       (S.loansOut ? " \u00b7 lent " + fmt(S.loansOut) + " dr." : "") +
-      ((S.cityDebt || S.warLoanLeft) ? " \u00b7 the city owes " + fmt((S.cityDebt || 0) + (S.warLoanLeft || 0)) + " dr." + (S.warLoanLeft ? " (" + fmt(S.warLoanLeft) + " of it the war loans)" : "") : "");
+      ((S.cityDebt || S.warLoanLeft) ? " \u00b7 the city owes " + fmt((S.cityDebt || 0) + (S.warLoanLeft || 0)) + " dr." : ""); // the war loans' part is in the tooltip
     renderStandingStrip();
     setFigure("mRenown", renown(), v => fmt(v));
     if (S.deity) document.getElementById("planCaption").textContent =
       "Fig. 1 \u2014 Sanctuary of " + cultName() + ", restored \u00b7 bird\u2019s-eye view \u00b7 year " + S.year;
     if (S.deity) document.getElementById("deityLine").textContent = "Sanctuary of " + cultName() + ", " +
-      ["in the hills above a village", "the sanctuary of the polis", "a sanctuary of all the Greeks"][S.tier];
+      ["in the hills above a village", "adopted by the city", "a sanctuary of all the Greeks"][S.tier];
     const dp = document.getElementById("deityPort"), pp = S.deity ? PORTRAITS[S.deity] : null;
     if (dp) { if (pp) { dp.src = pp.src; dp.alt = pp.cap; dp.title = pp.cap + " \u2014 click for the source"; dp.style.display = ""; } else dp.style.display = "none"; }
     // the one word the header keeps: the phrase, or the fall and a way to stop it
     const rs = document.getElementById("mRenownSub");
     const shortNow = S.cal ? festivalShortfall() : 0;
     if (shortNow > 0) {
+      const planOk = S.cal && calDecadeAvg() >= festExpect(); // the calendar as it now stands, against last decade's held splendor
       rs.className = "status warn";
-      rs.innerHTML = '<button type="button" class="linkish" id="mWarnFix" title="The festivals fall short of what this rank expects. Click to set the calendar.">falling ' + shortNow + " per decade</button>";
+      rs.innerHTML = planOk
+        ? '<button type="button" class="linkish" id="mWarnFix" title="Last decade\u2019s festivals fell short of what this rank expects, and ' + shortNow + ' renown was lost at the audit. The calendar as it now stands meets the standard. Click to see it.">lost ' + shortNow + " last decade</button>"
+        : '<button type="button" class="linkish" id="mWarnFix" title="The festivals fall short of what this rank expects: ' + shortNow + ' renown is lost at each audit until the calendar reaches the standard. Click to set the calendar.">falling ' + shortNow + " per decade</button>";
       const fx = document.getElementById("mWarnFix");
       if (fx) fx.addEventListener("click", openCalModal);
     } else if (plannedBelow()) {
@@ -11821,7 +11969,7 @@
     tb.title = "Festivals of splendor " + festExpect() + " are expected of this sanctuary (the rank\u2019s floor is " + FEST_EXPECT[S.tier] + (rankFloor() < FEST_EXPECT[S.tier] ? ", reached by steps from " + rankFloor() : "") + "; more as income grows)" +
       (TIERS[S.tier + 1]
         ? "; " + TIERS[S.tier + 1].label + " rank needs renown " + TIERS[S.tier + 1].renownAt + (S.tier === 0 ? " and a peripteral temple" : "") +
-          ", and expects splendor " + FEST_EXPECT[S.tier + 1] + " at least."
+          ", and expects splendor " + standardWords(S.tier + 1) + "."
         : ".");
     const nxt = TIERS[S.tier + 1];
     document.getElementById("pausaniasBtn").style.display =
@@ -11863,7 +12011,7 @@
     rowEl.innerHTML =
       '<div class="drow"><span class="dl">Festivals</span><span class="dv stack">' +
         '<span class="line"><span title="' + hover.replace(/"/g, "&quot;") + '">' + names + "</span>" +
-          '<span><span class="num">' + fmt(y.cost) + "</span> dr. per year" + (strain ? ' <span class="bad">over income</span>' : "") +
+          '<span><span class="num">' + fmt(y.cost) + "</span> dr. per year" + (strain ? ' <span class="bad">over last decade\u2019s income</span>' : "") +
           ' <button class="ghost" id="calEditBtn">Edit</button></span></span>' +
         '<span class="line"><span>' + gl("splendor") + ' <span class="num">' + y.rep + '</span> planned <span class="lo">\u00b7 ' + gl("standard") + " " + want + "</span></span></span>" +
         verdict +
@@ -11890,7 +12038,7 @@
         '<span><span class="num">' + fmt(consultIncome()) + "</span> dr. per year</span></span>" +
       '<span class="line"><span class="lo" title="' + roomTip + '">room for ' + fmt(cap) + " \u00b7 " + where + ", " + S.priests.length + " priest" + (S.priests.length === 1 ? "" : "s") +
         (S.attendants ? ", " + S.attendants + " attendant" + (S.attendants === 1 ? "" : "s") : "") + "</span></span>" +
-      '<span class="line"><span>' + (S.attendants < ATTENDANT_CAP ? '<button class="ghost" id="hireAtt" title="Hire an attendant, ' + ATTENDANT_WAGE + ' dr. per year">Hire an attendant (' + ATTENDANT_WAGE + ' dr. per year)</button>' : "") +
+      '<span class="line"><span>' + (S.attendants < ATTENDANT_CAP ? '<button class="ghost" id="hireAtt" title="Hire an attendant, ' + ATTENDANT_WAGE + ' dr. per year: room for 55 more each year' + (turned ? '' : '; none are turned away now') + '">Hire an attendant (' + ATTENDANT_WAGE + ' dr. per year)</button>' : "") +
         (S.attendants > 0 ? '<button class="ghost" id="fireAtt" title="Let an attendant go">Let one go</button>' : "") + "</span></span>" +
       (turned ? '<span class="line"><span class="warn">' + fmt(turned) + " turned away per year; more room is needed</span></span>" : "") +
       "</span></div>";
@@ -11936,7 +12084,7 @@
       const by = how === "grant" ? "on the assembly\u2019s grant" : how === "subscription" ? "on the cities\u2019 pledges" : how === "benefactor" ? "at a benefactor\u2019s expense" : how === "fund" ? "from the building fund" : how === "family" ? "at a family\u2019s expense" : "";
       html += row("Construction", "<span>" + pr.name + (by ? ' <span class="lo">\u00b7 ' + by + "</span>" : "") +
         (S.projects.length > 1 ? ' <span class="lo">\u00b7 and ' + (S.projects.length - 1) + " more</span>" : "") + "</span>" +
-        '<span><span class="num">' + pr.left + "</span> year" + (pr.left === 1 ? "" : "s") + " left" + (S.projects.length > 1 ? ' <span class="lo">\u00b7 ' + S.projects.reduce((a, p) => a + p.left, 0) + " in all</span>" : "") + "</span>");
+        '<span><span class="num">' + pr.left + "</span> year" + (pr.left === 1 ? "" : "s") + " left" + (S.projects.length > 1 ? ' <span class="lo">\u00b7 ' + S.projects.reduce((a, p) => a + p.left, 0) + " years in all</span>" : "") + "</span>");
     } else html += row("Construction", '<span class="lo">none</span>');
     if (S.campaign) html += '<div class="drow block">' + fundBar("Toward the " + S.campaign.name.toLowerCase() + " (pledges and fund)", campaignTotal() + S.fund, S.campaign.cost) + "</div>";
     if (S.heldGrant) html += '<div class="drow block">' + fundBar("Toward the sanctuary\'s share of the " + S.heldGrant.name.toLowerCase(), Math.min(heldCover(S.heldGrant), S.heldGrant.share), S.heldGrant.share) + "</div>";
@@ -11957,6 +12105,11 @@
   // the cap on a kind of building at this rank: a second stoa from polis rank and a fourth at panhellenic,
   // after the pairs of stoas at the Archaic Heraia and the four or five at Kalauria and Olympia (multiples-research.md)
   function maxOf(b) { return b.maxBy ? b.maxBy[Math.min(2, S.tier || 0)] : b.max; }
+  // a standing vote on the palette card: to when it stands, and whether the share is in hand
+  function heldNote(key) {
+    const g = S.heldGrant; if (!g || g.key !== key) return "";
+    return " \u00b7 vote stands to year " + g.until + (heldCover(g) >= g.share ? " \u00b7 share met" : " \u00b7 short by " + fmt(g.share - heldCover(g)) + " dr.");
+  }
   function capLine(b) {
     const cap = maxOf(b), top = b.maxBy[2];
     return "Up to " + cap + " can stand at " + TIERS[Math.min(2, S.tier || 0)].label + " rank" + (top > cap ? ", " + top + " at panhellenic" : "") + ".";
@@ -12035,7 +12188,9 @@
     const pal = document.getElementById("palette");
     pal.innerHTML = "";
     const priming = !!S.deity && !palPrimed; // the first offer after the founding is not news
-    BUILDINGS.filter(b => !b.eventOnly && (!b.deities || b.deities.includes(S.deity)) && (!b.consultOnly || isConsultCult())).forEach(b => {
+    BUILDINGS.filter(b => !b.eventOnly && (!b.deities || b.deities.includes(S.deity)) && (!b.consultOnly || isConsultCult()))
+      .map((b, i) => ({ b, i, t: tierOf(b.id, 0, b.levels[0]) })).sort((p, q) => p.t - q.t || p.i - q.i).map(p => p.b) // by the rank that opens them, then the catalogue's order
+      .forEach(b => {
       const lvl0 = b.levels[0];
       const t0 = tierOf(b.id, 0, lvl0);
       const built = countBuilt(b.id);
@@ -12067,7 +12222,7 @@
         (isUpg ? '<div class="bgk">next stage: ' + nxt.name.toLowerCase() + "</div>"
                : (gkOf(b) ? '<div class="bgk">' + gkOf(b) + "</div>" : "")) +
         '<div class="bcost num">' + (isUpg
-          ? fmt(costOf(b.id, nxt)) + " dr." + (costOf(b.id, nxt) >= MAJOR_COST ? " · capital work" + (boardLocked(b.id + ":" + (S.built[upgIdx].lvl + 1)) ? " · waits on the board" : "") : "")
+          ? fmt(costOf(b.id, nxt)) + " dr." + (costOf(b.id, nxt) >= MAJOR_COST ? " · capital work" + (boardLocked(b.id + ":" + (S.built[upgIdx].lvl + 1)) ? " · waits on the board" : "") + heldNote(b.id + ":" + (S.built[upgIdx].lvl + 1)) : "")
           : maxed && S.built.some(x => x.id === b.id) ? (function () { // built: what its next stage is, and when
               const bi = S.built.find(x => x.id === b.id), nx = b.levels[bi.lvl + 1];
               if (!nx) return "final form";
@@ -12075,7 +12230,7 @@
               return "next stage: " + nx.name.toLowerCase() + " · " + fmt(costOf(b.id, nx)) + " dr." + (nt > S.tier ? " · at " + TIERS[nt].label + " rank" : "");
             })()
           : (lvl0.cost ? fmt(costOf(b.id, lvl0)) + " dr." +
-              (costOf(b.id, lvl0) >= MAJOR_COST ? " · capital work" + (boardLocked(b.id + ":0") ? " · waits on the board" : "") : "") : "gift of a polis") +
+              (costOf(b.id, lvl0) >= MAJOR_COST ? " · capital work" + (!locked && !underWay && boardLocked(b.id + ":0") ? " · waits on the board" : "") + heldNote(b.id + ":0") : "") : "gift of a polis") +
             (upgIdx >= 0 ? " · upgrade available" : (b.levels.length > 1 ? " · upgradeable" : "")) +
             (b.perDecade ? " · one per decade" : "")) + "</div>";
       if (fresh) { card.classList.add("fresh"); markSeen(card, mkey); }
@@ -12096,7 +12251,10 @@
         const act = () => { // a minor enlargement's siting opens at once with the file beside it; a capital one opens its card; fixed works keep the file's button
           if (S.pendingBegin && S.pendingBegin.key === b.id + ":" + (S.built[upgIdx].lvl + 1)) { inspect(upgIdx); resumePending(); return; } // its own siting, taken up again
           cancelPlacing(); inspect(upgIdx);
-          if (!b.preplaced) attemptUpgrade(upgIdx, true);
+          if (!b.preplaced) {
+            if (heraldOpen && costOf(b.id, b.levels[S.built[upgIdx].lvl + 1]) >= MAJOR_COST) notify("Answer the herald first: its card is open.", "bad"); // a capital card is not queued behind it in silence
+            else attemptUpgrade(upgIdx, true);
+          }
           focusSiteFile(true);
         };
         card.addEventListener("click", act);
@@ -12110,12 +12268,18 @@
           if (costOf(b.id, lvl0) >= MAJOR_COST) { // a capital work: the purse first, the ground once it is settled
             if (S.pendingBegin && S.pendingBegin.key === b.id + ":0") { showCatalogFile(b); resumePending(); return; } // its own siting is taken up again, not cancelled
             cancelPlacing(); showCatalogFile(b); renderAll(); focusSiteFile(true);
+            if (heraldOpen) { notify("Answer the herald first: its card is open.", "bad"); return; } // not queued behind it in silence
             openWorkCard(b.id + ":0");
             return;
           }
-          if (b.constraint === "fixed") { // laid out where it belongs: the file opens, then the work begins at once
+          if (b.constraint === "fixed") { // laid out where it belongs: the file opens, and the work begins at once, or, for a planting, from the file's button once the species is chosen
             cancelPlacing(); showCatalogFile(b); renderAll(); focusSiteFile(true);
-            const sp = fixedSpot(b.id); attemptPlace(b.id, sp.x, sp.y);
+            if (!b.planting) { const sp = fixedSpot(b.id); attemptPlace(b.id, sp.x, sp.y); }
+            return;
+          }
+          if (b.constraint === "in-temple") { // kept inside the temple: no siting, it is set up there
+            cancelPlacing(); showCatalogFile(b); renderAll(); focusSiteFile(true);
+            const sp = inTempleSpot(b.id); if (sp) attemptPlace(b.id, sp.x, sp.y); else notify("The temple has no room for it as things stand.", "bad");
             return;
           }
           S.placingUp = null; S.placingDonor = null;
@@ -12127,10 +12291,10 @@
         };
         card.addEventListener("click", act);
         card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
-      } else if (locked) {
-        card.title = b.requires && t0 <= S.tier
-          ? "Requires: " + BID[b.requires].name
-          : "Unlocks at " + TIERS[t0].label + " tier";
+      } else if (locked) { // the hover gives the reason the click would: the rank, the stage required, or the rule
+        card.title = t0 > S.tier ? "Unlocks at " + TIERS[t0].label + " rank"
+          : b.requires && !hasBld(b.requires, b.requiresLvl || 0) ? "Requires: " + BID[b.requires].name + (b.requiresLvl ? " (" + BID[b.requires].levels[b.requiresLvl].name.toLowerCase() + ")" : "")
+          : newBuildBlock(b) || "Not to be built now";
       }
       pal.appendChild(card);
     });
@@ -12160,19 +12324,25 @@
         (gkOf(b) ? '<div class="gk">' + gkOf(b) + "</div>" : "") +
         "<p>" + b.blurb + "</p>" +
         '<div class="fx num">' + fxLine(b.id, l) + "</div>" +
-        (b.planting ? speciesRow(b) : "") +
+        (b.planting && canPlaceNew ? speciesRow(b) : "") + // the species is chosen before the work begins, not after
         (b.maxBy ? '<div class="fx">' + capLine(b) + "</div>" : "") +
         (b.perDecade ? '<div class="fx">Up to ' + maxOf(b) + " can stand. One new one can be begun per decade" +
           (pacedOut(b) ? "; the next in year " + (S.year + 10) : "") + ".</div>" : "") +
         (costOf(b.id, l) >= MAJOR_COST && canPlaceNew ? payRow(b.id + ":0") : "") +
         (costOf(b.id, l) >= MAJOR_COST
-          ? '<div class="fx num">A capital work: full cost ' + fmt(costOf(b.id, l)) +
-            " dr. It cannot be paid from ordinary revenue. With a grant from the assembly the sanctuary's share is between " +
-            fmt(Math.round(costOf(b.id, l) * 0.1)) + " and " + fmt(Math.round(costOf(b.id, l) * 0.5)) + " dr., depending on the conditions accepted, and comes from the building fund, which holds " + fmt(S.fund) + " dr. Public money brings public officials with it.</div>" +
-            (boardLocked(b.id + ":0") ? '<div class="fx">The city\u2019s officials have named the ' + priorityNames() + " as the next capital work. This waits until it is under way.</div>" : "")
+          ? (function () { // under way, voted, or still to be paid for: one fact, in its place
+              const key = b.id + ":0", pr = S.projects.find(p => p.kind === "place" && p.id === b.id), g = S.heldGrant && S.heldGrant.key === key ? S.heldGrant : null;
+              if (pr) return '<div class="fx num">Under way: ' + pr.left + " year" + (pr.left === 1 ? "" : "s") + " of building left" + (S.projects[0] !== pr ? ", once the masons are free" : "") + ".</div>";
+              if (g) return '<div class="fx num">The assembly has voted ' + fmt(g.sponsored) + " dr. toward it. The sanctuary\u2019s share is " + fmt(g.share) + " dr.; " + fmt(Math.min(heldCover(g), g.share)) + " dr. stand toward it" +
+                (heldCover(g) >= g.share ? ", and the work can begin" : ", short by " + fmt(g.share - heldCover(g)) + " dr.") + ". The vote stands to year " + g.until + ".</div>";
+              return '<div class="fx num">A capital work: full cost ' + fmt(costOf(b.id, l)) +
+                " dr. It cannot be paid from ordinary revenue. With a grant from the assembly the sanctuary's share is between " +
+                fmt(Math.round(costOf(b.id, l) * 0.1)) + " and " + fmt(Math.round(costOf(b.id, l) * 0.5)) + " dr., depending on the conditions accepted, and half of that when an honored citizen pays his part; it comes from the building fund, which holds " + fmt(S.fund) + " dr. Public money brings public officials with it.</div>" +
+                (boardLocked(key) ? '<div class="fx">The city\u2019s officials have named the ' + priorityNames() + " as the next capital work. This waits until it is under way.</div>" : "");
+            })()
           : "") +
         ev("more info", '<div class="cite">' + l.cite + (l.real ? '<span class="real">' + l.real + "</span>" : "") + "</div>") +
-        (canPlaceNew && costOf(b.id, l) < MAJOR_COST ? '<button type="button" class="act place-btn" id="placeBtn">' + (b.constraint === "fixed" ? "Begin the work" : "Place it on the map &uarr;") + "</button>" : "") +
+        (canPlaceNew && costOf(b.id, l) < MAJOR_COST ? '<button type="button" class="act place-btn' + (b.constraint === "fixed" || b.constraint === "in-temple" ? " fixed" : "") + '" id="placeBtn">' + (b.constraint === "fixed" || b.constraint === "in-temple" ? "Begin the work" : "Place it on the map &uarr;") + "</button>" : "") +
       "</div>";
     // one-column layout only (see the phone block): scroll up to the map, and
     // take up the placement again if it was cancelled meanwhile. Shown only
@@ -12181,6 +12351,7 @@
     if (pb) pb.addEventListener("click", () => {
       if (newBuildBlock(b)) { renderAll(); return; }
       if (b.constraint === "fixed") { const sp = fixedSpot(b.id); attemptPlace(b.id, sp.x, sp.y); return; } // no siting: it is laid out where it belongs
+      if (b.constraint === "in-temple") { const sp = inTempleSpot(b.id); if (sp) attemptPlace(b.id, sp.x, sp.y); else notify("The temple has no room for it as things stand.", "bad"); return; } // set up inside the temple
       if (S.placingId !== b.id) { S.placingUp = null; S.placingDonor = null; S.placingId = b.id; renderAll(); }
       focusMap();
     });
@@ -12274,7 +12445,7 @@
       upg =
         '<div class="upg-row">' +
         (sitingOpen
-          ? '<button id="upgBtn"' + (coarse ? "" : " disabled") + ">" + (coarse ? "Site it on the map \u2191" : "Siting open: click the map (Esc to cancel)") + "</button>"
+          ? '<button id="upgBtn"' + (coarse ? "" : " disabled") + ">" + (coarse ? "Place it on the map \u2191" : "Siting open: click the map (Esc to cancel)") + "</button>"
           : '<button id="upgBtn"' + (disabled ? " disabled" : "") + ">Upgrade: " + next.name + " — " + fmt(nCost) + " dr.</button>") +
         (note ? '<span class="upg-note">' + note + "</span>" : "") +
         "</div>";
@@ -12376,7 +12547,8 @@
     const on = S.laws.surplus === "fund";
     if (!fundAllowed()) { setFigure("mFund", null, () => "\u2014"); el.innerHTML = "kept from polis rank"; return; }
     setFigure("mFund", S.fund, x => fmt(x) + " <small>dr.</small>");
-    el.innerHTML = (on ? "filling" : "not filling") +
+    const blocked = on && S.terms.lendable && (S.cityDebt || 0) > 0; // the city's debt takes the surplus first: nothing reaches the fund
+    el.innerHTML = (blocked ? '<span title="Nothing is set aside while the city owes the god ' + fmt(S.cityDebt) + ' dr.: under the assembly\u2019s condition the surplus is the city\u2019s first. The debt may stand in for half of the sanctuary\u2019s share of a capital work, never a whole work.">blocked</span>' : on ? "filling" : "not filling") +
       '<button type="button" class="switch' + (on ? "" : " ghost") + '" id="fundToggle" title="' + (on ? "Stop setting aside for building" : "Set aside a tenth of income each decade") + '">' + (on ? "stop" : "start") + "</button>";
   }
   // the header's one-line judgements
@@ -12404,10 +12576,11 @@
         (S._incomeRate !== undefined ? " Last decade: +" + fmt(S._incomeRate) + " and \u2212" + fmt(S._expenseRate || 0) + " dr. per year." : "") +
         (oblig ? " " + fmt(oblig) + " dr. is reserved for the building contracts." : "") + " Click the meter for a picture of where the money goes.") + trendBars("treasury"),
       mFundLabel: () => tip("Building fund", !fundAllowed() ? "Silver set aside for capital works. A fund can be kept from polis rank, or from the day the city offers its temple."
-        : S.tier === 0 ? "Silver set aside for the temple. While the village saves for its own temple, everything above the float goes in each decade, up to " + fmt(fundCap()) + " dr."
-        : "Silver set aside for capital works. While the switch is on, a tenth of income goes in each decade, up to " + fmt(fundCap()) + " dr., and only out of a surplus." +
-          (S.terms.lendable ? " Under the borrowing condition nothing goes in while the city owes; what the city owes, " + fmt(S.cityDebt || 0) + " dr., may stand in for the sanctuary's share." : "")) + trendBars("fund"),
-      mTreasureLabel: () => tip("The god\u2019s treasure", "Dedicated objects: plate, statues, spits. They add renown and can be lent to the city, but are never spent.") + trendBars("treasure"),
+        : S.tier === 0 ? "Silver set aside for the temple. " + fundRuleText() + "."
+        : "Silver set aside for capital works. While the switch is on: " + fundRuleText().replace(/^The fund/, "the fund") + "." +
+          (S.terms.lendable ? " Under the borrowing condition nothing goes in while the city owes; what the city owes, " + fmt(S.cityDebt || 0) + " dr., may stand in for half of the sanctuary's share." : "")) + trendBars("fund"),
+      mTreasureLabel: () => tip("The god\u2019s treasure", "Dedicated objects: plate, statues, spits. They add renown and can be lent to the city, but are never spent." +
+        ((S.cityDebt || S.warLoanLeft) ? " The city owes the god " + fmt((S.cityDebt || 0) + (S.warLoanLeft || 0)) + " dr." + (S.warLoanLeft ? ", " + fmt(S.warLoanLeft) + " dr. of it the war loans" : "") + "." : "")) + trendBars("treasure"),
       mRenownLabel: () => tip("Renown", "Where it comes from:") + renownRows() + trendBars("renown"),
       mPietyLabel: () => tip("Piety", "How faithfully the god is served. Monthly rites and the right victims raise it; neglect lowers it. It counts toward renown, the demos looks for " + demosPiety() + " before it votes money, and the cities pledge and answer the theoroi more readily when it is high." +
         " It falls a point per year on its own" + (S.tier >= 1 ? ", and " + (S.tier === 2 ? "half a point" : "a quarter point") + " more at this rank" : "") + "; the rites hold it up. The cap is " + pietyCap() + " at this rank.") + trendBars("piety"),
@@ -12420,8 +12593,11 @@
     const R = renown();
     return [
       { ok: R >= TIERS[2].renownAt, text: TIERS[2].renownAt + " renown", how: "now " + fmt(R) + "; richer festivals are the quickest way up, about " + Math.ceil((TIERS[2].renownAt - R) / 2.5) + " more splendor would close the gap" },
-      { ok: S.gamesStreak >= 1, text: "athletic games in a festival's greater year", how: "in the calendar, set Games to athletic and mark that festival greater every fourth year" },
-      { ok: S.recognized, text: "recognition by " + RECOG_NEED + " cities", how: S.recognition ? "recognized by " + S.recognition.cities + " so far" : "send the theoroi when the other three are met" },
+      { ok: S.gamesStreak >= 1, text: "athletic games in a festival's greater year", how: gamesInCalendar() && S.cal && S.cal.peak
+          ? (S._peakCutLast ? "the calendar is set, but the greater year of " + (S._peakCutLast.length === 1 ? "year " : "years ") + S._peakCutLast.join(" and ") + " was cut back for want of money and no games were held: keep the chest able to pay the rites"
+                            : "the calendar is set: the games count once a greater year has been held in full")
+          : "in the calendar, set Games to athletic and mark that festival greater every fourth year" },
+      { ok: S.recognized, text: "recognition by " + RECOG_NEED + " cities", how: S.recognition ? "recognized by " + S.recognition.cities + " so far" : "send the theoroi when the other two are met" },
     ];
   }
   // the strip under the tier badge: the road to the next rank in one line
@@ -12445,7 +12621,7 @@
       const pct = Math.max(0, Math.min(100, Math.round(100 * R / need)));
       const was = el.querySelector(".sfill"), prevW = was ? was.style.width : null;
       el.innerHTML = '<span class="sarrow">\u2192 polis</span><span class="sbar"><span class="sfill" style="width:' + pct + '%"></span></span>' +
-        '<span class="sep">\u00b7</span><span>' + fmt(Math.min(R, need)) + " of " + need + " renown</span>" +
+        '<span class="sep">\u00b7</span><span>' + fmt(R) + " of " + need + " renown" + (R >= need ? " \u2713" : "") + "</span>" +
         (hasBld("temple", 1) ? "" : '<span class="sep">\u00b7</span><span title="Polis standing needs a peripteral temple, the city\u2019s or the sanctuary\u2019s own; the city may offer to build it">a peripteral temple</span>');
       growFill(el.querySelector(".sfill"), prevW);
       return;
@@ -12460,7 +12636,7 @@
       const need = TIERS[1].renownAt, R = renown();
       openModal("What polis standing needs", "Standing",
         '<div class="law-row"><div style="font-size:.84rem">Polis standing comes at ' + need + " renown; the sanctuary has " + fmt(R) +
-        ". Renown comes from the festivals, the buildings, the dedications and piety, and the breakdown is under Renown in the header. Richer festivals are the quickest way up; buildings and dedications add to it more slowly. A polis sanctuary is expected to hold festivals of splendor " + FEST_EXPECT[1] + " at least, and more as its income grows; its demos will look for piety " + DEMOS_PIETY[1] + " and a festival above the standard before it votes money; a richer calendar raises both" +
+        ". Renown comes from the festivals, the buildings, the dedications and piety, and the breakdown is under Renown in the header. Richer festivals are the quickest way up; buildings and dedications add to it more slowly. A polis sanctuary is expected to hold festivals of splendor " + standardWords(1) + ", and more as its income grows; its demos will look for piety " + DEMOS_PIETY[1] + " and a festival above the standard before it votes money; a richer calendar raises both" +
         "; a calendar below that loses renown each decade once the rank is reached.</div>" +
         fundBar("Renown", Math.min(R, need), need, "") + "</div>" +
         '<div class="law-cite">' + POLIS_ROAD_CITE + "</div>");
@@ -12540,7 +12716,7 @@
     const total = Math.max(S.eventTotal || 0, S.pendingEvents.length), left = S.pendingEvents.length;
     const nth = total - left + 1;
     document.getElementById("infoHeading").textContent =
-      "Event — Year " + (ev._year || S.year) +
+      "Event of year " + (ev._year || S.year) +
       (total > 1 ? " \u00b7 " + nth + " of " + total : "");
     const box = document.getElementById("infoBox");
     const card = document.createElement("div");
@@ -12579,6 +12755,20 @@
   }
 
   let toastT = null;
+  // a herald's choice says what it moved: piety, renown and the treasure (the chest's changes have toasts of their own)
+  function heraldEffects(before) {
+    if (!S.deity || !before) return;
+    const sg = v => (v > 0 ? "+" : "\u2212") + fmt(Math.abs(v));
+    const m = { piety: Math.round(pietyR() - before.piety), renown: Math.round(renown() - before.renown), treasure: Math.round(treasureVal() - before.treasure) };
+    const bits = [];
+    if (m.piety) bits.push("piety " + sg(m.piety));
+    if (m.renown) bits.push("renown " + sg(m.renown));
+    if (m.treasure) bits.push("treasure " + sg(m.treasure) + " dr.");
+    if (!bits.length) return;
+    const t = document.getElementById("toast"), line = "Effects: " + bits.join(" \u00b7 ");
+    if (t.classList.contains("show")) { t.textContent += " \u00b7 " + line; clearTimeout(toastT); toastT = setTimeout(() => { t.className = ""; }, 4200); }
+    else notify(line, "");
+  }
   function notify(msg, cls) {
     if (cls === "good") log(msg, cls); // outcomes enter the chronicle; prompts and refusals are toasts only
     const t = document.getElementById("toast");
@@ -12630,7 +12820,7 @@
     }
     // newest first: a line that names an earlier year than the lines above it slips in beneath them
     let ref = l.firstElementChild;
-    while (ref && ref.classList.contains("log-entry") && +ref.dataset.year > year) ref = ref.nextElementSibling;
+    while (ref && ref.dataset.year && +ref.dataset.year > year) ref = ref.nextElementSibling; // a decade heading carries its closing year, so a line dated inside the decade passes beneath it
     l.insertBefore(d, ref);
     while (l.childNodes.length > 60) l.removeChild(l.lastChild);
   }
@@ -12805,8 +12995,8 @@
       '<div class="cal-totals sticky">' +
         '<div class="ct"><div class="ct-l lapidary">Cost of the calendar</div>' +
           '<div class="ct-v num' + (strain ? " warn" : "") + '">' + fmt(yNow.cost) + ' <small>dr. per year</small></div>' +
-          '<div class="ct-s">' + (inc !== null ? "against about " + fmt(inc) + " dr. per year of income, of which three tenths, " + fmt(festBudget()) + " dr., are expected on the festivals" : "set the rites, then advance the decade") +
-            (S.tier >= 1 && cal.peak ? " \u00b7 the greater year costs " + fmt(calForYear(4).cost) + " dr." : "") + "</div></div>" +
+          '<div class="ct-s">' + (inc !== null ? "against about " + fmt(inc) + " dr. per year of income" + (S._incomeRate !== undefined ? "; three tenths of last decade's income, " + fmt(festBudget()) + " dr., are expected on the festivals" : "") : "set the rites, then advance the decade") +
+            (S.tier >= 1 && cal.peak ? " \u00b7 the greater year costs " + fmt(calForYear(4).cost) + " dr. with the monthly rites" : "") + "</div></div>" +
         '<div class="ct"><div class="ct-l lapidary">Splendor over a decade</div>' +
           '<div class="ct-v num' + (avg < want || kept < have ? " warn" : " good") + '">' + avg +
             ' <small style="color:var(--ink-faint)">of ' + want + " expected</small></div>" +
@@ -12817,8 +13007,9 @@
               : (avg < want
                 ? (want - avg) + " below the standard for " + TIERS[S.tier].label + " rank" + (S.festRep.length ? " \u2014 renown falls" : " \u2014 nothing is lost in the first decade")
                 : "meets the standard for " + TIERS[S.tier].label + " rank")) +
-            (S.tier < 2 ? " \u00b7 " + TIERS[S.tier + 1].label + " rank will expect " + FEST_EXPECT[S.tier + 1] + " at least" : "") +
+            (S.tier < 2 ? " \u00b7 " + TIERS[S.tier + 1].label + " rank will expect " + standardWords(S.tier + 1) : "") +
             (S.festRep.length ? " \u00b7 the last decade averaged " + festivalRep() : "") +
+            (avg < want && S.cal.heortai.length < heortaiCap() ? " \u00b7 a second festival would raise the decade\u2019s splendor: the calendar holds " + heortaiCap() + " at this rank" : "") +
             "</div></div>" +
       "</div>";
     openModal("The Festival Calendar", "recurring rites and their costs",
@@ -12874,7 +13065,7 @@
   }
 
   // instituting a new festival is a founding act, not a toggle
-  function foundFestival(discount, direct) {
+  function foundFestival(discount, direct, given) {
     const cost = Math.max(0, 120 - (discount || 0));
     if (S.cal.heortai.length >= heortaiCap()) { notify("The calendar is full for the sanctuary's rank.", "bad"); return; }
     if (S.treasury < cost) { notify("The founding rites alone need " + fmt(cost) + " dr.", "bad"); return; }
@@ -12883,7 +13074,7 @@
       artemis: ["Mounichia", "Elaphebolia"], dionysus: ["Anthesteria", "Lenaia"], hephaistos: ["Chalkeia"],
       herakles: ["Diomeia"] };
     const names = (BY_GOD[S.deity] || []).concat(["Soteria", "Charisteria", "Nea Heorte"]);
-    const name = names.find(n => !S.cal.heortai.some(h => h.name === n)) || "Nea Heorte";
+    const name = given || names.find(n => !S.cal.heortai.some(h => h.name === n)) || "Nea Heorte"; // an event may name the rite it founds
     const found = () => { // the rites held, the festival entered, and the composer opened at it
       S.treasury -= cost;
       gainPiety(1);
@@ -12998,10 +13189,10 @@
       '<div class="law-row">\u2022 <b>dedications</b>: the god\u2019s objects, capped at 30</div>' +
       '<div class="law-row">\u2022 <b>conduct</b>: 0 when unblemished; graded choices push it down, and it heals one point per decade</div>' +
       '<div class="law-row">\u2022 <b>shortfall</b>: festivals below the standard lose 1.5 renown per missing point of splendor. The standard is the rank\u2019s floor (' + FEST_EXPECT.join(" / ") + ') or what three tenths of income would buy on a well-composed calendar, at seven tenths, whichever is higher: ' + festExpect() + ' now</div>' +
-      '<div class="law-row"><b>The city\u2019s grant</b>: three tenths of a capital work, and a fifth more for each condition accepted, up to nine tenths. The demos votes money at piety ' + DEMOS_PIETY.join(" / ") + ' by rank (' + demosPiety() + ' now) and a festival a quarter above the standard; the wealthy when a benefactor was honored within ten years; the magistrates when the accounts are in order; the Council in peace, when the city has no work of its own</div>' +
+      '<div class="law-row"><b>The city\u2019s grant</b>: three tenths of a capital work, and a fifth more for each condition accepted, up to four fifths. The demos votes money at piety ' + DEMOS_PIETY.join(" / ") + ' by rank (' + demosPiety() + ' now) and a festival a tenth above the standard; the wealthy when a benefactor was honored within twenty years; the magistrates when the accounts are in order; the Council in peace, when the city has no work of its own</div>' +
       '<div class="law-row" style="margin-top:.5rem"><b>Rank</b>: polis at ' + TIERS[1].renownAt + ' renown and a peripteral temple, the city\u2019s or the sanctuary\u2019s own (the city\u2019s temple brings polis standing by itself); panhellenic at ' + TIERS[2].renownAt + ' renown, athletic games held in a festival\u2019s greater year, and recognition by ' + RECOG_NEED + ' cities through the theoroi</div>' +
       '<div class="law-row"><b>Visitors</b>: renown fills the capacity your buildings provide \u2014 fill = R / (R + 90), times the festival\u2019s draw and piety\u2019s pull (70\u2013100%)</div>' +
-      '<div class="law-row"><b>The audit</b>: each decade the treasurers keep a working float (' + WORK_FLOAT.join(" / ") + ' dr. by rank, plus what the masons are owed) and dispose of what stands above it as the Sacred law directs: worked into plate, lent at interest, or, with the fund kept, a tenth of income set aside and the rest into plate</div>' +
+      '<div class="law-row"><b>The audit</b>: each decade the treasurers keep a working float (' + WORK_FLOAT.join(" / ") + ' dr. by rank, plus what the masons are owed) and dispose of what stands above it, when it comes to more than 300 dr., as the Sacred law directs: worked into plate, lent at interest, or, with the fund kept, set aside for building first and the rest into plate. ' + fundRuleText() + '. Under the assembly\u2019s conditions the city borrows from the surplus before the fund: half of it with the accounts on stone, all of it with the right to borrow, and while the city owes under that condition nothing reaches the fund</div>' +
       '<div class="law-row"><b>Victim prices</b>: piglet 3 \u00b7 kid 5 \u00b7 goat 11 \u00b7 sheep 12 \u00b7 ox 50 dr. \u2014 the Attic calendar prices</div>', true);
   }
   function openLaurels() {
@@ -13079,7 +13270,7 @@
         L.gk + "</span></div>" +
         '<div class="law-opts">' + opts + "</div>" +
         '<div class="law-note">' + L.options[S.laws[k] || Object.keys(L.options)[0]].note +
-          (k === "surplus" && (S.terms.lendable || S.cityBooks) ? " The city takes the whole surplus first, up to its ceiling, by the assembly's condition; while it owes, nothing goes to the fund, and the debt may stand in for the sanctuary's share of a capital work." :
+          (k === "surplus" && (S.terms.lendable || S.cityBooks) ? " The city takes the whole surplus first, up to its ceiling, by the assembly's condition; while it owes, nothing goes to the fund, and the debt may stand in for half of the sanctuary's share of a capital work, never a whole work." :
            k === "surplus" && S.terms.accounts ? " The accounts on stone show the city the surplus, and it borrows first, by the assembly's condition." : "") +
           (k === "hides" && S.terms.epistatai ? (/[.!?]$/.test(L.options[S.laws[k]].note) ? "" : ".") + " With city officials on the board the dermatikon goes to the city." : "") +
           (k === "land" && S.laws.land === "olives" && S.landLease != null ? " The lease runs from year " + S.landLease + " to year " + (S.landLease + 20) + (S.year - S.landLease >= 20 ? ". The olives bear, and the rent stands a third higher." : ". The rent stands a third lower while the shoots grow.") : "") + "</div>" +
@@ -13159,11 +13350,12 @@
     const nT = countBuilt("treasury");
     if (nT) parts.push("Along the way stand " + (nT === 1 ? "a treasury built by a grateful city" : nT + " treasuries built by rival cities") + ", filled with dedications of which I will record the most notable.");
     if (get("katagogion")) parts.push("There is lodging for those who come from far off, for the festival draws all of Greece.");
-    parts.push("Of the votive offerings, the number is too great to set down each one; I will mention only what seemed most worthy of memory.");
+    const notable = S.dedications.filter(d => !/phialai worked from surplus/i.test(d.name)).sort((a, b) => b.val - a.val).slice(0, 3).map(d => d.name.toLowerCase());
+    parts.push("Of the votive offerings, the number is too great to set down each one; I will mention only what seemed most worthy of memory" +
+      (notable.length ? ": " + (notable.length > 1 ? notable.slice(0, -1).join(", ") + " and " + notable[notable.length - 1] : notable[0]) : "") + ".");
 
     openModal("Pausanias, <i>Description of Greece</i>", "Book XI · Your Sanctuary",
-      "<p>" + parts.join(" ") + "</p>" +
-      '<p style="font-size:.72rem;color:var(--ink-soft)"><i>Endgame concept: the simulator scores a run by generating a periegesis of the player\'s sanctuary — what Pausanias mentions, and how warmly, is the grade.</i></p>');
+      "<p>" + parts.join(" ") + "</p>"); // the design note that stood here is in the briefs, not on the player's page
   }
 
   /* ================================================================== */
@@ -13366,7 +13558,8 @@
   }
   function goalLine() {
     const nxt = TIERS[S.tier + 1];
-    if (nxt) return "Goal: renown " + nxt.renownAt + " brings " + nxt.label.toLowerCase() + " standing.";
+    if (nxt) return S.tier === 0 ? "Goal: polis standing needs renown " + nxt.renownAt + " and a peripteral temple, the city's or the sanctuary's own."
+      : "Goal: panhellenic standing needs renown " + nxt.renownAt + ", athletic games held in a festival's greater year, and recognition by " + RECOG_NEED + " cities through the theoroi.";
     return "At the end, Pausanias walks the site and describes what you left standing.";
   }
   function showHowTo(d) {
